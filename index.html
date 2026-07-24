@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sangil Studio — En proceso</title>
+  <meta name="description" content="Sangil Studio · Estamos trabajando en algo especial." />
+  <style>
+    :root {
+      --negro: #1a1a1a;
+      --gris: #9a9a9a;
+      --gris-claro: #c9c9c9;
+      --blanco: #ffffff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: "Montserrat", "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
+      background-color: var(--blanco);
+      color: var(--negro);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    /* Lienzo con la retícula de "s" interactiva */
+    #fondo {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      display: block;
+    }
+
+    /* Halo suave que difumina las "s" detrás del contenido */
+    #halo {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: radial-gradient(ellipse 82vw 64vh at center,
+        rgba(255,255,255,0.97) 0%,
+        rgba(255,255,255,0.93) 34%,
+        rgba(255,255,255,0.62) 58%,
+        rgba(255,255,255,0)    80%);
+    }
+
+    .contenido {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.3rem;
+      max-width: 720px;
+      width: 100%;
+      pointer-events: none; /* deja pasar el ratón al fondo interactivo */
+      animation: aparecer 1.4s ease-out both;
+    }
+
+    @keyframes aparecer {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      width: min(460px, 88vw);
+      height: auto;
+      user-select: none;
+      pointer-events: auto;
+      cursor: default;
+      transition: transform 1.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  filter 1.7s ease;
+      will-change: transform;
+    }
+
+    .logo:hover {
+      transform: scale(1.28);
+      filter: drop-shadow(0 8px 30px rgba(0, 0, 0, 0.16));
+    }
+
+    /* Indicador de progreso */
+    .barra {
+      width: min(280px, 70vw);
+      height: 2px;
+      background-color: var(--gris-claro);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .barra::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 40%;
+      background-color: var(--negro);
+      border-radius: 2px;
+      animation: deslizar 2.4s ease-in-out infinite;
+    }
+
+    @keyframes deslizar {
+      0%   { left: -40%; }
+      100% { left: 100%; }
+    }
+
+    /* Mensajes dinámicos */
+    .mensaje {
+      display: inline-block;
+      font-size: clamp(0.95rem, 2.4vw, 1.25rem);
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--negro);
+      min-height: 1.6em;
+      pointer-events: auto;
+      cursor: default;
+      transition: opacity 0.6s ease,
+                  letter-spacing 1.1s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  color 1.1s ease,
+                  text-shadow 1.1s ease;
+      opacity: 1;
+    }
+
+    .mensaje:hover {
+      letter-spacing: 0.34em;
+      color: #000;
+      text-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+    }
+
+    .mensaje.oculto { opacity: 0; }
+
+    .subtitulo {
+      display: inline-block;
+      font-size: clamp(0.7rem, 1.8vw, 0.85rem);
+      font-weight: 400;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--gris);
+      margin-top: 4.5rem;
+      pointer-events: none;
+    }
+
+    /* Más aire lateral en móvil */
+    @media (max-width: 600px) {
+      body {
+        padding-left: 3.2rem;
+        padding-right: 3.2rem;
+      }
+      .logo {
+        width: min(460px, 62vw);
+      }
+      .mensaje,
+      .subtitulo {
+        max-width: 70vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fondo"></canvas>
+  <div id="halo"></div>
+
+  <main class="contenido">
+    <img class="logo" src="assets/logo.png" alt="Sangil Studio" />
+
+    <p class="subtitulo">Sitio en construcción</p>
+
+    <p class="mensaje" id="mensaje">Estamos trabajando en ello</p>
+
+    <div class="barra" aria-hidden="true"></div>
+  </main>
+
+  <script>
+    /* ---------- Mensajes dinámicos ---------- */
+    const mensajes = [
+      "Estamos trabajando en ello",
+      "Construyendo algo especial",
+      "Diseñando cada detalle",
+      "Creando experiencias únicas",
+      "Afinando los últimos detalles",
+      "Muy pronto estaremos aquí",
+      "Dando forma a nuevas ideas"
+    ];
+    const elMensaje = document.getElementById("mensaje");
+    let mIdx = 0;
+    setInterval(() => {
+      elMensaje.classList.add("oculto");
+      setTimeout(() => {
+        mIdx = (mIdx + 1) % mensajes.length;
+        elMensaje.textContent = mensajes[mIdx];
+        elMensaje.classList.remove("oculto");
+      }, 600);
+    }, 3500);
+
+    /* ---------- Fondo de "s" interactivo ---------- */
+    const canvas = document.getElementById("fondo");
+    const ctx = canvas.getContext("2d");
+
+    // Parámetros del efecto (fáciles de ajustar)
+    const CELDA      = 30;   // separación entre "s" (px). Menor = más densas
+    const BASE_SIZE  = 15;   // tamaño normal de la "s" (px)
+    const MAX_ADD    = 15;   // cuánto crecen cerca del ratón (px extra)
+    const RADIO      = 130;  // radio de influencia del ratón (px)
+    const BASE_GRIS  = 198;  // gris en reposo (0=negro, 255=blanco)
+    const DARK_GRIS  = 125;  // gris al máximo acercamiento (más suave)
+    const SUAVIZADO  = 0.18; // 0-1: menor = el efecto "persigue" más suave
+
+    let cols = 0, rows = 0, offX = 0, offY = 0;
+    let factores;            // factor actual (0..1) por celda
+    let W = 0, H = 0, dpr = 1;
+
+    // Ratón fuera de pantalla al inicio
+    let mx = -9999, my = -9999;
+
+    function redimensionar() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width  = Math.floor(W * dpr);
+      canvas.height = Math.floor(H * dpr);
+      canvas.style.width  = W + "px";
+      canvas.style.height = H + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      cols = Math.ceil(W / CELDA) + 1;
+      rows = Math.ceil(H / CELDA) + 1;
+      // Centrar la retícula
+      offX = (W - (cols - 1) * CELDA) / 2;
+      offY = (H - (rows - 1) * CELDA) / 2;
+      factores = new Float32Array(cols * rows);
+    }
+
+    function smoothstep(t) { return t * t * (3 - 2 * t); }
+
+    function dibujar() {
+      ctx.clearRect(0, 0, W, H);
+      const r2 = RADIO * RADIO;
+
+      // Primera pasada: las "s" en reposo (mismo font y color → eficiente)
+      ctx.font = BASE_SIZE + 'px "Segoe UI", Arial, sans-serif';
+      ctx.fillStyle = "rgb(" + BASE_GRIS + "," + BASE_GRIS + "," + BASE_GRIS + ")";
+
+      const activas = [];
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const i = r * cols + c;
+          const x = offX + c * CELDA;
+          const y = offY + r * CELDA;
+
+          // factor objetivo según distancia al ratón
+          const dx = x - mx, dy = y - my;
+          const d2 = dx * dx + dy * dy;
+          let objetivo = 0;
+          if (d2 < r2) {
+            objetivo = smoothstep(1 - Math.sqrt(d2) / RADIO);
+          }
+
+          // suavizado hacia el objetivo
+          let f = factores[i] + (objetivo - factores[i]) * SUAVIZADO;
+          if (f < 0.004) f = 0;
+          factores[i] = f;
+
+          if (f === 0) {
+            ctx.fillText("s", x, y);   // reposo
+          } else {
+            activas.push(i, x, y, f);  // se dibuja en 2ª pasada
+          }
+        }
+      }
+
+      // Segunda pasada: las "s" cercanas al ratón (más grandes y oscuras)
+      for (let k = 0; k < activas.length; k += 4) {
+        const x = activas[k + 1], y = activas[k + 2], f = activas[k + 3];
+        const size = BASE_SIZE + MAX_ADD * f;
+        const gris = Math.round(BASE_GRIS + (DARK_GRIS - BASE_GRIS) * f);
+        ctx.font = size + 'px "Segoe UI", Arial, sans-serif';
+        ctx.fillStyle = "rgb(" + gris + "," + gris + "," + gris + ")";
+        ctx.fillText("s", x, y);
+      }
+
+      requestAnimationFrame(dibujar);
+    }
+
+    window.addEventListener("mousemove", (e) => { mx = e.clientX; my = e.clientY; });
+    window.addEventListener("mouseleave", () => { mx = -9999; my = -9999; });
+    window.addEventListener("touchmove", (e) => {
+      if (e.touches[0]) { mx = e.touches[0].clientX; my = e.touches[0].clientY; }
+    }, { passive: true });
+    window.addEventListener("touchend", () => { mx = -9999; my = -9999; });
+    window.addEventListener("resize", redimensionar);
+
+    redimensionar();
+    requestAnimationFrame(dibujar);
+  </script>
+</body>
+</html>
