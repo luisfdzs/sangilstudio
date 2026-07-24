@@ -5,6 +5,16 @@ dependencias ni build: un único `index.html` con todo el CSS y JS en línea.
 
 🌐 **En producción:** [sangilstudio.com](https://sangilstudio.com)
 
+> **📁 Contexto del proyecto y skill `/retomar`**
+> El contexto compartido (memoria, decisiones, convenciones) y la skill `/retomar` **no están en esta
+> rama de código**: viven en la rama Git huérfana **`claude`**. Para consultarlos tras clonar:
+> ```bash
+> git checkout claude          # o, para tenerlo junto al código:
+> git worktree add ../sangil-claude claude
+> ```
+> En esa rama, empieza con `/retomar` para ponerte al día. Si vas a hacer *push*, reaplica la
+> config local de git/`gh` descrita en la memoria `cuenta-git-gh`.
+
 ## Características
 
 - **Fondo interactivo de "s"**: una retícula dibujada en `<canvas>` donde las
@@ -64,6 +74,9 @@ Los mensajes rotativos se editan en el array `mensajes`.
 
 ## Despliegue
 
-Hospedado en **Netlify** (sirviendo desde la raíz del repositorio) con el
-dominio `sangilstudio.com` apuntado vía DNS en IONOS. Al hacer *push* a la rama
-principal, Netlify publica los cambios automáticamente.
+Hospedado en **Vercel**, con dos entornos que se publican **automáticamente al
+hacer *push*** (sirviendo la web estática desde la raíz del repositorio):
+
+- **Producción:** rama `main` → `sangilstudio.vercel.app` y el dominio
+  **`sangilstudio.com`** (DNS en IONOS, `www` canónico, SSL de Vercel).
+- **Test:** rama `test` → `sangilstudiotest.vercel.app`.
