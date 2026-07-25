@@ -1,0 +1,203 @@
+@import 'tailwindcss';
+
+/* ============================================================================
+   SANGIL STUDIO · Sistema de diseño
+   Los tokens viven aquí y SÓLO aquí. Las utilidades de Tailwind se generan a
+   partir de este @theme, así que no existe forma de usar un color o un espaciado
+   que no esté declarado en el sistema. Regla: si algo no está en esta lista,
+   no se usa en el diseño.
+   ========================================================================= */
+
+@theme {
+  /* --- Color: papel, tinta y grises. Nada más. --------------------------- */
+  --color-paper: #f4f2ee; /* fondo cálido, no blanco puro */
+  --color-paper-deep: #ebe8e2; /* bloques alternos, hovers */
+  --color-ink: #14140f; /* texto principal, casi negro */
+  --color-ink-soft: #6c6b64; /* texto secundario */
+  --color-ink-faint: #a8a6a0; /* metadatos, numeración */
+  --color-line: #d9d5cd; /* filetes de 1px */
+  --color-inverse: #0f0f0c; /* secciones oscuras (fichas, footer) */
+
+  /* --- Tipografía: una sans neo-grotesca + una serif editorial ----------- */
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+
+  /* Escala fluida: un solo valor por peldaño, sin variantes intermedias.
+     clamp() evita media queries para tipografía y elimina saltos bruscos. */
+  --text-micro: 0.6875rem; /* 11px · etiquetas, numeración */
+  --text-micro--line-height: 1.4;
+  --text-micro--letter-spacing: 0.12em;
+  --text-small: 0.8125rem; /* 13px · metadatos */
+  --text-small--line-height: 1.5;
+  --text-body: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
+  --text-body--line-height: 1.65;
+  --text-lead: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  --text-lead--line-height: 1.5;
+  --text-title: clamp(1.5rem, 1.2rem + 1.4vw, 2.5rem);
+  --text-title--line-height: 1.15;
+  --text-display: clamp(2.25rem, 1.4rem + 4vw, 5.5rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.02em;
+
+  /* --- Ritmo espacial: escala limitada, saltos claros -------------------- */
+  --spacing-gutter: clamp(1.25rem, 4vw, 3.5rem); /* margen lateral de página */
+  --spacing-section: clamp(4.5rem, 10vw, 11rem); /* aire vertical entre bloques */
+
+  /* --- Movimiento -------------------------------------------------------- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --animate-reveal: reveal 0.9s var(--ease-out-soft) both;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================================
+   Base
+   ========================================================================= */
+
+@layer base {
+  /* Cabecera sobre hero a sangre: mientras no se ha hecho scroll, el texto pasa a
+     color papel para tener contraste sobre la foto. Se resuelve con :has() —
+     el header no necesita saber en qué página está, sólo si hay un hero debajo.
+
+     OJO: se aplica sólo a la BARRA (.header-bar), no a todo el <header>. El panel
+     del menú móvil también vive dentro del header pero sobre fondo papel: si
+     heredara este color, saldría blanco sobre blanco (pasó, y en escritorio no se
+     veía porque el menú móvil está oculto). */
+  header[data-top='true'] .header-bar {
+    color: var(--color-ink);
+  }
+
+  body:has([data-hero]) header[data-top='true'] .header-bar {
+    color: var(--color-paper);
+    text-shadow: 0 1px 24px rgb(0 0 0 / 0.35);
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* El header es sticky: los anclajes no deben quedar debajo. */
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Foco visible y coherente en todo el sitio (accesibilidad). */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+
+  img,
+  video {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Nadie debería marearse con nuestras animaciones. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ============================================================================
+   Utilidades del sistema
+   Sólo patrones que se repiten de verdad. Todo lo demás, utilidades de Tailwind.
+   ========================================================================= */
+
+@utility page-gutter {
+  padding-inline: var(--spacing-gutter);
+}
+
+/* Etiqueta en versalitas: secciones, años, categorías. */
+@utility eyebrow {
+  font-size: var(--text-micro);
+  line-height: var(--text-micro--line-height);
+  letter-spacing: var(--text-micro--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+/* Enlace con subrayado que se dibuja al hacer hover. */
+@utility link-underline {
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -0.15em;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--ease-out-soft);
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Amplía el área pulsable a los 24 px que exige WCAG 2.2 sin cambiar el diseño:
+   el texto sigue midiendo lo que mide y el subrayado sigue pegado a él; lo que
+   crece es una capa invisible por encima. Imprescindible en los enlaces pequeños
+   (pie, contacto, redes) cuando se usan con el dedo. */
+@utility tap {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline: -0.25rem;
+    inset-block: -0.4rem;
+  }
+}
+
+/* Aparición al entrar en viewport. La hace CSS con scroll-driven animations
+   cuando el navegador las soporta (cero JS); si no, el contenido se ve fijo. */
+@utility reveal {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      opacity: 0;
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 22%;
+    }
+  }
+}

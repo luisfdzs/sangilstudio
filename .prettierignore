@@ -1,0 +1,6 @@
+# Generado o ajeno: no lo formateamos.
+.next/
+node_modules/
+public/
+docs/legacy-landing/
+content/media-manifest.json

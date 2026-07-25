@@ -1,0 +1,37 @@
+{
+  "name": "sangilstudio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "images": "node scripts/optimize-images.mjs",
+    "check": "npm run typecheck && npm run lint && prettier --check .",
+    "brand": "node scripts/generate-brand-assets.mjs",
+    "format": "prettier --write .",
+    "check:mobile": "node scripts/check-mobile.mjs"
+  },
+  "dependencies": {
+    "next": "^16.2.11",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/node": "^24.5.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.36.0",
+    "eslint-config-next": "^16.2.11",
+    "playwright-core": "^1.62.0",
+    "prettier": "^3.9.6",
+    "sharp": "^0.34.4",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2"
+  }
+}

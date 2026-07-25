@@ -61,4 +61,17 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 .DS_Store
+
+# --- Assets maestros de imagen (NUNCA al repo) ---
+# El ZIP (~1,7 GB) y su contenido descomprimido son el ARCHIVO MAESTRO: se guardan
+# en Drive + disco externo, jamás en git. La web sólo versiona los derivados
+# optimizados que genera `npm run images` en public/media/.
 IMAGENES PROYECTOS.zip
+IMAGENES PROYECTOS/
+LOGO REDES/
+
+# --- Next.js / Vercel ---
+.vercel
+next-env.d.ts
+*.tsbuildinfo
+.env*
