@@ -20,6 +20,10 @@ import { CONTENT_TAG } from '@/lib/content'
  *   Dataset  production · Trigger on: create, update, delete
  *   Secret   el mismo valor que la variable SANITY_REVALIDATE_SECRET
  */
+const SIGNATURE_HEADER = 'sanity-webhook-signature'
+/** Ventana de validez de la firma: cinco minutos de margen para relojes desajustados. */
+const MAX_AGE_MS = 5 * 60 * 1000
+
 export async function POST(request: NextRequest) {
   const secret = process.env.SANITY_REVALIDATE_SECRET
   if (!secret) {
@@ -34,6 +38,14 @@ export async function POST(request: NextRequest) {
 
     if (!isValidSignature) {
       return new Response('Firma no válida', { status: 401 })
+    }
+
+    // La verificación de firma no comprueba la antigüedad, así que una petición
+    // capturada seguiría siendo válida indefinidamente. El daño posible es pequeño
+    // (forzar regeneraciones de caché), pero descartar lo viejo sale gratis.
+    const timestamp = Number(/t=(\d+)/.exec(request.headers.get(SIGNATURE_HEADER) ?? '')?.[1])
+    if (Number.isFinite(timestamp) && Math.abs(Date.now() - timestamp) > MAX_AGE_MS) {
+      return new Response('Firma caducada', { status: 401 })
     }
 
     // Una sola etiqueta para todo el contenido: son pocas páginas y regenerarlas es
