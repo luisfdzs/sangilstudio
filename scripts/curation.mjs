@@ -124,7 +124,8 @@ export const curation = {
 
 /**
  * Concursos. Una sola imagen por concurso: la sección es un índice sobrio, no un
- * segundo portfolio. Los datos editoriales viven en `content/competitions.ts`.
+ * segundo portfolio. Los datos editoriales ya no viven en el repositorio: están en el
+ * panel de administración (Sanity).
  */
 export const competitionsCuration = {
   'music-center-zelazowa-wola': {

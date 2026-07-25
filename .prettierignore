@@ -4,3 +4,4 @@ node_modules/
 public/
 docs/legacy-landing/
 content/media-manifest.json
+scripts/migration/content-snapshot.json
