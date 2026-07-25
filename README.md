@@ -1,7 +1,8 @@
 # Sangil Studio — Web del estudio
 
 Web de portfolio de **Sangil Studio**, estudio de arquitectura en Pamplona (Navarra).
-Next.js 16 (App Router) + TypeScript + Tailwind CSS 4, desplegada en Vercel.
+Next.js 16 (App Router) + TypeScript + Tailwind CSS 4, con **Sanity** como panel de administración,
+desplegada en Vercel.
 
 🌐 **Producción:** [sangilstudio.com](https://sangilstudio.com) · **Test:** [sangilstudiotest.vercel.app](https://sangilstudiotest.vercel.app)
 
@@ -33,6 +34,46 @@ npm run dev        # http://localhost:3000
 | `npm run images` | Genera los derivados web desde el archivo maestro de imágenes      |
 | `npm run brand`  | Genera favicon, icono de iOS e imagen de compartir (OG)            |
 
+## Panel de administración (/admin)
+
+El contenido **no está en el código**: vive en Sanity y se edita en **`/admin`**, dentro de la propia
+web. Quien edita entra con su cuenta (invitada por email), no con una contraseña compartida: se puede
+dar y quitar acceso persona a persona, cada cambio queda con autor y fecha, y hay historial para
+deshacer.
+
+Desde ahí se puede hacer **todo** sin tocar el repositorio ni hablar con nadie:
+
+- Crear, editar y borrar proyectos y concursos.
+- **Reordenarlos arrastrando** (Proyectos › listado): ese orden es el de la web, y los seis marcados
+  como destacados forman la portada — el primero es el que la abre a pantalla completa.
+- Subir, sustituir, reordenar y borrar imágenes, **del tamaño que sean**: la CDN de Sanity entrega a
+  cada pantalla la versión ligera que necesita (ver `sanity/imageLoader.ts`), así que una foto de
+  25 MB llega optimizada igual que las que preparábamos con el script.
+- Editar todos los textos en **español e inglés**, con los dos idiomas uno al lado del otro.
+- Cambiar el manifiesto del estudio, el equipo, los colaboradores y los datos de contacto
+  («Estudio y contacto»).
+
+Al pulsar **Publicar**, Sanity avisa a `/api/revalidate` y la web se actualiza en segundos, **sin
+desplegar nada**. Sigue siendo estática y servida desde el CDN.
+
+Lo que **no** se puede tocar desde el panel, a propósito: el diseño. Los estados y tipos de proyecto
+son listas cerradas (la web tiene traducción preparada para cada valor) y las memorias son párrafos,
+no texto con formato libre, para que nadie pueda romper la estética con un titular gigante.
+
+### Puesta en marcha del panel (una sola vez)
+
+1. Crear el proyecto de Sanity: `npx sanity@latest login` y luego `npx sanity@latest init`
+   (o desde el Marketplace de Vercel: `vercel integration add sanity/project`, que además deja las
+   variables puestas en los dos entornos).
+2. Copiar `.env.example` a `.env.local` y rellenar `NEXT_PUBLIC_SANITY_PROJECT_ID`,
+   `SANITY_API_WRITE_TOKEN` (sanity.io/manage › API › Tokens, permiso Editor) y
+   `SANITY_REVALIDATE_SECRET` (cualquier cadena larga y aleatoria).
+3. `npm run migrate:sanity` — sube los 14 proyectos, 17 concursos, los textos del estudio y las 78
+   imágenes con su descripción. Es idempotente: repetirla actualiza, no duplica.
+4. En Vercel, las mismas variables en los dos proyectos (`vercel env add`), y en
+   sanity.io/manage › API › Webhooks un webhook a `/api/revalidate` con ese secreto.
+5. Invitar a quien vaya a editar en sanity.io/manage › Members, con rol **Administrator**.
+
 ## Arquitectura
 
 ```
@@ -63,8 +104,9 @@ proxy.ts               ← negocia el idioma y redirige / → /es | /en
 
 Cuatro decisiones que conviene entender antes de tocar código:
 
-1. **Ninguna página importa `content/` directamente**: todas pasan por `lib/content.ts`. Así,
-   migrar a un CMS es reescribir ese módulo sin tocar ni una vista.
+1. **Ninguna página consulta Sanity directamente**: todas pasan por `lib/content.ts`. Cuando el
+   contenido vivía en ficheros, ese módulo los leía; ahora lee del CMS y **ninguna vista cambió**.
+   Era exactamente para esto.
 2. **Todo es estático.** Las 46 rutas se prerrenderizan en build; no hay render en petición ni
    base de datos. Lo único que corre en el servidor es `proxy.ts`, que negocia el idioma.
    `dynamicParams = false` en el layout de idioma: cualquier locale que no sea `es`/`en` es un 404,
@@ -82,8 +124,10 @@ Cuatro decisiones que conviene entender antes de tocar código:
 - **Derivados web:** `public/media/**` (~31 MB, WebP máx. 2560 px), sí versionados.
 - Para añadir o cambiar imágenes: editar `scripts/curation.mjs` y ejecutar `npm run images`.
   La primera imagen de cada proyecto es la portada. `npm run images -- --force` rehace todo.
-- Un proyecto sin imágenes **rompe el build a propósito**: la web es fotografía, un hueco vacío
-  no es un estado válido.
+- **Un documento incompleto no tumba la web**: `lib/content.ts` valida cada proyecto por separado y
+  descarta el que no cumple, avisando por consola. Cuando el contenido estaba en el repositorio,
+  romper el build era lo correcto; ahora lo edita una persona desde el navegador y la web no puede
+  caerse porque alguien deje un proyecto a medias.
 - **Textos alternativos:** cada proyecto lleva un array `alts` en `content/projects/*.ts`, alineado
   con el orden de `curation.mjs`. Describen lo que se ve, no repiten el nombre del proyecto. Si
   añades una imagen, añade su alt: sin él se usa un genérico que funciona pero es peor.
