@@ -13,20 +13,27 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   if (!isLocale(locale)) notFound()
 
   const t = getDictionary(locale)
-  const [featured, settings] = await Promise.all([getFeaturedProjects(6), getSiteSettings()])
-  const [hero, ...rest] = featured
+  const [featured, settings] = await Promise.all([getFeaturedProjects(8), getSiteSettings()])
+  const [hero, ...pool] = featured
   if (!hero) notFound()
+
+  // El grid va en ciclos de tres piezas: una a ancho completo + dos a mitad. Sólo
+  // queda hueco cuando sobra UNA pieza a mitad (resto 2), y entonces se recorta: un
+  // hueco vacío al lado del último proyecto se ve peor que un proyecto menos. Si el
+  // resto es 1, esa pieza es ancha y cierra la fila entera, así que se queda.
+  const rest = pool.length % 3 === 2 ? pool.slice(0, -1) : pool
 
   return (
     <>
       <Hero project={hero} locale={locale} />
 
-      {/* Manifiesto: una sola idea, mucho aire alrededor. */}
+      {/* Manifiesto: una sola idea, mucho aire alrededor. Bloque centrado en todos los
+          tamaños — alineado a la izquierda dejaba media pantalla vacía en escritorio. */}
       <section className="page-gutter py-(--spacing-section)">
-        <Reveal className="max-w-3xl">
+        <Reveal className="mx-auto max-w-3xl text-center">
           <p className="eyebrow">{t.home.heroLead}</p>
           <p className="mt-8 text-title font-serif text-balance">{settings.statement[locale][0]}</p>
-          <p className="mt-6 max-w-2xl text-ink-soft">{settings.statement[locale][1]}</p>
+          <p className="mt-6 max-w-2xl text-ink-soft md:mx-auto">{settings.statement[locale][1]}</p>
           <Link
             href={href(locale, 'studio')}
             className="link-underline tap mt-10 inline-block text-small"
@@ -64,10 +71,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      <section className="page-gutter py-(--spacing-section)">
-        <Reveal className="border-t border-line pt-10">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <p className="max-w-xl text-lead font-serif">{settings.statement[locale][2]}</p>
+      {/* Cierre: mismo criterio que el manifiesto — bloque centrado en todos los
+          tamaños. El aire de la sección se reparte a partes iguales (filete → texto →
+          enlace → final), en vez de dejar el enlace pegado al párrafo y todo el hueco
+          abajo. Un solo valor derivado de --spacing-section para los tres huecos, así
+          escala igual en móvil y en escritorio. */}
+      <section className="page-gutter pt-(--spacing-section)">
+        <Reveal className="border-t border-line">
+          <div className="mx-auto flex max-w-2xl flex-col items-center gap-[calc(var(--spacing-section)*0.6)] pt-[calc(var(--spacing-section)*0.6)] text-center">
+            <p className="text-lead font-serif text-balance">{settings.statement[locale][2]}</p>
             <Link href={href(locale, 'competitions')} className="link-underline tap text-small">
               {t.home.viewAllCompetitions}
             </Link>
