@@ -172,6 +172,21 @@ async function main() {
       : `áreas pulsables por debajo de 24 px: ${JSON.stringify(small.slice(0, 5))}`,
   )
 
+  // --- Indexación: sólo sangilstudio.com puede aparecer en Google ---------------
+  // El proyecto de test despliega su rama como "production" de ese proyecto, así que
+  // durante un tiempo sangilstudiotest.vercel.app se anunció como indexable y con
+  // `Allow: /`. Si esto falla en un entorno que no sea el dominio real, hay que
+  // revisar `lib/site-env.ts` antes de que Google lo indexe.
+  if (!BASE.includes('sangilstudio.com')) {
+    const robotsMeta = await page.evaluate(
+      () => document.querySelector('meta[name="robots"]')?.getAttribute('content') ?? '(ninguna)',
+    )
+    check(
+      robotsMeta.includes('noindex'),
+      `este entorno no es indexable (meta robots: ${robotsMeta})`,
+    )
+  }
+
   check(errors.length === 0, `sin errores de consola${errors.length ? `: ${errors[0]}` : ''}`)
 
   await browser.close()
