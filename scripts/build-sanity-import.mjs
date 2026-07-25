@@ -24,7 +24,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const SNAPSHOT = path.join(ROOT, 'scripts', 'migration', 'content-snapshot.json')
@@ -41,9 +41,11 @@ function assetRef(localSrc) {
     console.warn(`  ✗ falta la imagen ${localSrc}`)
     missing++
   }
-  // Ruta relativa a la raíz del proyecto: el importador se ejecuta desde aquí.
-  const relative = `./public${localSrc}`
-  return { _type: 'image', _sanityAsset: `image@file://${relative}` }
+  // Ruta ABSOLUTA a propósito. Las relativas dan dos problemas: el importador las
+  // resuelve respecto al directorio del NDJSON (no al del comando) y, si empiezan por
+  // `../`, `file://../..` interpreta esa parte como nombre de host y falla. Al ser un
+  // fichero generado y gitignorado, que contenga rutas de esta máquina no molesta.
+  return { _type: 'image', _sanityAsset: `image@${pathToFileURL(file).href}` }
 }
 
 function toProjectImage(image) {

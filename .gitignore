@@ -79,3 +79,6 @@ next-env.d.ts
 # --- Migración a Sanity ---
 # Generado por npm run migrate:build a partir de content-snapshot.json.
 scripts/migration/import.ndjson
+
+.vercel
+.env*
