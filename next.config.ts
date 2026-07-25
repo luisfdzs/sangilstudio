@@ -4,9 +4,11 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   images: {
-    // Los derivados ya se generan en build-time con sharp (npm run images), así que
-    // aquí sólo declaramos los formatos y anchos que el optimizador de Vercel sirve.
-    formats: ['image/avif', 'image/webp'],
+    // Las transformaciones las hace la CDN de Sanity, que ya tiene el original: ver
+    // sanity/imageLoader.ts. Así no se consume cuota de optimización de Vercel y las
+    // imágenes que se suben desde el panel se optimizan igual que las demás.
+    loader: 'custom',
+    loaderFile: './sanity/imageLoader.ts',
     deviceSizes: [420, 640, 828, 1200, 1600, 2048, 2560],
     // Next 16 restringe las calidades permitidas a una lista blanca (por defecto
     // sólo 75). Declaramos las dos que usamos: 82 para portadas y hero, 75 para el

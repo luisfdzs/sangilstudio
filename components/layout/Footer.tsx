@@ -1,30 +1,33 @@
 import Link from 'next/link'
-import { site, team } from '@/content/site'
+import { site } from '@/content/site'
+import { getSiteSettings } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href } from '@/lib/i18n/routes'
 
-export function Footer({ locale }: { locale: Locale }) {
+export async function Footer({ locale }: { locale: Locale }) {
   const t = getDictionary(locale)
+  // Teléfonos, email, ciudad y redes salen del panel: el estudio los cambia sin nosotros.
+  const settings = await getSiteSettings()
 
   return (
     <footer className="mt-(--spacing-section) border-t border-line bg-paper">
       <div className="page-gutter grid gap-12 py-16 md:grid-cols-[1.2fr_1fr_1fr] md:py-20">
         <div>
-          <p className="text-lead font-serif max-w-xs">
+          <p className="text-lead max-w-xs font-serif">
             {locale === 'es'
               ? 'Arquitectura en Pamplona, Navarra.'
               : 'Architecture in Pamplona, Navarre.'}
           </p>
           <p className="mt-4 text-small text-ink-soft">
-            {site.city}, {site.region[locale]} · {site.country[locale]}
+            {settings.city}, {settings.region[locale]} · {settings.country[locale]}
           </p>
         </div>
 
         <div>
           <p className="eyebrow">{t.contact.title}</p>
           <ul className="mt-4 space-y-2 text-small">
-            {team.map((member) => (
+            {settings.team.map((member) => (
               <li key={member.name} className="text-ink-soft">
                 <span className="text-ink">{member.name}</span>
                 <br />
@@ -34,8 +37,8 @@ export function Footer({ locale }: { locale: Locale }) {
               </li>
             ))}
             <li>
-              <a className="link-underline tap" href={`mailto:${site.email}`}>
-                {site.email}
+              <a className="link-underline tap" href={`mailto:${settings.email}`}>
+                {settings.email}
               </a>
             </li>
           </ul>
@@ -59,16 +62,18 @@ export function Footer({ locale }: { locale: Locale }) {
                 {t.nav.competitions}
               </Link>
             </li>
-            <li>
-              <a
-                className="link-underline tap text-ink-soft hover:text-ink"
-                href={site.instagram}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                Instagram
-              </a>
-            </li>
+            {settings.instagram && (
+              <li>
+                <a
+                  className="link-underline tap text-ink-soft hover:text-ink"
+                  href={settings.instagram}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  Instagram
+                </a>
+              </li>
+            )}
           </ul>
 
           <p className="text-micro text-ink-faint">

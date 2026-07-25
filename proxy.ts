@@ -34,5 +34,7 @@ function negotiateLocale(request: NextRequest): string {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|media|favicon|robots.txt|sitemap.xml|.*\\.[\\w]+$).*)'],
+  // `admin` queda fuera: el panel no tiene versión por idioma y redirigirlo a /es/admin
+  // lo dejaría inaccesible.
+  matcher: ['/((?!api|admin|_next|media|favicon|robots.txt|sitemap.xml|.*\\.[\\w]+$).*)'],
 }

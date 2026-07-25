@@ -1,9 +1,9 @@
 import Image from 'next/image'
-import type { MediaImage } from '@/lib/media'
+import type { DescribedImage } from '@/lib/content'
 import { cn } from '@/lib/cn'
 
 type Props = {
-  image: MediaImage
+  image: DescribedImage
   alt: string
   /** Anchos que la imagen ocupará según viewport. Obligatorio: sin esto el
    *  navegador descarga siempre la variante más grande. */

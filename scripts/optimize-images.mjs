@@ -15,6 +15,12 @@
  * (CLS = 0) y el placeholder difuminado evita el "flash" de hueco vacío.
  *
  * Es idempotente: sólo reprocesa lo que ha cambiado. `--force` rehace todo.
+ *
+ * NOTA (desde que existe el panel de administración): el contenido de la web ya no se
+ * sirve desde aquí, sino desde Sanity, que optimiza por su cuenta lo que se sube. Este
+ * script se conserva porque sigue siendo la forma cómoda de **preparar en lote**
+ * derivados manejables a partir de los originales de 80–95 MB antes de subirlos al
+ * panel, y porque generó las imágenes de la migración inicial.
  */
 
 import { createHash } from 'node:crypto'
