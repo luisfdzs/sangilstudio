@@ -1,3 +1,4 @@
+import { cacheLife, cacheTag } from 'next/cache'
 import { z } from 'zod'
 import { client } from '@/sanity/client'
 import {
@@ -91,9 +92,24 @@ export type CompetitionEntry = z.infer<typeof competitionSchema> & {
 }
 export type SiteSettings = z.infer<typeof siteSettingsSchema>
 
-/** Lee de Sanity con la etiqueta de caché puesta: la web es estática hasta que se publique algo. */
+/**
+ * Lee de Sanity y **cachea con etiqueta**: la web se sirve estática hasta que alguien
+ * publica, y entonces el webhook invalida esta etiqueta y se regenera.
+ *
+ * Ojo, aquí hubo un fallo silencioso: antes se pasaba `{ next: { tags, revalidate } }`
+ * como tercer argumento de `client.fetch`, pero **`@sanity/client` ignora esa opción**
+ * (no usa el `fetch` de Next con sus extensiones). Resultado: los datos quedaban
+ * horneados en el build sin etiqueta alguna, el webhook respondía 200 y la web no se
+ * actualizaba nunca. La forma correcta en Next 16 es la directiva `use cache` con
+ * `cacheTag`, que sí registra la dependencia. Verificado midiendo el tiempo real desde
+ * «Publicar» hasta ver el cambio.
+ */
 async function fetchContent<T>(query: string): Promise<T> {
-  return client.fetch<T>(query, {}, { next: { tags: [CONTENT_TAG], revalidate: 3600 } })
+  'use cache'
+  cacheTag(CONTENT_TAG)
+  // 'max': se sirve de caché indefinidamente y sólo cambia cuando se publica algo.
+  cacheLife('max')
+  return client.fetch<T>(query)
 }
 
 /**

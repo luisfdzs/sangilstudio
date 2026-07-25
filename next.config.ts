@@ -2,6 +2,9 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Necesario para la directiva `use cache` (ver lib/content.ts): es lo que permite
+  // etiquetar los datos del CMS y que el webhook de publicación los invalide.
+  cacheComponents: true,
   poweredByHeader: false,
   images: {
     // Las transformaciones las hace la CDN de Sanity, que ya tiene el original: ver

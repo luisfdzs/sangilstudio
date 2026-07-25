@@ -37,12 +37,12 @@ export function generateStaticParams() {
 }
 
 /**
- * Sólo existen /es y /en: cualquier otro valor de `[locale]` es un 404, no algo que
- * haya que renderizar en petición. Sin esto, Next deja la puerta abierta a idiomas
- * desconocidos y el sitio deja de ser 100 % estático (el builder de Vercel llega a
- * fallar buscando una función que no generamos).
+ * Sólo existen /es y /en: cualquier otro valor de `[locale]` es un 404. Antes esto se
+ * declaraba con `export const dynamicParams = false`, pero **Cache Components no lo
+ * admite** (ver `cacheComponents` en next.config.ts). El `notFound()` del layout, más
+ * abajo, cumple la misma función: un idioma desconocido devuelve 404 en lugar de
+ * intentar renderizarse.
  */
-export const dynamicParams = false
 
 export async function generateMetadata({
   params,

@@ -1,3 +1,4 @@
+import { cacheLife } from 'next/cache'
 import Link from 'next/link'
 import { site } from '@/content/site'
 import { getSiteSettings } from '@/lib/content'
@@ -5,10 +6,24 @@ import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href } from '@/lib/i18n/routes'
 
+/**
+ * El año del copyright, en una función cacheada por días.
+ *
+ * Con Cache Components, leer la hora actual en un componente de servidor está prohibido
+ * (rompería el prerenderizado: ¿de qué momento sería el HTML?). Encerrarlo aquí lo
+ * resuelve sin congelarlo para siempre: la caché caduca a diario, así que el 1 de enero
+ * el pie se actualiza solo.
+ */
+async function currentYear(): Promise<number> {
+  'use cache'
+  cacheLife('days')
+  return new Date().getFullYear()
+}
+
 export async function Footer({ locale }: { locale: Locale }) {
   const t = getDictionary(locale)
   // Teléfonos, email, ciudad y redes salen del panel: el estudio los cambia sin nosotros.
-  const settings = await getSiteSettings()
+  const [settings, year] = await Promise.all([getSiteSettings(), currentYear()])
 
   return (
     <footer className="mt-(--spacing-section) border-t border-line bg-paper">
@@ -77,7 +92,7 @@ export async function Footer({ locale }: { locale: Locale }) {
           </ul>
 
           <p className="text-micro text-ink-faint">
-            © {new Date().getFullYear()} {site.name}. {t.footer.rights}
+            © {year} {site.name}. {t.footer.rights}
           </p>
         </div>
       </div>

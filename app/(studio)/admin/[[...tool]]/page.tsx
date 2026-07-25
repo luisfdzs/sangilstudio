@@ -9,8 +9,6 @@ import config from '@/sanity.config'
  * navegación por debajo de esa dirección. Quien entra sin sesión ve la pantalla de
  * acceso de Sanity: el contenido sólo se puede leer o cambiar con una cuenta invitada.
  */
-export const dynamic = 'force-static'
-
 export const metadata: Metadata = {
   title: 'Administración · Sangil Studio',
   // El panel nunca debe aparecer en buscadores.
