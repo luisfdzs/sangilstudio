@@ -28,7 +28,9 @@ export default defineProject({
     },
   ],
   order: 30,
-  featured: true,
+  // Fuera de los destacados de la home: su portada se parecía demasiado a la de
+  // MZ1-6 Housing, que va justo al lado en el grid.
+  featured: false,
   summary: {
     es: 'Rehabilitación integral de una vivienda unifamiliar abierta al jardín.',
     en: 'Full refurbishment of a single-family house opened up to its garden.',

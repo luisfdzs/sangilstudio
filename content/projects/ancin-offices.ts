@@ -19,7 +19,7 @@ export default defineProject({
     },
   ],
   order: 80,
-  featured: false,
+  featured: true,
   summary: {
     es: 'Oficinas donde el mobiliario fijo construye el espacio.',
     en: 'An office where built-in furniture builds the space.',

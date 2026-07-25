@@ -19,7 +19,7 @@ export default defineProject({
     },
   ],
   order: 100,
-  featured: false,
+  featured: true,
   summary: {
     es: 'Reforma de un apartamento con puertas que desaparecen en el plano de pared.',
     en: 'Apartment refurbishment with doors that vanish into the wall plane.',
