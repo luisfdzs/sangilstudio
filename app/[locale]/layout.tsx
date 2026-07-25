@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header'
 import { site } from '@/content/site'
 import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
+import { isIndexable } from '@/lib/site-env'
 import '../globals.css'
 
 /**
@@ -76,12 +77,9 @@ export async function generateMetadata({
     // La imagen la aporta app/opengraph-image.jpg (convención de ficheros de Next),
     // generada por `npm run brand`. Aquí sólo se declara el formato de tarjeta.
     twitter: { card: 'summary_large_image', title, description },
-    // El entorno de test NUNCA se indexa: sería contenido duplicado compitiendo
-    // con sangilstudio.com. Vercel expone VERCEL_ENV=preview/production.
-    robots:
-      process.env.VERCEL_ENV === 'production'
-        ? { index: true, follow: true }
-        : { index: false, follow: false },
+    // Sólo la rama main se indexa; test y previews van con noindex. El criterio
+    // y el motivo (test es "production" en su propio proyecto) en lib/site-env.ts.
+    robots: isIndexable() ? { index: true, follow: true } : { index: false, follow: false },
   }
 }
 
