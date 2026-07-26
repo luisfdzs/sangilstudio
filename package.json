@@ -12,6 +12,7 @@
     "images": "node scripts/optimize-images.mjs",
     "check": "npm run typecheck && npm run lint && prettier --check .",
     "brand": "node scripts/generate-brand-assets.mjs",
+    "wordmark": "node scripts/generate-wordmark-svg.mjs",
     "format": "prettier --write .",
     "check:mobile": "node scripts/check-mobile.mjs",
     "migrate:build": "node scripts/build-sanity-import.mjs",

@@ -81,7 +81,7 @@ export function Header({ locale, dictionary }: Props) {
 
         <div className="header-bar page-gutter flex h-20 items-center justify-between gap-6 md:h-24">
           <Link href={href(locale, 'home')} aria-label={dictionary.nav.home}>
-            <Wordmark className="h-[6.3rem] w-auto md:h-[8.1rem]" />
+            <Wordmark className="h-5 w-auto md:h-7" />
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
