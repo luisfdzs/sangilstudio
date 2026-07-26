@@ -123,9 +123,11 @@ export const curation = {
 }
 
 /**
- * Concursos. Una sola imagen por concurso: la sección es un índice sobrio, no un
- * segundo portfolio. Los datos editoriales ya no viven en el repositorio: están en el
- * panel de administración (Sanity).
+ * Concursos. Ya no son una categoría aparte —son proyectos con estado «Concurso»—, pero
+ * sus originales siguen viniendo de una carpeta maestra propia (`VIA - CONCURSOS/`) y se
+ * mantienen en su propia colección de `public/media` para no renombrar 34 derivados ya
+ * generados. Dos imágenes por entrada: es lo que hay en el archivo. Los datos
+ * editoriales no viven en el repositorio, sino en el panel (Sanity).
  */
 export const competitionsCuration = {
   'music-center-zelazowa-wola': {
@@ -178,7 +180,10 @@ export const competitionsCuration = {
   },
   'health-center-pamplona': {
     dir: 'VIA - CONCURSOS/13. Health Center Pamplona, Navarra 2017',
-    images: [],
+    // Es el único de la carpeta con una sola imagen aprovechable, y estuvo sin ninguna
+    // mientras los concursos fueron un índice sin ficha. Al pasar a ser proyectos la
+    // portada es obligatoria, así que entra el único render que hay.
+    images: ['render_exterior_top.png'],
   },
   'kultural-center-barcelona': {
     dir: 'VIA - CONCURSOS/14. Kultural Center & Book Hub Barcelona 2019',

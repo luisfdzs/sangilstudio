@@ -9,7 +9,6 @@ const es = {
   nav: {
     home: 'Inicio',
     work: 'Proyectos',
-    competitions: 'Concursos',
     studio: 'Estudio',
     contact: 'Contacto',
     menu: 'Menú',
@@ -22,19 +21,13 @@ const es = {
       'Sangil Studio proyecta vivienda, rehabilitación y espacios de trabajo con una idea fija: que cada decisión —la luz, el material, la medida— tenga una razón.',
     selectedWork: 'Obra seleccionada',
     viewAllWork: 'Ver todos los proyectos',
-    competitionsTeaser: 'Concursos',
-    viewAllCompetitions: 'Ver todos los concursos',
   },
   work: {
     title: 'Proyectos',
-    lead: 'Obra construida y en curso.',
+    lead: 'Obra construida, en curso y propuestas presentadas a concurso.',
     all: 'Todos',
     filterYear: 'Año',
     empty: 'No hay proyectos en esta selección.',
-  },
-  competitions: {
-    title: 'Concursos',
-    lead: 'Propuestas presentadas a concurso, la mayoría junto a la plataforma VIA.',
   },
   project: {
     year: 'Año',
@@ -80,6 +73,10 @@ const es = {
     offices: 'Oficinas',
     cultural: 'Cultural',
     'multi-family': 'Vivienda colectiva',
+    education: 'Docente',
+    sports: 'Deportivo',
+    health: 'Sanitario',
+    commercial: 'Comercial',
   },
   notFound: {
     title: 'Esta página no existe',
@@ -96,7 +93,6 @@ const en: Dictionary = {
   nav: {
     home: 'Home',
     work: 'Work',
-    competitions: 'Competitions',
     studio: 'Studio',
     contact: 'Contact',
     menu: 'Menu',
@@ -109,19 +105,13 @@ const en: Dictionary = {
       'Sangil Studio designs housing, refurbishments and workspaces with one fixed idea: every decision —light, material, measure— should have a reason behind it.',
     selectedWork: 'Selected work',
     viewAllWork: 'View all projects',
-    competitionsTeaser: 'Competitions',
-    viewAllCompetitions: 'View all competitions',
   },
   work: {
     title: 'Work',
-    lead: 'Built and ongoing projects.',
+    lead: 'Built and ongoing projects, and competition entries.',
     all: 'All',
     filterYear: 'Year',
     empty: 'No projects in this selection.',
-  },
-  competitions: {
-    title: 'Competitions',
-    lead: 'Competition entries, most of them alongside the VIA platform.',
   },
   project: {
     year: 'Year',
@@ -167,6 +157,10 @@ const en: Dictionary = {
     offices: 'Offices',
     cultural: 'Cultural',
     'multi-family': 'Multi-family housing',
+    education: 'Educational',
+    sports: 'Sports',
+    health: 'Healthcare',
+    commercial: 'Retail',
   },
   notFound: {
     title: 'This page does not exist',

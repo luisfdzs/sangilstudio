@@ -58,8 +58,7 @@ async function arreglar(tipo, etiqueta) {
   return documentos.length
 }
 
-const total =
-  (await arreglar('project', 'Proyectos')) + (await arreglar('competition', 'Concursos'))
+const total = await arreglar('project', 'Proyectos')
 
 console.log(
   total > 0

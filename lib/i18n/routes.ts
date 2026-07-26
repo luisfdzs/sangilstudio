@@ -9,7 +9,6 @@ import type { Locale } from './config'
 export const routes = {
   home: '',
   work: 'work',
-  competitions: 'competitions',
   studio: 'studio',
   contact: 'contact',
 } as const
@@ -31,11 +30,6 @@ export function href(locale: Locale, key: RouteKey, ...segments: string[]): stri
 
 /** Entradas del menú. `as const` para que el tipo sea la unión exacta de claves
  *  (sin `home`) y el diccionario pueda indexarse sin comprobaciones extra. */
-export const navigation = [
-  'work',
-  'competitions',
-  'studio',
-  'contact',
-] as const satisfies readonly RouteKey[]
+export const navigation = ['work', 'studio', 'contact'] as const satisfies readonly RouteKey[]
 
 export type NavKey = (typeof navigation)[number]

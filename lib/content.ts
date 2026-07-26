@@ -1,12 +1,7 @@
 import { cacheLife, cacheTag } from 'next/cache'
 import { z } from 'zod'
 import { client } from '@/sanity/client'
-import {
-  COMPETITIONS_QUERY,
-  PROJECTS_QUERY,
-  PROJECT_SLUGS_QUERY,
-  SITE_SETTINGS_QUERY,
-} from '@/sanity/queries'
+import { PROJECTS_QUERY, PROJECT_SLUGS_QUERY, SITE_SETTINGS_QUERY } from '@/sanity/queries'
 import type { Localized } from '@/lib/i18n/config'
 
 /**
@@ -47,7 +42,17 @@ const projectSchema = z.object({
   location: localizedString,
   year: z.number().int(),
   status: z.enum(['built', 'in-progress', 'project', 'competition']),
-  type: z.enum(['housing', 'multi-family', 'refurbishment', 'offices', 'cultural']),
+  type: z.enum([
+    'housing',
+    'multi-family',
+    'refurbishment',
+    'offices',
+    'cultural',
+    'education',
+    'sports',
+    'health',
+    'commercial',
+  ]),
   area: z.string().nullish(),
   client: z.string().nullish(),
   collaboration: z.string().nullish(),
@@ -56,15 +61,6 @@ const projectSchema = z.object({
   body: localizedParagraphs,
   images: z.array(imageSchema).min(1),
   plans: z.array(imageSchema).nullish(),
-})
-
-const competitionSchema = z.object({
-  slug: z.string().min(1),
-  title: z.string().min(1),
-  location: localizedString,
-  year: z.number().int(),
-  collaboration: z.string().nullish(),
-  images: z.array(imageSchema).nullish(),
 })
 
 const siteSettingsSchema = z.object({
@@ -85,10 +81,6 @@ export type DescribedImage = z.infer<typeof imageSchema>
 export type ProjectEntry = z.infer<typeof projectSchema> & {
   plans: DescribedImage[]
   cover: DescribedImage
-}
-export type CompetitionEntry = z.infer<typeof competitionSchema> & {
-  images: DescribedImage[]
-  cover: DescribedImage | null
 }
 export type SiteSettings = z.infer<typeof siteSettingsSchema>
 
@@ -137,6 +129,11 @@ function keepValid<T>(items: unknown[], schema: z.ZodType<T>, label: string): T[
   return valid
 }
 
+/**
+ * Todos los proyectos, **incluidos los concursos**: son proyectos con
+ * `status: 'competition'`, no otro tipo de documento. Si alguna vista necesitara
+ * separarlos, se filtra por `status` aquí mismo y no hace falta otra consulta.
+ */
 export async function getProjects(): Promise<ProjectEntry[]> {
   const raw = await fetchContent<unknown[]>(PROJECTS_QUERY)
   return keepValid(raw, projectSchema, 'el proyecto').map((project) => ({
@@ -174,15 +171,6 @@ export async function getProjectNeighbours(
   const next = projects[(index + 1) % projects.length]
   if (!previous || !next) return null
   return { previous, next }
-}
-
-export async function getCompetitions(): Promise<CompetitionEntry[]> {
-  const raw = await fetchContent<unknown[]>(COMPETITIONS_QUERY)
-  return keepValid(raw, competitionSchema, 'el concurso').map((competition) => ({
-    ...competition,
-    images: competition.images ?? [],
-    cover: competition.images?.[0] ?? null,
-  }))
 }
 
 /**
