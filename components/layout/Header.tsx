@@ -81,7 +81,11 @@ export function Header({ locale, dictionary }: Props) {
 
         <div className="header-bar page-gutter flex h-20 items-center justify-between gap-6 md:h-24">
           <Link href={href(locale, 'home')} aria-label={dictionary.nav.home}>
-            <Wordmark className="h-[6.3rem] w-auto md:h-[8.1rem]" />
+            {/* El montaje horizontal tiene la caja ajustada al dibujo (proporción ~9,4:1),
+                así que el alto que se pide es el alto que se ve. El apilado necesitaba
+                6,3 rem para mostrar unos 39 px de letra porque casi la mitad de su lienzo
+                era vacío. */}
+            <Wordmark className="h-5 w-auto md:h-7" />
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">

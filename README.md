@@ -25,14 +25,15 @@ npm install
 npm run dev        # http://localhost:3000
 ```
 
-| Script           | Qué hace                                                           |
-| ---------------- | ------------------------------------------------------------------ |
-| `npm run dev`    | Servidor de desarrollo (Turbopack)                                 |
-| `npm run build`  | Build de producción (prerrenderiza las 46 rutas)                   |
-| `npm run check`  | `tsc --noEmit` + ESLint + Prettier — pasar esto antes de commitear |
-| `npm run format` | Aplica Prettier a todo el proyecto                                 |
-| `npm run images` | Genera los derivados web desde el archivo maestro de imágenes      |
-| `npm run brand`  | Genera favicon, icono de iOS e imagen de compartir (OG)            |
+| Script             | Qué hace                                                           |
+| ------------------ | ------------------------------------------------------------------ |
+| `npm run dev`      | Servidor de desarrollo (Turbopack)                                 |
+| `npm run build`    | Build de producción (prerrenderiza las 86 rutas)                   |
+| `npm run check`    | `tsc --noEmit` + ESLint + Prettier — pasar esto antes de commitear |
+| `npm run format`   | Aplica Prettier a todo el proyecto                                 |
+| `npm run images`   | Genera los derivados web desde el archivo maestro de imágenes      |
+| `npm run brand`    | Genera favicon, icono de iOS e imagen de compartir (OG)            |
+| `npm run wordmark` | Escribe los dos montajes del logotipo en `public/brand/*.svg`      |
 
 ## Panel de administración (/admin)
 
@@ -99,6 +100,7 @@ scripts/
   curation.mjs         ← qué imágenes entran en la web y en qué orden
   optimize-images.mjs  ← pipeline sharp → WebP + placeholder
   generate-brand-assets.mjs ← favicon + OG desde el logotipo
+  generate-wordmark-svg.mjs ← los dos montajes del wordmark en public/brand/
 proxy.ts               ← negocia el idioma y redirige / → /es | /en
                          (en Next 16 `middleware.ts` se llama `proxy.ts`)
 ```
@@ -108,7 +110,7 @@ Cuatro decisiones que conviene entender antes de tocar código:
 1. **Ninguna página consulta Sanity directamente**: todas pasan por `lib/content.ts`. Cuando el
    contenido vivía en ficheros, ese módulo los leía; ahora lee del CMS y **ninguna vista cambió**.
    Era exactamente para esto.
-2. **Todo es estático.** Las 46 rutas se prerrenderizan en build; no hay render en petición ni
+2. **Todo es estático.** Las 86 rutas se prerrenderizan en build; no hay render en petición ni
    base de datos. Lo único que corre en el servidor es `proxy.ts`, que negocia el idioma.
    `dynamicParams = false` en el layout de idioma: cualquier locale que no sea `es`/`en` es un 404,
    no algo que se renderice en petición.
@@ -179,5 +181,8 @@ La landing anterior ("en construcción") se conserva en `docs/legacy-landing/` c
 - **Textos**: las memorias de proyecto de `content/projects/` son un primer borrador redactado
   a partir de tipología, ubicación y año; deben revisarlas los autores.
 - **Curaduría de imágenes**: la selección de `scripts/curation.mjs` es una primera propuesta.
-- **Logotipo en vectorial**: el encabezado usa hoy una aproximación tipográfica (`components/layout/Wordmark.tsx`).
-  Con el logo en SVG/AI se sustituye por el trazo real del estudio manteniendo la misma API.
+- **Logotipo**: ya es el trazo vectorial real del estudio, en montaje horizontal (SANGIL STUDIO en
+  una línea). Los trazos están en `lib/brand/wordmark.ts` y de ahí salen tanto la cabecera como los
+  dos ficheros `public/brand/wordmark-{horizontal,vertical}.svg` (`npm run wordmark`). Si alguna vez
+  hay una versión oficial vectorizada por un diseñador, se sustituyen los dos `*_PATH` de ese módulo
+  y todo lo demás sigue funcionando.
