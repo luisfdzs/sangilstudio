@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { cn } from '@/lib/cn'
 import { localeNames, locales, type Locale } from '@/lib/i18n/config'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
-import { href, navigation } from '@/lib/i18n/routes'
+import { href, isSection, navigation } from '@/lib/i18n/routes'
 import { Wordmark } from './Wordmark'
 
 type Props = {
@@ -87,7 +87,12 @@ export function Header({ locale, dictionary }: Props) {
           <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
             {navigation.map((key) => {
               const target = href(locale, key)
-              const active = pathname === target || pathname.startsWith(`${target}/`)
+              // Estudio y contacto son anclas de la portada, no páginas: `aria-current`
+              // marcaría las dos a la vez estando en el inicio, que es peor que no
+              // marcar ninguna. Saber cuál se está viendo pediría un observador de
+              // scroll, y esta barra ya carga con todo el JS que se le permite.
+              const active =
+                !isSection(key) && (pathname === target || pathname.startsWith(`${target}/`))
               return (
                 <Link
                   key={key}

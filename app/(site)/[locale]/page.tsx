@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { ContactSection } from '@/components/sections/ContactSection'
 import { Hero } from '@/components/sections/Hero'
 import { ProjectCard } from '@/components/sections/ProjectCard'
+import { StudioSection } from '@/components/sections/StudioSection'
 import { Reveal } from '@/components/ui/Reveal'
 import { getFeaturedProjects, getSiteSettings } from '@/lib/content'
 import { isLocale } from '@/lib/i18n/config'
@@ -27,24 +29,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <>
       <Hero project={hero} locale={locale} />
 
-      {/* Manifiesto: una sola idea, mucho aire alrededor. Bloque centrado en todos los
-          tamaños — alineado a la izquierda dejaba media pantalla vacía en escritorio. */}
-      <section className="page-gutter py-(--spacing-section)">
-        <Reveal className="mx-auto max-w-3xl text-center">
-          <p className="eyebrow">{t.home.heroLead}</p>
-          <p className="mt-8 text-title font-serif text-balance">{settings.statement[locale][0]}</p>
-          <p className="mt-6 max-w-2xl text-ink-soft md:mx-auto">{settings.statement[locale][1]}</p>
-          <Link
-            href={href(locale, 'studio')}
-            className="link-underline tap mt-10 inline-block text-small"
-          >
-            {t.nav.studio}
-          </Link>
-        </Reveal>
-      </section>
-
-      {/* Obra seleccionada: ritmo alterno ancho/mitad para que no parezca catálogo. */}
-      <section className="page-gutter">
+      {/* Obra seleccionada: ritmo alterno ancho/mitad para que no parezca catálogo.
+          Antes de esta rejilla iba un manifiesto con los dos primeros párrafos del
+          estudio; ahora que el estudio es una sección de esta misma página (abajo),
+          repetirlo aquí sería decir dos veces lo mismo a media pantalla de distancia. */}
+      <section className="page-gutter pt-(--spacing-section)">
         <div className="flex items-baseline justify-between border-b border-line pb-4">
           <h2 className="eyebrow">{t.home.selectedWork}</h2>
           <Link href={href(locale, 'work')} className="link-underline tap text-small">
@@ -71,24 +60,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      {/* Cierre: mismo criterio que el manifiesto — bloque centrado en todos los
-          tamaños. El aire de la sección se reparte a partes iguales (filete → texto →
-          enlace → final), en vez de dejar el enlace pegado al párrafo y todo el hueco
-          abajo. Un solo valor derivado de --spacing-section para los tres huecos, así
-          escala igual en móvil y en escritorio. */}
-      <section className="page-gutter pt-(--spacing-section)">
-        <Reveal className="border-t border-line">
-          <div className="mx-auto flex max-w-2xl flex-col items-center gap-[calc(var(--spacing-section)*0.6)] pt-[calc(var(--spacing-section)*0.6)] text-center">
-            <p className="text-lead font-serif text-balance">{settings.statement[locale][2]}</p>
-            {/* Cerraba enviando a la sección de concursos, que ya no existe: los
-                concursos están en /work con el resto de la obra, y ese listado ya tiene
-                su enlace arriba. El cierre natural de la portada es el contacto. */}
-            <Link href={href(locale, 'contact')} className="link-underline tap text-small">
-              {t.nav.contact}
-            </Link>
-          </div>
-        </Reveal>
-      </section>
+      {/* Estudio y contacto ya no son páginas propias: se leen aquí, en el orden del
+          menú (obra → estudio → contacto), y el menú lleva a su ancla. Quien entra por
+          la portada acaba el recorrido sin haber navegado ni una vez. */}
+      <StudioSection locale={locale} settings={settings} />
+      <ContactSection locale={locale} settings={settings} />
     </>
   )
 }

@@ -115,9 +115,24 @@ async function main() {
   )
 
   // --- Resto de plantillas ---------------------------------------------------
-  for (const route of ['work', 'studio', 'contact']) {
-    await page.goto(`${BASE}/${LOCALE}/${route}`, { waitUntil: 'networkidle' })
-    check((await horizontalOverflow(page)) <= 1, `/${route} no desborda en horizontal`)
+  await page.goto(`${BASE}/${LOCALE}/work`, { waitUntil: 'networkidle' })
+  check((await horizontalOverflow(page)) <= 1, '/work no desborda en horizontal')
+
+  // Estudio y contacto son secciones de la portada, no páginas: se comprueba que el
+  // ancla existe y que al entrar por su URL el bloque queda por debajo de la barra
+  // fija (`scroll-padding-top` en globals.css), no tapado por ella.
+  for (const id of ['studio', 'contact']) {
+    await page.goto(`${BASE}/${LOCALE}#${id}`, { waitUntil: 'networkidle' })
+    // El ancla se mide con la página ya asentada: las imágenes de la rejilla entran
+    // perezosamente y, midiendo antes, la sección aún está bajándose de sitio.
+    await page.waitForTimeout(1500)
+    const top = await page.evaluate((anchor) => {
+      const section = document.getElementById(anchor)
+      return section ? Math.round(section.getBoundingClientRect().top) : null
+    }, id)
+    check(top !== null, `la portada tiene la sección #${id}`)
+    check(top !== null && top >= 0 && top < 200, `#${id} queda justo bajo la barra (${top} px)`)
+    check((await horizontalOverflow(page)) <= 1, `#${id} no desborda en horizontal`)
   }
 
   // --- Enlaces absolutos, comprobado desde una página PROFUNDA -----------------
