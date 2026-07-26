@@ -28,6 +28,19 @@ const nextConfig: NextConfig = {
         destination: '/:locale/work',
         permanent: true,
       },
+      {
+        // Estudio y contacto dejaron de ser páginas: son secciones de la portada. Las
+        // URLs antiguas llevan a su ancla, para que no se rompa nada de lo que ya se
+        // haya compartido (y porque estuvieron en el sitemap del entorno de test).
+        source: '/:locale(es|en)/studio',
+        destination: '/:locale#studio',
+        permanent: true,
+      },
+      {
+        source: '/:locale(es|en)/contact',
+        destination: '/:locale#contact',
+        permanent: true,
+      },
     ]
   },
   async headers() {
