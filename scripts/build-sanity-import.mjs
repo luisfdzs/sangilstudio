@@ -25,6 +25,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { LexoRank } from 'lexorank'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const SNAPSHOT = path.join(ROOT, 'scripts', 'migration', 'content-snapshot.json')
@@ -57,8 +58,20 @@ function toProjectImage(image) {
   }
 }
 
-/** El plugin de orden por arrastre ordena por este campo de texto. */
-const rank = (index) => `a${String(index).padStart(3, '0')}`
+/**
+ * Orden para el plugin de arrastre. **No vale cualquier cadena**: usa LexoRank
+ * (`0|hzzzzz:`), un formato que permite insertar algo entre dos elementos sin renumerar
+ * el resto. La primera versión de este script escribía `a000`, `a001`… y el plugin, al
+ * no reconocer el bucket, lanzaba una excepción: **los listados del panel no llegaban a
+ * cargar nunca** (spinner infinito y «There was an error»). Si hay que repararlo en un
+ * dataset existente: `npx sanity exec scripts/fix-order-ranks.mjs --with-user-token`.
+ */
+let siguienteRank = LexoRank.middle()
+const rank = () => {
+  const actual = siguienteRank.toString()
+  siguienteRank = siguienteRank.genNext()
+  return actual
+}
 
 const documents = []
 
@@ -80,7 +93,7 @@ for (const [index, project] of snapshot.projects.entries()) {
     body: { _type: 'localizedParagraphs', es: project.body.es, en: project.body.en },
     images: project.images.map(toProjectImage),
     ...(project.plans?.length ? { plans: project.plans.map(toProjectImage) } : {}),
-    orderRank: rank(index),
+    orderRank: rank(),
   })
 }
 
@@ -94,7 +107,7 @@ for (const [index, competition] of snapshot.competitions.entries()) {
     year: competition.year,
     ...(competition.collaboration ? { collaboration: competition.collaboration } : {}),
     ...(competition.images?.length ? { images: competition.images.map(toProjectImage) } : {}),
-    orderRank: rank(index),
+    orderRank: rank(),
   })
 }
 

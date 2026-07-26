@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { NextStudio } from 'next-sanity/studio'
 import config from '@/sanity.config'
+import { ConnectionNotice } from '../ConnectionNotice'
 
 /**
  * El panel de administración completo, servido desde la propia web en `/admin`.
@@ -23,5 +24,12 @@ export const viewport: Viewport = {
 }
 
 export default function AdminPage() {
-  return <NextStudio config={config} />
+  return (
+    <>
+      <NextStudio config={config} />
+      {/* Si la conexión en tiempo real está bloqueada, explica por qué en vez de dejar
+          el panel girando sin decir nada. Ver ConnectionNotice.tsx. */}
+      <ConnectionNotice />
+    </>
+  )
 }
