@@ -7,6 +7,7 @@ import type { Locale } from './config'
  */
 const es = {
   nav: {
+    home: 'Inicio',
     work: 'Proyectos',
     competitions: 'Concursos',
     studio: 'Estudio',
@@ -93,6 +94,7 @@ type Dictionary = {
 
 const en: Dictionary = {
   nav: {
+    home: 'Home',
     work: 'Work',
     competitions: 'Competitions',
     studio: 'Studio',
