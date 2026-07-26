@@ -115,7 +115,7 @@ async function main() {
   )
 
   // --- Resto de plantillas ---------------------------------------------------
-  for (const route of ['work', 'competitions', 'studio', 'contact']) {
+  for (const route of ['work', 'studio', 'contact']) {
     await page.goto(`${BASE}/${LOCALE}/${route}`, { waitUntil: 'networkidle' })
     check((await horizontalOverflow(page)) <= 1, `/${route} no desborda en horizontal`)
   }

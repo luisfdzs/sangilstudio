@@ -43,7 +43,8 @@ deshacer.
 
 Desde ahí se puede hacer **todo** sin tocar el repositorio ni hablar con nadie:
 
-- Crear, editar y borrar proyectos y concursos.
+- Crear, editar y borrar proyectos. **Un concurso es un proyecto con el estado «Concurso»**: misma
+  lista, mismo formulario y misma ficha en la web, sin una sección aparte que mantener.
 - **Reordenarlos arrastrando** (Proyectos › listado): ese orden es el de la web, y los seis marcados
   como destacados forman la portada — el primero es el que la abre a pantalla completa.
 - Subir, sustituir, reordenar y borrar imágenes, **del tamaño que sean**: la CDN de Sanity entrega a
@@ -68,8 +69,9 @@ no texto con formato libre, para que nadie pueda romper la estética con un titu
 2. Copiar `.env.example` a `.env.local` y rellenar `NEXT_PUBLIC_SANITY_PROJECT_ID`,
    `SANITY_API_WRITE_TOKEN` (sanity.io/manage › API › Tokens, permiso Editor) y
    `SANITY_REVALIDATE_SECRET` (cualquier cadena larga y aleatoria).
-3. `npm run migrate:sanity` — sube los 14 proyectos, 17 concursos, los textos del estudio y las 78
-   imágenes con su descripción. Es idempotente: repetirla actualiza, no duplica.
+3. `npm run migrate:sanity` — sube los 31 proyectos (14 obras y 17 presentados a concurso), los
+   textos del estudio y las 79 imágenes con su descripción. Es idempotente: repetirla actualiza, no
+   duplica.
 4. En Vercel, las mismas variables en los dos proyectos (`vercel env add`), y en
    sanity.io/manage › API › Webhooks un webhook a `/api/revalidate` con ese secreto.
 5. Invitar a quien vaya a editar en sanity.io/manage › Members, con rol **Administrator**.
@@ -81,8 +83,7 @@ app/
   [locale]/            ← todas las páginas viven bajo idioma (/es, /en)
     layout.tsx         · fuentes, header/footer, metadata y hreflang
     page.tsx           · home (hero a pantalla completa + obra seleccionada)
-    work/              · índice de obra y ficha de proyecto [slug]
-    competitions/      · índice de concursos
+    work/              · índice de obra (concursos incluidos) y ficha de proyecto [slug]
     studio/ contact/
   globals.css          ← SISTEMA DE DISEÑO: todos los tokens, y sólo aquí
   sitemap.ts robots.ts ← generados del contenido real

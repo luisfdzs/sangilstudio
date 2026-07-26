@@ -82,9 +82,9 @@ export async function Footer({ locale }: { locale: Locale }) {
               <li>
                 <Link
                   className="link-underline tap text-ink-soft hover:text-ink"
-                  href={href(locale, 'competitions')}
+                  href={href(locale, 'studio')}
                 >
-                  {t.nav.competitions}
+                  {t.nav.studio}
                 </Link>
               </li>
               {settings.instagram && (

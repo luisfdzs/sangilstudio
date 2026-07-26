@@ -80,8 +80,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <Reveal className="border-t border-line">
           <div className="mx-auto flex max-w-2xl flex-col items-center gap-[calc(var(--spacing-section)*0.6)] pt-[calc(var(--spacing-section)*0.6)] text-center">
             <p className="text-lead font-serif text-balance">{settings.statement[locale][2]}</p>
-            <Link href={href(locale, 'competitions')} className="link-underline tap text-small">
-              {t.home.viewAllCompetitions}
+            {/* Cerraba enviando a la sección de concursos, que ya no existe: los
+                concursos están en /work con el resto de la obra, y ese listado ya tiene
+                su enlace arriba. El cierre natural de la portada es el contacto. */}
+            <Link href={href(locale, 'contact')} className="link-underline tap text-small">
+              {t.nav.contact}
             </Link>
           </div>
         </Reveal>

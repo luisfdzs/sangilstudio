@@ -18,6 +18,18 @@ const nextConfig: NextConfig = {
     // resto. Una calidad no declarada se redondea a la más cercana, en silencio.
     qualities: [75, 82],
   },
+  async redirects() {
+    return [
+      {
+        // `/competitions` existió como sección propia y estuvo en el sitemap. Los
+        // concursos son ahora proyectos con estado «Concurso», así que la URL antigua
+        // lleva al listado de obra en vez de devolver un 404 a quien tenga el enlace.
+        source: '/:locale(es|en)/competitions',
+        destination: '/:locale/work',
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {

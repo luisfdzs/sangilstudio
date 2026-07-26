@@ -4,8 +4,9 @@
  *
  * Convierte el volcado del contenido que vivía en ficheros
  * (`scripts/migration/content-snapshot.json`) en un fichero NDJSON que el CLI de Sanity
- * importa de un tirón: 14 proyectos, 17 concursos, los textos del estudio y las 78
- * imágenes con su descripción en los dos idiomas.
+ * importa de un tirón: 31 proyectos —14 obras y 17 que se presentaron a concurso, todos
+ * del mismo tipo—, los textos del estudio y las 79 imágenes con su descripción en los
+ * dos idiomas.
  *
  * **Por qué NDJSON y no la API con un token:** el CLI usa la sesión de quien ha hecho
  * `sanity login`, así que no hay que crear, pegar ni guardar ninguna credencial en
@@ -93,20 +94,6 @@ for (const [index, project] of snapshot.projects.entries()) {
     body: { _type: 'localizedParagraphs', es: project.body.es, en: project.body.en },
     images: project.images.map(toProjectImage),
     ...(project.plans?.length ? { plans: project.plans.map(toProjectImage) } : {}),
-    orderRank: rank(),
-  })
-}
-
-for (const [index, competition] of snapshot.competitions.entries()) {
-  documents.push({
-    _id: `competition-${competition.slug}`,
-    _type: 'competition',
-    title: competition.title,
-    slug: { _type: 'slug', current: competition.slug },
-    location: { _type: 'localizedString', ...competition.location },
-    year: competition.year,
-    ...(competition.collaboration ? { collaboration: competition.collaboration } : {}),
-    ...(competition.images?.length ? { images: competition.images.map(toProjectImage) } : {}),
     orderRank: rank(),
   })
 }

@@ -79,6 +79,9 @@ next-env.d.ts
 # --- Migración a Sanity ---
 # Generado por npm run migrate:build a partir de content-snapshot.json.
 scripts/migration/import.ndjson
+# Generado por npm run images. Dejó de versionarse cuando el contenido pasó al panel:
+# las dimensiones y el LQIP los sirve ahora Sanity, no este fichero.
+content/media-manifest.json
 
 .vercel
 .env*

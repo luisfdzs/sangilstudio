@@ -60,14 +60,3 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
     linkedin
   }
 `)
-
-export const COMPETITIONS_QUERY = defineQuery(`
-  *[_type == "competition"] | order(orderRank) {
-    "slug": slug.current,
-    title,
-    location,
-    year,
-    collaboration,
-    "images": images[] ${IMAGE}
-  }
-`)
