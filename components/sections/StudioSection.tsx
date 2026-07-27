@@ -24,10 +24,14 @@ export function StudioSection({ locale, settings }: { locale: Locale; settings: 
     <div className="pt-(--spacing-section)">
       {/* `scroll-mt` suma al `scroll-padding-top` global: al llegar por el ancla, el
           encabezado no queda pegado al borde inferior de la barra. */}
-      <section id={sections.studio} className="page-gutter scroll-mt-8">
+      {/* `text-center` en la sección: el centrado es de todo el bloque —manifiesto,
+          equipo y colaboradores— para que no se lea como dos criterios distintos. */}
+      <section id={sections.studio} className="page-gutter scroll-mt-8 text-center">
         <h2 className="eyebrow border-b border-line pb-4">{t.studio.title}</h2>
 
-        <div className="mt-10 grid max-w-4xl gap-6 md:mt-16">
+        {/* `mx-auto`: con el texto centrado, la columna estrecha del manifiesto tiene
+            que ir centrada también, o el bloque quedaría escorado a la izquierda. */}
+        <div className="mx-auto mt-10 grid max-w-4xl gap-6 md:mt-16">
           {settings.statement[locale].map((paragraph, index) => (
             <Reveal key={paragraph.slice(0, 24)} step={index}>
               <p className={index === 0 ? 'text-lead font-serif text-balance' : 'text-ink-soft'}>
