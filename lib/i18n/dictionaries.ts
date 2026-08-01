@@ -11,9 +11,14 @@ const es = {
     work: 'Proyectos',
     studio: 'Estudio',
     contact: 'Contacto',
-    menu: 'Menú',
     close: 'Cerrar',
     skipToContent: 'Saltar al contenido',
+    /* Los tres de abajo sólo se oyen: nombran la barra de iconos de móvil y su botón de
+       idioma para quien navega con lector de pantalla. En la barra no hay rótulos —cinco
+       palabras no caben a lo ancho de un móvil—, así que el nombre accesible es lo único
+       que distingue un hueco de otro. */
+    language: 'Idioma',
+    mobile: 'Navegación',
   },
   home: {
     heroLead: 'Arquitectura en Navarra',
@@ -95,9 +100,10 @@ const en: Dictionary = {
     work: 'Work',
     studio: 'Studio',
     contact: 'Contact',
-    menu: 'Menu',
     close: 'Close',
     skipToContent: 'Skip to content',
+    language: 'Language',
+    mobile: 'Navigation',
   },
   home: {
     heroLead: 'Architecture in Navarre',

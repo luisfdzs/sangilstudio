@@ -4,13 +4,14 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
 
 /**
- * Contacto como SECCIÓN de la portada (`/es#contact`), cerrando la página.
+ * Contacto como SECCIÓN de la portada, cerrando la página. Con dirección propia
+ * —`/es/contact`— pero sin página propia: ver `StudioSection` y `[section]/page.tsx`.
  *
  * Directo, sin formulario: un formulario implica backend antispam y política de
  * privacidad; se añadirá cuando el estudio lo decida (ver README).
  *
- * El hueco de separación va en el envoltorio, no en el relleno de la sección, por
- * el mismo motivo que en `StudioSection`: que el ancla caiga en el encabezado.
+ * El hueco de separación va en el envoltorio, no en el relleno de la sección, por el
+ * mismo motivo que en `StudioSection`: que el desplazamiento caiga en el encabezado.
  */
 export function ContactSection({ locale, settings }: { locale: Locale; settings: SiteSettings }) {
   const t = getDictionary(locale)
@@ -18,9 +19,13 @@ export function ContactSection({ locale, settings }: { locale: Locale; settings:
   return (
     <div className="pt-(--spacing-section)">
       {/* Ver `StudioSection`: el `scroll-mt` despega el encabezado de la barra. */}
-      <section id={sections.contact} className="page-gutter scroll-mt-8">
+      {/* `text-center` en la sección: el centrado alcanza a las tres columnas —correo,
+          teléfonos y dónde estamos—, que son datos paralelos y se leen como un bloque. */}
+      <section id={sections.contact} className="page-gutter scroll-mt-8 text-center">
         <h2 className="eyebrow border-b border-line pb-4">{t.contact.title}</h2>
-        <p className="mt-10 max-w-3xl text-lead font-serif text-balance md:mt-16">
+        {/* `mx-auto`: con el texto centrado, una columna estrecha tiene que ir centrada
+            también, o el bloque quedaría escorado a la izquierda. */}
+        <p className="mx-auto mt-10 max-w-3xl text-lead font-serif text-balance md:mt-16">
           {t.contact.lead}
         </p>
 
@@ -60,7 +65,7 @@ export function ContactSection({ locale, settings }: { locale: Locale; settings:
               {settings.region[locale]}, {settings.country[locale]}
             </p>
             {/* Las redes son opcionales en el panel: si no hay enlace, no se muestra. */}
-            <div className="mt-6 flex gap-4 text-small">
+            <div className="mt-6 flex justify-center gap-4 text-small">
               {[
                 { label: 'Instagram', url: settings.instagram },
                 { label: 'LinkedIn', url: settings.linkedin },

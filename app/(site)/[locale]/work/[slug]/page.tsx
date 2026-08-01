@@ -80,14 +80,24 @@ export default async function ProjectPage({
       )}
 
       <div className="page-gutter">
-        <header className="grid gap-10 py-16 md:grid-cols-[1.4fr_1fr] md:gap-20 md:py-24">
-          <div>
-            <h1 className="text-display font-serif text-balance">{project.title}</h1>
-            <p className="mt-6 max-w-xl text-lead text-ink-soft">{project.summary[locale]}</p>
-          </div>
+        {/* El titular y el resumen dejan de ir en una columna a la izquierda con la ficha
+            técnica enfrente: van centrados y a todo el ancho, y la ficha pasa debajo, en
+            una fila de datos sobre su filete. La composición a dos columnas obligaba a
+            leer en zigzag —título a la izquierda, año a la derecha, texto abajo otra vez
+            a la izquierda— y con el titular a `text-display` la columna estrecha de la
+            derecha quedaba siempre corta. */}
+        <header className="py-16 text-center md:py-24">
+          <h1 className="text-display mx-auto max-w-4xl font-serif text-balance">
+            {project.title}
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lead text-ink-soft">
+            {project.summary[locale]}
+          </p>
 
-          {/* Ficha técnica: lista de definición, semántica correcta y sobria. */}
-          <dl className="grid grid-cols-2 gap-x-8 gap-y-6 self-start border-t border-line pt-6 md:grid-cols-1 md:border-t-0 md:pt-2">
+          {/* Ficha técnica: lista de definición, semántica correcta y sobria. El filete
+              va a todo el ancho aunque los datos estén centrados: es lo que sostiene el
+              bloque contra el borde de la página y le da la escala de tabla que tiene. */}
+          <dl className="mt-12 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-line pt-8 md:mt-16 md:grid-cols-4">
             {facts.map((fact) => (
               <div key={fact.label}>
                 <dt className="eyebrow">{fact.label}</dt>
@@ -97,7 +107,10 @@ export default async function ProjectPage({
           </dl>
         </header>
 
-        <div className="max-w-2xl space-y-6 pb-16 md:pb-24">
+        {/* El cuerpo se queda en columna estrecha —una medida larga no se lee— pero
+            centrada en la página. Los párrafos NO van centrados: en un texto corrido de
+            varias líneas el centrado destruye el borde izquierdo que guía la lectura. */}
+        <div className="mx-auto max-w-2xl space-y-6 pb-16 md:pb-24">
           {project.body[locale].map((paragraph) => (
             <p key={paragraph.slice(0, 24)}>{paragraph}</p>
           ))}
@@ -128,7 +141,7 @@ export default async function ProjectPage({
       )}
 
       {project.plans.length > 0 && (
-        <section className="page-gutter pt-(--spacing-section)">
+        <section className="page-gutter pt-(--spacing-section) text-center">
           <h2 className="eyebrow border-b border-line pb-4">{t.project.plans}</h2>
           <div className="mt-10 grid gap-8 md:grid-cols-2">
             {project.plans.map((plan, index) => (
@@ -146,28 +159,25 @@ export default async function ProjectPage({
         </section>
       )}
 
+      {/* Anterior · volver · siguiente. Cada uno centrado en SU columna, no el trío
+          empujado a los extremos: el orden de las tres celdas ya dice cuál es cuál, y
+          con los títulos alineados al borde de la página el de la derecha quedaba
+          colgando en una medida distinta del de la izquierda. En móvil se apila, con
+          «volver a proyectos» en medio de los dos saltos. */}
       {neighbours && (
-        <nav className="page-gutter mt-(--spacing-section) flex items-center justify-between gap-6 border-t border-line py-10">
-          <Link
-            href={href(locale, 'work', neighbours.previous.slug)}
-            className="group max-w-[45%]"
-            rel="prev"
-          >
+        <nav className="page-gutter mt-(--spacing-section) grid gap-8 border-t border-line py-10 text-center md:grid-cols-3 md:items-center">
+          <Link href={href(locale, 'work', neighbours.previous.slug)} className="group" rel="prev">
             <span className="eyebrow">{t.project.previous}</span>
             <span className="mt-2 block font-serif text-lead group-hover:opacity-70">
               {neighbours.previous.title}
             </span>
           </Link>
 
-          <Link href={href(locale, 'work')} className="link-underline tap eyebrow shrink-0">
+          <Link href={href(locale, 'work')} className="link-underline tap eyebrow mx-auto">
             {t.project.backToWork}
           </Link>
 
-          <Link
-            href={href(locale, 'work', neighbours.next.slug)}
-            className="group max-w-[45%] text-right"
-            rel="next"
-          >
+          <Link href={href(locale, 'work', neighbours.next.slug)} className="group" rel="next">
             <span className="eyebrow">{t.project.next}</span>
             <span className="mt-2 block font-serif text-lead group-hover:opacity-70">
               {neighbours.next.title}

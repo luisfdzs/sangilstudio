@@ -12,6 +12,10 @@
  *     al <header> en bloque contenedor de sus descendientes `fixed`.
  *  3. Enlaces con menos de 24 px de área pulsable (WCAG 2.2).
  *
+ * Los dos primeros eran del menú desplegable de la cabecera, que ya no existe: la
+ * navegación de móvil es ahora una barra fija de iconos abajo. Se quedan escritos porque
+ * explican por qué esta lista mide lo que mide.
+ *
  * Usa `playwright-core` con el Chrome ya instalado: no descarga navegadores.
  * Requiere el servidor levantado (`npm run dev`) o un despliegue:
  *
@@ -65,74 +69,115 @@ async function main() {
   await page.goto(`${BASE}/${LOCALE}`, { waitUntil: 'networkidle' })
   check((await horizontalOverflow(page)) <= 1, 'la portada no desborda en horizontal')
 
-  const menuButton = page.locator('header button[aria-controls="mobile-nav"]')
-  check(await menuButton.isVisible(), 'el botón de menú se ve en móvil')
   check(
     !(await page.locator('header nav[aria-label="Principal"]').first().isVisible()),
     'la navegación de escritorio está oculta',
   )
 
-  // --- Menú: abrir, bloquear scroll, cerrar, navegar --------------------------
-  await menuButton.click()
-  const panel = page.locator('#mobile-nav')
-  const opened = await panel
+  // --- La barra inferior de iconos --------------------------------------------
+  // Sustituyó al botón «Menú» de la cabecera. Lo que se comprueba aquí es lo que la
+  // hace útil: que esté a la vista SIEMPRE —también tras bajar hasta el pie—, que no
+  // tape nada y que el pulgar la alcance.
+  const bar = page.locator('nav[aria-label="Navegación"]')
+  check(await bar.isVisible(), 'la barra de iconos se ve en móvil')
+
+  const slots = bar.locator('a, button')
+  check((await slots.count()) === 5, `la barra tiene cinco huecos (${await slots.count()})`)
+
+  // Todos los huecos, con el dedo: WCAG 2.2 pide 24×24 px como mínimo.
+  const tightSlots = []
+  for (let index = 0; index < (await slots.count()); index += 1) {
+    const box = await slots.nth(index).boundingBox()
+    if (!box || box.width < 24 || box.height < 24) tightSlots.push(index)
+  }
+  check(
+    tightSlots.length === 0,
+    `todos los huecos pasan de 24 px (fallan: ${tightSlots.join(', ') || '—'})`,
+  )
+
+  // Fija de verdad: se baja hasta el final y la barra sigue en el borde inferior.
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+  await page.waitForTimeout(600)
+  const barBox = await bar.boundingBox()
+  const viewport = page.viewportSize()
+  check(
+    Math.abs((barBox?.y ?? 0) + (barBox?.height ?? 0) - viewport.height) <= 1,
+    'la barra sigue pegada abajo tras bajar hasta el pie',
+  )
+
+  // El <body> se reserva el alto de la barra: si no, el copyright queda debajo.
+  const footerHidden = await page.evaluate(() => {
+    const last = document.querySelector('footer p:last-of-type')
+    if (!last) return null
+    const bottom = last.getBoundingClientRect().bottom
+    const nav = document.querySelector('nav[aria-label="Navegación"]')
+    return bottom > nav.getBoundingClientRect().top
+  })
+  check(footerHidden === false, 'el pie no queda tapado por la barra')
+
+  // --- El selector de idioma: abrir, cerrar, y que no tape la barra ------------
+  const localeButton = bar.locator('button[aria-controls="mobile-locales"]')
+  await localeButton.click()
+  const tray = page.locator('#mobile-locales')
+  const opened = await tray
     .waitFor({ state: 'visible', timeout: 4000 })
     .then(() => true)
     .catch(() => false)
-  check(opened, 'el panel del menú se abre y ocupa la pantalla')
+  check(opened, 'la bandeja de idiomas se abre')
 
-  const panelBox = await panel.boundingBox()
+  // La bandeja se apoya JUSTO encima de la barra: si el cálculo del alto fallara,
+  // se solaparían y el botón de cerrar dejaría de ser pulsable.
+  const trayBox = await tray.boundingBox()
+  const barTop = (await bar.boundingBox())?.y ?? 0
   check(
-    (panelBox?.height ?? 0) > 400,
-    `el panel tiene altura real (${Math.round(panelBox?.height ?? 0)} px)`,
+    Math.abs((trayBox?.y ?? 0) + (trayBox?.height ?? 0) - barTop) <= 1,
+    'la bandeja se apoya justo encima de la barra',
   )
-  check(
-    (await page.evaluate(() => document.body.style.overflow)) === 'hidden',
-    'el scroll de la página se bloquea con el menú abierto',
-  )
-
-  // La barra deja de ir en color papel al abrir el menú (contraste sobre papel).
-  await page.waitForTimeout(700)
-  const barColor = await page.evaluate(
-    () => getComputedStyle(document.querySelector('.header-bar')).color,
-  )
-  check(barColor === 'rgb(20, 20, 15)', `la barra usa tinta con el menú abierto (${barColor})`)
 
   await page.keyboard.press('Escape')
-  check(!(await panel.isVisible()), 'Escape cierra el menú')
-  check(
-    (await page.evaluate(() => document.body.style.overflow)) === '',
-    'el scroll se restaura al cerrar',
-  )
+  check(!(await tray.isVisible()), 'Escape cierra la bandeja de idiomas')
 
-  await menuButton.click()
-  await panel.locator('a').first().click()
-  await page.waitForURL(`**/${LOCALE}/**`)
-  check(!(await panel.isVisible()), 'el menú se cierra al navegar')
-  check(
-    (await page.evaluate(() => document.body.style.overflow)) === '',
-    'el scroll queda desbloqueado tras navegar',
-  )
+  // --- El wordmark, centrado en la cabecera de móvil --------------------------
+  // Sin menú al lado, la marca se centra. Se mide contra el centro de la pantalla.
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await page.waitForTimeout(400)
+  const markOffset = await page.evaluate(() => {
+    const mark = document.querySelector('.header-bar a[aria-label] svg')
+    if (!mark) return null
+    const box = mark.getBoundingClientRect()
+    return Math.abs(box.left + box.width / 2 - window.innerWidth / 2)
+  })
+  check(markOffset !== null && markOffset < 4, `el wordmark va centrado (${markOffset} px del eje)`)
 
   // --- Resto de plantillas ---------------------------------------------------
   await page.goto(`${BASE}/${LOCALE}/work`, { waitUntil: 'networkidle' })
   check((await horizontalOverflow(page)) <= 1, '/work no desborda en horizontal')
 
-  // Estudio y contacto son secciones de la portada, no páginas: se comprueba que el
-  // ancla existe y que al entrar por su URL el bloque queda por debajo de la barra
-  // fija (`scroll-padding-top` en globals.css), no tapado por ella.
+  // Estudio y contacto son secciones de la portada, pero con RUTA propia (`/es/studio`,
+  // no `/es#studio`). Se entra por esa URL y se comprueba que devuelve la portada con la
+  // sección colocada bajo la barra fija, no tapada por ella. Es el contrato de la ruta:
+  // si el salto se hiciera antes de que la página asiente, el encabezado quedaría oculto
+  // —pasó con las fuentes, ver `ScrollToSection`— y esto lo cazaría.
   for (const id of ['studio', 'contact']) {
-    await page.goto(`${BASE}/${LOCALE}#${id}`, { waitUntil: 'networkidle' })
-    // El ancla se mide con la página ya asentada: las imágenes de la rejilla entran
-    // perezosamente y, midiendo antes, la sección aún está bajándose de sitio.
+    await page.goto(`${BASE}/${LOCALE}/${id}`, { waitUntil: 'networkidle' })
+    // Se mide con la página ya asentada: las imágenes de la rejilla entran perezosamente
+    // y las fuentes cambian los altos, así que midiendo antes la sección aún se mueve.
     await page.waitForTimeout(1500)
     const top = await page.evaluate((anchor) => {
       const section = document.getElementById(anchor)
       return section ? Math.round(section.getBoundingClientRect().top) : null
     }, id)
-    check(top !== null, `la portada tiene la sección #${id}`)
-    check(top !== null && top >= 0 && top < 200, `#${id} queda justo bajo la barra (${top} px)`)
-    check((await horizontalOverflow(page)) <= 1, `#${id} no desborda en horizontal`)
+    const barBottom = await page.evaluate(
+      () => document.querySelector('header')?.getBoundingClientRect().bottom ?? 0,
+    )
+    check(top !== null, `/${LOCALE}/${id} devuelve la portada con la sección ${id}`)
+    check(top !== null && top >= barBottom && top < 200, `${id} queda bajo la barra (${top} px)`)
+    check((await horizontalOverflow(page)) <= 1, `/${LOCALE}/${id} no desborda en horizontal`)
+    // La mejora es la URL: nada de almohadilla en la barra de direcciones.
+    check(
+      !(await page.evaluate(() => location.hash)),
+      `/${LOCALE}/${id} no deja almohadilla en la URL`,
+    )
   }
 
   // --- Enlaces absolutos, comprobado desde una página PROFUNDA -----------------
