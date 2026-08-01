@@ -39,13 +39,13 @@ export async function HomeContent({ locale }: { locale: Locale }) {
           Antes de esta rejilla iba un manifiesto con los dos primeros párrafos del
           estudio; ahora que el estudio es una sección de esta misma página (abajo),
           repetirlo aquí sería decir dos veces lo mismo a media pantalla de distancia. */}
-      <section className="page-gutter pt-(--spacing-section)">
-        <div className="flex items-baseline justify-between border-b border-line pb-4">
-          <h2 className="eyebrow">{t.home.selectedWork}</h2>
-          <Link href={href(locale, 'work')} className="link-underline tap text-small">
-            {t.home.viewAllWork}
-          </Link>
-        </div>
+      <section className="page-gutter pt-(--spacing-section) text-center">
+        {/* El encabezado se queda solo sobre su filete, centrado como el resto de la
+            página. El enlace a todos los proyectos, que antes iba en el extremo derecho
+            de esta misma línea, ha bajado debajo de la rejilla: al lado del título
+            invitaba a saltarse justo lo que la sección venía a enseñar, y centrado bajo
+            la obra se ve desde cualquiera de las dos columnas. */}
+        <h2 className="eyebrow border-b border-line pb-4">{t.home.selectedWork}</h2>
 
         <div className="mt-10 grid gap-x-8 gap-y-16 md:mt-16 md:grid-cols-2 md:gap-y-24">
           {rest.map((project, index) => {
@@ -64,6 +64,13 @@ export async function HomeContent({ locale }: { locale: Locale }) {
             )
           })}
         </div>
+
+        <Link
+          href={href(locale, 'work')}
+          className="link-underline tap mt-14 inline-block text-small"
+        >
+          {t.home.viewAllWork}
+        </Link>
       </section>
 
       {/* Estudio y contacto no son páginas propias: se leen aquí, en el orden del menú

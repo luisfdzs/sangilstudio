@@ -43,6 +43,14 @@
   --spacing-gutter: clamp(1.25rem, 4vw, 3.5rem); /* margen lateral de página */
   --spacing-section: clamp(4.5rem, 10vw, 11rem); /* aire vertical entre bloques */
 
+  /* Alto de la barra de navegación inferior de móvil. Vive en el sistema porque lo
+     necesitan cuatro sitios que tienen que cuadrar al píxel: la barra, la bandeja de
+     idiomas que se abre justo encima, el hueco que el hero se reserva para que su pie
+     de foto no quede debajo de ella y el que el <body> se reserva bajo el pie.
+     El `env()` es la franja del gesto de inicio del iPhone: sin sumarla, los iconos
+     caen debajo de la rayita del sistema. */
+  --spacing-nav-mobile: calc(4rem + env(safe-area-inset-bottom));
+
   /* --- Movimiento -------------------------------------------------------- */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
@@ -103,6 +111,16 @@
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* La barra de navegación de móvil va fija sobre el contenido, así que el documento se
+     reserva su alto por debajo del pie. Sin esto, el copyright y los enlaces del pie
+     quedan tapados justo en el final de la página, que es donde más se nota. Sólo por
+     debajo de `md`, que es donde existe la barra. */
+  @media (width < 48rem) {
+    body {
+      padding-bottom: var(--spacing-nav-mobile);
+    }
   }
 
   /* Foco visible y coherente en todo el sitio (accesibilidad). */

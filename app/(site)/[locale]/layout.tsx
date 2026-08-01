@@ -3,6 +3,7 @@ import { Instrument_Sans, Instrument_Serif } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
+import { MobileNav } from '@/components/layout/MobileNav'
 import { site } from '@/content/site'
 import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
@@ -108,6 +109,7 @@ export default async function LocaleLayout({
           {children}
         </main>
         <Footer locale={typedLocale} />
+        <MobileNav locale={typedLocale} dictionary={dictionary} />
       </body>
     </html>
   )

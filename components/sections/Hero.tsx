@@ -38,19 +38,28 @@ export function Hero({ project, locale }: { project: ProjectEntry; locale: Local
         className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/45"
       />
 
-      <div className="page-gutter absolute inset-x-0 bottom-0 flex flex-col gap-6 pb-12 text-paper md:pb-16">
+      {/* El bloque de texto, centrado en el ancho de la pantalla y no pegado a la
+          izquierda. `items-center` además del `text-center` porque el titular y el pie de
+          foto llevan ancho máximo: sin él la caja se quedaría a la izquierda y el texto
+          saldría centrado dentro de una caja descentrada, que es peor que no centrar. */}
+      <div className="page-gutter absolute inset-x-0 bottom-0 flex flex-col items-center gap-6 pb-12 text-center text-paper md:pb-16">
         <p className="eyebrow text-paper/70">{t.home.heroLead}</p>
-        <h1 className="text-display max-w-4xl font-serif">
+        <h1 className="text-display max-w-4xl font-serif text-balance">
           {locale === 'es'
             ? 'Arquitectura con una razón detrás de cada decisión.'
             : 'Architecture with a reason behind every decision.'}
         </h1>
         <Link
           href={href(locale, 'work', project.slug)}
-          className="link-underline tap text-small w-fit text-paper/85"
+          className="link-underline tap text-small text-paper/85"
         >
           {project.title}, {project.location[locale]} · {project.year}
         </Link>
+
+        {/* El hueco de la barra de iconos de móvil, que va fija sobre el contenido: sin
+            él, el pie de foto del hero —el único enlace de la primera pantalla— queda
+            medio tapado por ella. Desaparece en `md`, donde la barra ya no existe. */}
+        <div aria-hidden className="h-(--spacing-nav-mobile) md:hidden" />
       </div>
     </section>
   )

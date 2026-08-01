@@ -29,10 +29,12 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
   const projects = await getProjects()
 
   return (
-    <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
-      <header className="max-w-2xl">
-        <h1 className="text-display font-serif">{t.work.title}</h1>
-        <p className="mt-6 text-lead text-ink-soft">{t.work.lead}</p>
+    <div className="page-gutter pt-16 pb-(--spacing-section) text-center md:pt-24">
+      {/* `mx-auto` en los dos: llevan ancho máximo, y una caja estrecha sin centrar deja
+          el texto centrado dentro de un bloque pegado a la izquierda. */}
+      <header className="mx-auto max-w-2xl">
+        <h1 className="text-display font-serif text-balance">{t.work.title}</h1>
+        <p className="mx-auto mt-6 max-w-xl text-lead text-ink-soft">{t.work.lead}</p>
       </header>
 
       <div className="mt-16 grid gap-x-8 gap-y-16 md:mt-24 md:grid-cols-2 md:gap-y-24">
