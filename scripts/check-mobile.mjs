@@ -118,21 +118,31 @@ async function main() {
   await page.goto(`${BASE}/${LOCALE}/work`, { waitUntil: 'networkidle' })
   check((await horizontalOverflow(page)) <= 1, '/work no desborda en horizontal')
 
-  // Estudio y contacto son secciones de la portada, no páginas: se comprueba que el
-  // ancla existe y que al entrar por su URL el bloque queda por debajo de la barra
-  // fija (`scroll-padding-top` en globals.css), no tapado por ella.
+  // Estudio y contacto son secciones de la portada, pero con RUTA propia (`/es/studio`,
+  // no `/es#studio`). Se entra por esa URL y se comprueba que devuelve la portada con la
+  // sección colocada bajo la barra fija, no tapada por ella. Es el contrato de la ruta:
+  // si el salto se hiciera antes de que la página asiente, el encabezado quedaría oculto
+  // —pasó con las fuentes, ver `ScrollToSection`— y esto lo cazaría.
   for (const id of ['studio', 'contact']) {
-    await page.goto(`${BASE}/${LOCALE}#${id}`, { waitUntil: 'networkidle' })
-    // El ancla se mide con la página ya asentada: las imágenes de la rejilla entran
-    // perezosamente y, midiendo antes, la sección aún está bajándose de sitio.
+    await page.goto(`${BASE}/${LOCALE}/${id}`, { waitUntil: 'networkidle' })
+    // Se mide con la página ya asentada: las imágenes de la rejilla entran perezosamente
+    // y las fuentes cambian los altos, así que midiendo antes la sección aún se mueve.
     await page.waitForTimeout(1500)
     const top = await page.evaluate((anchor) => {
       const section = document.getElementById(anchor)
       return section ? Math.round(section.getBoundingClientRect().top) : null
     }, id)
-    check(top !== null, `la portada tiene la sección #${id}`)
-    check(top !== null && top >= 0 && top < 200, `#${id} queda justo bajo la barra (${top} px)`)
-    check((await horizontalOverflow(page)) <= 1, `#${id} no desborda en horizontal`)
+    const barBottom = await page.evaluate(
+      () => document.querySelector('header')?.getBoundingClientRect().bottom ?? 0,
+    )
+    check(top !== null, `/${LOCALE}/${id} devuelve la portada con la sección ${id}`)
+    check(top !== null && top >= barBottom && top < 200, `${id} queda bajo la barra (${top} px)`)
+    check((await horizontalOverflow(page)) <= 1, `/${LOCALE}/${id} no desborda en horizontal`)
+    // La mejora es la URL: nada de almohadilla en la barra de direcciones.
+    check(
+      !(await page.evaluate(() => location.hash)),
+      `/${LOCALE}/${id} no deja almohadilla en la URL`,
+    )
   }
 
   // --- Enlaces absolutos, comprobado desde una página PROFUNDA -----------------

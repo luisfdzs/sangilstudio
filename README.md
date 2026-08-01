@@ -28,7 +28,7 @@ npm run dev        # http://localhost:3000
 | Script             | Qué hace                                                           |
 | ------------------ | ------------------------------------------------------------------ |
 | `npm run dev`      | Servidor de desarrollo (Turbopack)                                 |
-| `npm run build`    | Build de producción (prerrenderiza las 86 rutas)                   |
+| `npm run build`    | Build de producción (prerrenderiza las 87 rutas)                   |
 | `npm run check`    | `tsc --noEmit` + ESLint + Prettier — pasar esto antes de commitear |
 | `npm run format`   | Aplica Prettier a todo el proyecto                                 |
 | `npm run images`   | Genera los derivados web desde el archivo maestro de imágenes      |
@@ -83,9 +83,11 @@ no texto con formato libre, para que nadie pueda romper la estética con un titu
 app/
   [locale]/            ← todas las páginas viven bajo idioma (/es, /en)
     layout.tsx         · fuentes, header/footer, metadata y hreflang
-    page.tsx           · home (hero a pantalla completa + obra seleccionada)
+    page.tsx           · home → HomeContent
+    HomeContent.tsx    · la portada entera: hero, obra seleccionada, estudio y contacto
     work/              · índice de obra (concursos incluidos) y ficha de proyecto [slug]
-    studio/ contact/
+    [section]/         · /es/studio y /es/contact: la MISMA portada, abierta en su sección
+                         (canonical a /es; el mapa de secciones está en lib/i18n/routes.ts)
   globals.css          ← SISTEMA DE DISEÑO: todos los tokens, y sólo aquí
   sitemap.ts robots.ts ← generados del contenido real
 content/               ← CONTENIDO: un fichero por proyecto, validado con zod
@@ -110,7 +112,7 @@ Cuatro decisiones que conviene entender antes de tocar código:
 1. **Ninguna página consulta Sanity directamente**: todas pasan por `lib/content.ts`. Cuando el
    contenido vivía en ficheros, ese módulo los leía; ahora lee del CMS y **ninguna vista cambió**.
    Era exactamente para esto.
-2. **Todo es estático.** Las 86 rutas se prerrenderizan en build; no hay render en petición ni
+2. **Todo es estático.** Las 87 rutas se prerrenderizan en build; no hay render en petición ni
    base de datos. Lo único que corre en el servidor es `proxy.ts`, que negocia el idioma.
    `dynamicParams = false` en el layout de idioma: cualquier locale que no sea `es`/`en` es un 404,
    no algo que se renderice en petición.

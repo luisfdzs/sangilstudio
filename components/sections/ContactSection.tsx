@@ -4,13 +4,14 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
 
 /**
- * Contacto como SECCIÓN de la portada (`/es#contact`), cerrando la página.
+ * Contacto como SECCIÓN de la portada, cerrando la página. Con dirección propia
+ * —`/es/contact`— pero sin página propia: ver `StudioSection` y `[section]/page.tsx`.
  *
  * Directo, sin formulario: un formulario implica backend antispam y política de
  * privacidad; se añadirá cuando el estudio lo decida (ver README).
  *
- * El hueco de separación va en el envoltorio, no en el relleno de la sección, por
- * el mismo motivo que en `StudioSection`: que el ancla caiga en el encabezado.
+ * El hueco de separación va en el envoltorio, no en el relleno de la sección, por el
+ * mismo motivo que en `StudioSection`: que el desplazamiento caiga en el encabezado.
  */
 export function ContactSection({ locale, settings }: { locale: Locale; settings: SiteSettings }) {
   const t = getDictionary(locale)
