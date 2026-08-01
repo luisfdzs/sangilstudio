@@ -19,9 +19,13 @@ export function ContactSection({ locale, settings }: { locale: Locale; settings:
   return (
     <div className="pt-(--spacing-section)">
       {/* Ver `StudioSection`: el `scroll-mt` despega el encabezado de la barra. */}
-      <section id={sections.contact} className="page-gutter scroll-mt-8">
+      {/* `text-center` en la sección: el centrado alcanza a las tres columnas —correo,
+          teléfonos y dónde estamos—, que son datos paralelos y se leen como un bloque. */}
+      <section id={sections.contact} className="page-gutter scroll-mt-8 text-center">
         <h2 className="eyebrow border-b border-line pb-4">{t.contact.title}</h2>
-        <p className="mt-10 max-w-3xl text-lead font-serif text-balance md:mt-16">
+        {/* `mx-auto`: con el texto centrado, una columna estrecha tiene que ir centrada
+            también, o el bloque quedaría escorado a la izquierda. */}
+        <p className="mx-auto mt-10 max-w-3xl text-lead font-serif text-balance md:mt-16">
           {t.contact.lead}
         </p>
 
@@ -61,7 +65,7 @@ export function ContactSection({ locale, settings }: { locale: Locale; settings:
               {settings.region[locale]}, {settings.country[locale]}
             </p>
             {/* Las redes son opcionales en el panel: si no hay enlace, no se muestra. */}
-            <div className="mt-6 flex gap-4 text-small">
+            <div className="mt-6 flex justify-center gap-4 text-small">
               {[
                 { label: 'Instagram', url: settings.instagram },
                 { label: 'LinkedIn', url: settings.linkedin },

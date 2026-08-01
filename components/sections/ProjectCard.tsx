@@ -35,13 +35,17 @@ export function ProjectCard({ project, locale, priority = false, span = 'half' }
           />
         )}
 
-        <div className="mt-4 flex items-baseline justify-between gap-6">
-          <h3 className="text-lead font-serif leading-tight">{project.title}</h3>
-          <span className="eyebrow shrink-0">{project.year}</span>
+        {/* El pie de la tarjeta, centrado bajo su imagen. El año deja de ir en el extremo
+            opuesto al título: en una tarjeta a media columna esa fila abría un hueco
+            enorme entre dos palabras cortas, y en las anchas el año se iba tan lejos del
+            título que ya no se leían juntos. Ahora baja a la línea de metadatos, con la
+            ubicación y el estado, que es lo que es. */}
+        <div className="mt-4 text-center">
+          <h3 className="text-lead font-serif leading-tight text-balance">{project.title}</h3>
+          <p className="mt-1 text-small text-ink-soft">
+            {project.location[locale]} · {t.status[project.status]} · {project.year}
+          </p>
         </div>
-        <p className="mt-1 text-small text-ink-soft">
-          {project.location[locale]} · {t.status[project.status]}
-        </p>
       </Link>
     </article>
   )
