@@ -28,19 +28,15 @@ const nextConfig: NextConfig = {
         destination: '/:locale/work',
         permanent: true,
       },
-      {
-        // Estudio y contacto dejaron de ser páginas: son secciones de la portada. Las
-        // URLs antiguas llevan a su ancla, para que no se rompa nada de lo que ya se
-        // haya compartido (y porque estuvieron en el sitemap del entorno de test).
-        source: '/:locale(es|en)/studio',
-        destination: '/:locale#studio',
-        permanent: true,
-      },
-      {
-        source: '/:locale(es|en)/contact',
-        destination: '/:locale#contact',
-        permanent: true,
-      },
+      // Aquí había una redirección de `/studio` y `/contact` al ancla de la portada,
+      // de cuando dejaron de ser páginas. Ya no: son otra vez direcciones válidas, y
+      // dejarla habría hecho justo lo contrario de lo que se buscaba —convertir
+      // `/es/studio` en `/es#studio`— interceptando la ruta antes de que exista.
+      //
+      // Iba con 308, y un permanente lo cachea el navegador sin fecha de caducidad:
+      // quien las visitó entonces seguirá yendo al ancla hasta que limpie la caché. No
+      // se rompe nada, porque el `id` del `<section>` sigue estando y el navegador cae
+      // en el mismo sitio; sólo se ve una almohadilla que ya no toca.
     ]
   },
   async headers() {

@@ -5,7 +5,10 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
 
 /**
- * El estudio, como SECCIÓN de la portada (`/es#studio`), no como página aparte.
+ * El estudio, como SECCIÓN de la portada, no como página aparte. Tiene dirección
+ * propia —`/es/studio`, que sirve `[section]/page.tsx`— pero el HTML es el de la
+ * portada: el `id` de abajo es a la vez el destino al que lleva esa ruta.
+ *
  * El texto es el mismo que el estudio edita en el panel (`statement`), y aquí
  * hace además de manifiesto: es el respiro entre la obra y el contacto.
  *
@@ -14,7 +17,7 @@ import { sections } from '@/lib/i18n/routes'
  * quitaría a este bloque justo lo que aporta, que es aire.
  *
  * El hueco de separación va en un envoltorio y no en el relleno de la sección: si
- * lo llevara dentro, al entrar por `/es#studio` el navegador dejaría ese hueco
+ * lo llevara dentro, al entrar por `/es/studio` el desplazamiento dejaría ese hueco
  * arriba y con él la última línea de la sección anterior, asomando bajo la barra.
  */
 export function StudioSection({ locale, settings }: { locale: Locale; settings: SiteSettings }) {
@@ -22,8 +25,8 @@ export function StudioSection({ locale, settings }: { locale: Locale; settings: 
 
   return (
     <div className="pt-(--spacing-section)">
-      {/* `scroll-mt` suma al `scroll-padding-top` global: al llegar por el ancla, el
-          encabezado no queda pegado al borde inferior de la barra. */}
+      {/* `scroll-mt` suma al `scroll-padding-top` global: al llegar por la ruta de la
+          sección, el encabezado no queda pegado al borde inferior de la barra. */}
       <section id={sections.studio} className="page-gutter scroll-mt-8">
         <h2 className="eyebrow border-b border-line pb-4">{t.studio.title}</h2>
 
