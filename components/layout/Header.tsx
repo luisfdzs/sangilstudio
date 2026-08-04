@@ -21,7 +21,8 @@ type Props = {
  * En escritorio: wordmark a la izquierda, menú y los dos idiomas a la derecha.
  *
  * En móvil: wordmark a la izquierda y un **«+» en la esquina superior derecha** que
- * despliega el menú **a pantalla completa**; el «+» se convierte en «−» y es lo que lo
+ * despliega el menú **a pantalla completa, con las entradas centradas** (2026-08-04, con
+ * la web de Swiftmet como referencia); el «+» se convierte en «−» y es lo que lo
  * contrae. Antes esto era una barra fija de iconos abajo, y se quitó por decisión del
  * estudio: la barra comía cuatro centímetros de foto en todas las pantallas del sitio,
  * que en una web que es fotografía a sangre es justo lo que no sobra.
@@ -188,9 +189,22 @@ export function Header({ locale, dictionary }: Props) {
       <div
         id="mobile-menu"
         hidden={!open}
-        className="page-gutter fixed inset-0 z-40 flex flex-col overflow-y-auto bg-paper pt-20 pb-16 md:hidden"
+        className="page-gutter fixed inset-0 z-40 overflow-y-auto bg-paper pt-20 pb-16 md:hidden"
       >
-        <nav aria-label={dictionary.nav.menu} className="flex flex-col gap-6 pt-10">
+        {/* El menú va CENTRADO en la pantalla, como en Swiftmet: con cinco entradas y nada
+            más, alineadas arriba y a la izquierda dejaban la pantalla medio vacía y el ojo
+            no sabía dónde ir. El centrado lo pone este `<nav>` y no el panel de fuera: una
+            utilidad de `display` ahí discutiría con el atributo `hidden`, que es quien
+            apaga el panel cerrado.
+
+            `min-h-full` y no `h-full`: llena el panel para poder centrar, y si algún día
+            las entradas no caben en una pantalla baja, crece y el `overflow-y-auto` del
+            panel las deja alcanzables. El hueco de arriba (`pt-20`) sigue dejando libre la
+            altura de la barra, donde vive el «−» que cierra. */}
+        <nav
+          aria-label={dictionary.nav.menu}
+          className="flex min-h-full flex-col items-center justify-center gap-6 text-center"
+        >
           <Link href={home} onClick={goHome} className="text-title tracking-tight">
             {dictionary.nav.home}
           </Link>
@@ -208,27 +222,29 @@ export function Header({ locale, dictionary }: Props) {
               {dictionary.nav[key]}
             </Link>
           ))}
-        </nav>
 
-        {/* Los idiomas, al final y separados por un filete: no son un destino más. */}
-        <div className="mt-auto flex items-center gap-6 border-t border-line pt-8">
-          <GlobeIcon className="h-4 w-4 shrink-0 text-ink-faint" />
-          {locales.map((option) => (
-            <Link
-              key={option}
-              href={swapLocale(option)}
-              hrefLang={option}
-              onClick={close}
-              aria-current={option === locale ? 'true' : undefined}
-              className={cn(
-                'tap text-small uppercase',
-                option === locale ? 'text-ink' : 'text-ink-soft',
-              )}
-            >
-              {localeNames[option]}
-            </Link>
-          ))}
-        </div>
+          {/* Los idiomas, separados por un filete: no son un destino más. Ya no van
+              anclados al fondo con `mt-auto` —eso los dejaba lejos del grupo centrado y
+              rompía el eje—, sino justo debajo y centrados con él. */}
+          <div className="mt-6 flex items-center justify-center gap-6 border-t border-line pt-6">
+            <GlobeIcon className="h-4 w-4 shrink-0 text-ink-faint" />
+            {locales.map((option) => (
+              <Link
+                key={option}
+                href={swapLocale(option)}
+                hrefLang={option}
+                onClick={close}
+                aria-current={option === locale ? 'true' : undefined}
+                className={cn(
+                  'tap text-small uppercase',
+                  option === locale ? 'text-ink' : 'text-ink-soft',
+                )}
+              >
+                {localeNames[option]}
+              </Link>
+            ))}
+          </div>
+        </nav>
       </div>
     </>
   )

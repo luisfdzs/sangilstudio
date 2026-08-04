@@ -135,6 +135,20 @@ async function main() {
   })
   check(legible, 'el texto del menú contrasta con su fondo')
 
+  // Las entradas van CENTRADAS en la pantalla (2026-08-04, referencia: Swiftmet). Se mide
+  // el desvío del centro de cada enlace respecto al centro del panel; si alguien devolviera
+  // el `flex` al panel de fuera, el `hidden` volvería a discutir con él y esto lo cazaría.
+  const offCentre = await page.evaluate(() => {
+    const middle = window.innerWidth / 2
+    return Math.max(
+      ...[...document.querySelectorAll('#mobile-menu nav > a')].map((link) => {
+        const box = link.getBoundingClientRect()
+        return Math.abs((box.left + box.right) / 2 - middle)
+      }),
+    )
+  })
+  check(offCentre <= 2, `el menú está centrado (${Math.round(offCentre)} px de desvío)`)
+
   // El «−» que lo cierra vive en la cabecera y tiene que quedar POR ENCIMA del panel.
   check(
     await toggle.isVisible(),
