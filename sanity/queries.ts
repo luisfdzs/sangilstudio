@@ -47,15 +47,30 @@ export const PROJECT_SLUGS_QUERY = defineQuery(`
   *[_type == "project" && defined(slug.current)] | order(orderRank) { "slug": slug.current }
 `)
 
+/**
+ * `hero` sale de las referencias de `heroProjects`: de cada proyecto elegido en el
+ * panel se toma la primera imagen de su galería, que es su portada.
+ *
+ * Se devuelve envuelto en `{ "image": … }` en vez de aplanado a propósito. Un proyecto
+ * referenciado puede haberse quedado sin galería —o haberse borrado—, y con la forma
+ * plana ese hueco llegaría como `null` mezclado entre imágenes buenas. Así el filtrado
+ * se hace en un sitio explícito (`lib/content.ts`) y no depende de cómo GROQ decida
+ * colapsar los nulos de una travesía.
+ */
 export const SITE_SETTINGS_QUERY = defineQuery(`
   *[_type == "siteSettings"][0] {
+    "hero": heroProjects[]-> { "image": images[0] ${IMAGE} },
     statement,
     "team": team[] { name, role, phone },
     collaborators,
-    email,
+    street,
+    postalCode,
     city,
     region,
     country,
+    phone,
+    email,
+    website,
     instagram,
     linkedin
   }

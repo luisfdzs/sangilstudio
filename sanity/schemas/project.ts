@@ -118,22 +118,31 @@ export const project = defineType({
       group: 'ficha',
       description: 'Opcional. Ejemplo: «MUROA».',
     }),
+    /**
+     * Es el mismo campo que antes se llamaba «Colaboración»: se renombró al rediseñar
+     * la ficha, que ahora enseña una línea de «Arquitectos». Se conserva el nombre
+     * interno (`collaboration`) a propósito: cambiarlo obligaría a migrar los treinta y
+     * un documentos publicados para no perder lo que ya está escrito, y lo que hay
+     * escrito son precisamente los estudios que firman cada obra con nosotros.
+     */
     defineField({
       name: 'collaboration',
-      title: 'Colaboración',
+      title: 'Arquitectos',
       type: 'string',
       group: 'ficha',
-      description: 'Opcional. Ejemplo: «Vaíllo Architects».',
+      description:
+        'Quién firma la obra, separados por comas. Se enseña en la ficha del proyecto. ' +
+        'Ejemplo: «Yago Fernández Sangil, Vaíllo Architects».',
     }),
     defineField({
       name: 'featured',
-      title: 'Mostrar en la portada',
+      title: 'Destacado',
       type: 'boolean',
       group: 'ficha',
       initialValue: false,
       description:
-        'La portada muestra los seis primeros proyectos marcados, en el orden del ' +
-        'listado. El primero de todos es el que abre la web a pantalla completa.',
+        'Reserva: si en «Estudio y contacto» no se elige ningún proyecto para la ' +
+        'portada, se usan las imágenes de los destacados.',
     }),
 
     defineField({
@@ -160,8 +169,10 @@ export const project = defineType({
       group: 'imagenes',
       validation: (rule) => rule.required().min(1),
       description:
-        'La PRIMERA imagen es la portada del proyecto. Arrastra para reordenar. ' +
-        'Las verticales se muestran a media anchura y las horizontales a anchura completa.',
+        'La PRIMERA imagen es la portada del proyecto: es la que sale en la rejilla ' +
+        '—recortada en cuadrado— y la que se usa si el proyecto está en la portada de ' +
+        'la web. En la ficha se ven todas, una debajo de otra y sin recortar. Arrastra ' +
+        'para reordenar.',
     }),
     defineField({
       name: 'plans',

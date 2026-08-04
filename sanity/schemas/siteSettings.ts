@@ -3,20 +3,42 @@ import { defineField, defineType } from 'sanity'
 /**
  * AJUSTES DEL ESTUDIO (documento único)
  *
- * Todo lo que no es un proyecto: el manifiesto que abre la web y la página Estudio, el
- * equipo, los colaboradores y los datos de contacto. Es un documento único (singleton):
- * no se puede crear un segundo, para que no haya dudas de cuál manda.
+ * Todo lo que no es un proyecto: los proyectos que se ven en la portada, el manifiesto
+ * de la página Estudio, el equipo, los colaboradores y los datos de contacto. Es un
+ * documento único (singleton): no se puede crear un segundo, para que no haya dudas de
+ * cuál manda.
  */
 export const siteSettings = defineType({
   name: 'siteSettings',
   title: 'Estudio y contacto',
   type: 'document',
   groups: [
-    { name: 'textos', title: 'Textos', default: true },
+    { name: 'portada', title: 'Portada', default: true },
+    { name: 'textos', title: 'Textos' },
     { name: 'equipo', title: 'Equipo' },
     { name: 'contacto', title: 'Contacto' },
   ],
   fields: [
+    /**
+     * LA PORTADA. El estudio elige aquí, y sólo aquí, qué se ve al entrar en la web.
+     *
+     * Se eligen PROYECTOS, no imágenes sueltas, para que no haya que volver a subir
+     * fotos que ya están: de cada proyecto se usa la primera imagen de su galería, que
+     * es la portada de ese proyecto. Así, cambiar la portada de un proyecto cambia
+     * también lo que sale en el inicio, y no hay dos sitios que puedan contradecirse.
+     */
+    defineField({
+      name: 'heroProjects',
+      title: 'Proyectos de la portada',
+      type: 'array',
+      group: 'portada',
+      of: [{ type: 'reference', to: [{ type: 'project' }] }],
+      description:
+        'Las imágenes que se van fundiendo a pantalla completa al entrar en la web. Se ' +
+        'usa la PRIMERA imagen de cada proyecto elegido, en este orden. Si se deja ' +
+        'vacío, la web recurre a los proyectos marcados como destacados.',
+    }),
+
     defineField({
       name: 'statement',
       title: 'Manifiesto del estudio',
@@ -24,8 +46,8 @@ export const siteSettings = defineType({
       group: 'textos',
       validation: (rule) => rule.required(),
       description:
-        'Los párrafos que describen al estudio. El PRIMERO se usa también en la ' +
-        'portada, en grande; el segundo, debajo. La página Estudio muestra todos.',
+        'Los párrafos que describen al estudio. Se leen en la página Estudio; el ' +
+        'primero va en grande, a modo de entrada.',
     }),
     defineField({
       name: 'team',
@@ -60,7 +82,9 @@ export const siteSettings = defineType({
         },
       ],
       validation: (rule) => rule.required().min(1),
-      description: 'El orden de esta lista es el que se ve en la web. Arrastra para cambiarlo.',
+      description:
+        'El orden de esta lista es el que se ve en la web, también al final del bloque ' +
+        'de contacto. Arrastra para cambiarlo.',
     }),
     defineField({
       name: 'collaborators',
@@ -70,13 +94,25 @@ export const siteSettings = defineType({
       group: 'equipo',
       description: 'Estudios y empresas con los que se colabora. Uno por línea.',
     }),
+
+    /* --- Contacto -----------------------------------------------------------
+       Estos campos componen, literalmente y en este orden, el bloque de contacto de
+       la portada. Si alguno se deja vacío, la web usa el valor que tiene escrito por
+       defecto (ver `lib/content.ts`): así el bloque nunca sale a medias. */
     defineField({
-      name: 'email',
-      title: 'Email de contacto',
+      name: 'street',
+      title: 'Calle y número',
       type: 'string',
       group: 'contacto',
-      validation: (rule) => rule.required().email(),
-      description: 'Aparece en el pie de página y en Contacto, en todas las páginas.',
+      initialValue: 'Castillo de Maya 35, bajo',
+      description: 'Primera línea de la dirección. Ejemplo: «Castillo de Maya 35, bajo».',
+    }),
+    defineField({
+      name: 'postalCode',
+      title: 'Código postal',
+      type: 'string',
+      group: 'contacto',
+      initialValue: '31004',
     }),
     defineField({
       name: 'city',
@@ -92,6 +128,7 @@ export const siteSettings = defineType({
       type: 'localizedString',
       group: 'contacto',
       validation: (rule) => rule.required(),
+      description: 'No aparece en el bloque de contacto; se usa en los textos de la web.',
     }),
     defineField({
       name: 'country',
@@ -101,10 +138,35 @@ export const siteSettings = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'phone',
+      title: 'Teléfono del estudio',
+      type: 'string',
+      group: 'contacto',
+      initialValue: '+34 664 197 624',
+      description: 'El único que aparece en el bloque de contacto, precedido de una «T».',
+    }),
+    defineField({
+      name: 'email',
+      title: 'Email de contacto',
+      type: 'string',
+      group: 'contacto',
+      validation: (rule) => rule.required().email(),
+      description: 'Aparece en el bloque de contacto de la portada.',
+    }),
+    defineField({
+      name: 'website',
+      title: 'Página web',
+      type: 'url',
+      group: 'contacto',
+      initialValue: 'https://www.sangilstudio.com',
+      description: 'Se muestra sin «https://». Ejemplo: «www.sangilstudio.com».',
+    }),
+    defineField({
       name: 'instagram',
       title: 'Instagram',
       type: 'url',
       group: 'contacto',
+      description: 'Dirección completa del perfil. En la web se enseña sólo el nombre de usuario.',
     }),
     defineField({
       name: 'linkedin',
