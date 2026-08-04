@@ -175,8 +175,16 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
           className="w-full border-b border-line bg-transparent py-4 text-center text-lead tracking-wide placeholder:text-ink-faint focus:border-ink focus:outline-none"
         />
 
-        {/* Flota sobre la rejilla (de ahí el fondo opaco y el `z-10`) y se limita en alto
-            para que con treinta y un proyectos no tape la página entera.
+        {/* Flota sobre la rejilla (de ahí el `z-10`) y se limita en alto para que con treinta
+            y un proyectos no tape la página entera.
+
+            **Semitransparente, con desenfoque** (2026-08-04, decisión del estudio): con el
+            fondo opaco la lista tapaba las fotos de debajo y parecía un trozo de página
+            recortado. Ahora se siguen intuyendo las imágenes a través de ella. El
+            `backdrop-blur` no es adorno: es lo que mantiene legibles los títulos sobre una
+            fotografía cualquiera —sin él, un texto gris sobre una foto con detalle se
+            vuelve ilegible— y por eso el fondo no baja del 80 %.
+
             Sin borde arriba: el filete del campo hace de tapa y así la lista se lee como
             continuación del buscador y no como una caja aparte pegada debajo. La sombra
             es larguísima y muy tenue —lo justo para separar del blanco de la página—,
@@ -187,7 +195,7 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
           role="listbox"
           aria-label={dictionary.work.suggestions}
           hidden={!showList}
-          className="scrollbar-hairline absolute top-full left-0 z-10 max-h-[24rem] w-full overflow-y-auto border-x border-b border-line bg-paper shadow-[0_24px_48px_-24px_rgba(0,0,0,0.18)]"
+          className="scrollbar-hairline absolute top-full left-0 z-10 max-h-[24rem] w-full overflow-y-auto border-x border-b border-line bg-paper/80 shadow-[0_24px_48px_-24px_rgba(0,0,0,0.18)] backdrop-blur-md"
         >
           {suggestions.map((project, index) => (
             /* Cada título respira: centrado, en versalitas espaciadas y con una fila alta,
@@ -203,7 +211,7 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
               onPointerEnter={() => setActive(index)}
               onClick={() => go(project)}
               className={`cursor-pointer px-6 py-4 text-center text-body tracking-[0.14em] uppercase transition-colors duration-200 ease-(--ease-out-soft) ${
-                index === active ? 'bg-paper-deep text-ink' : 'text-ink-soft'
+                index === active ? 'bg-paper-deep/70 text-ink' : 'text-ink-soft'
               } ${index > 0 ? 'border-t border-line/60' : ''}`}
             >
               {project.title}

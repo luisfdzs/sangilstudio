@@ -70,9 +70,11 @@ async function main() {
   await page.goto(`${BASE}/${LOCALE}`, { waitUntil: 'networkidle' })
   check((await horizontalOverflow(page)) <= 1, 'la portada no desborda en horizontal')
 
+  // Ya no hay dos navegaciones: el menú del «+» es el mismo en móvil y en escritorio
+  // (2026-08-04), así que la fila de enlaces de la barra no existe en ninguna pantalla.
   check(
-    !(await page.locator('header nav[aria-label="Principal"]').first().isVisible()),
-    'la navegación de escritorio está oculta',
+    !(await page.locator('header nav').count()),
+    'la barra no lleva navegación propia: sólo marca y botón',
   )
 
   // La portada son dos bloques y nada más: el hero y el contacto. Sin pie de página.
@@ -82,12 +84,30 @@ async function main() {
   )
   check(!(await page.locator('footer').count()), 'no hay pie de página')
 
-  // El hero ocupa la pantalla y es un enlace a proyectos: es la única forma de entrar.
+  // El hero es un enlace a proyectos: es la única forma de entrar.
+  //
+  // Ya NO va a sangre (2026-08-04): respeta los márgenes de toda la web y arranca por
+  // debajo de la cabecera, que tiene su propio espacio en blanco. Se comprueban las dos
+  // cosas —que quede bajo la barra y que tenga margen lateral— porque justamente al ir a
+  // sangre la cabecera se pintaba en blanco encima de la foto, y ese blanco sobre blanco
+  // es el fallo nº 1 del historial de este script.
   const hero = page.locator('[data-hero]')
   const heroBox = await hero.boundingBox()
+  const barBottom = await page.evaluate(
+    () => document.querySelector('header')?.getBoundingClientRect().bottom ?? 0,
+  )
   check(
-    Math.abs((heroBox?.height ?? 0) - 844) <= 2,
-    `el hero ocupa la pantalla completa (${Math.round(heroBox?.height ?? 0)} px)`,
+    (heroBox?.y ?? 0) >= barBottom - 1,
+    `el hero arranca por debajo de la cabecera (${Math.round(heroBox?.y ?? 0)} px, barra hasta ${Math.round(barBottom)})`,
+  )
+  check(
+    (heroBox?.x ?? 0) >= 16 && (heroBox?.width ?? 390) <= 390 - 32,
+    `el hero tiene márgenes laterales (${Math.round(heroBox?.x ?? 0)} px a cada lado)`,
+  )
+  // Sigue siendo la pantalla de entrada: tiene que llenar lo que queda de ventana.
+  check(
+    (heroBox?.height ?? 0) > 844 * 0.7,
+    `el hero llena la ventana bajo la cabecera (${Math.round(heroBox?.height ?? 0)} px)`,
   )
   check(
     (await hero.getAttribute('href'))?.endsWith('/work') === true,
@@ -95,7 +115,7 @@ async function main() {
   )
 
   // --- El menú: el «+» de la esquina, a pantalla completa ----------------------
-  const toggle = page.locator('header button[aria-controls="mobile-menu"]')
+  const toggle = page.locator('header button[aria-controls="site-menu"]')
   check(await toggle.isVisible(), 'el botón «+» se ve en la esquina superior derecha')
 
   // A la derecha del todo: si se descolocara, el pulgar buscaría donde no está.
@@ -105,8 +125,28 @@ async function main() {
     `el «+» está pegado al borde derecho (${Math.round((toggleBox?.x ?? 0) + (toggleBox?.width ?? 0))} px)`,
   )
 
+  // El panel está siempre en el DOM (es lo que permite el fundido), así que cerrado tiene
+  // que estar apagado de verdad: invisible, transparente y con la transición declarada.
+  const closed = await page.evaluate(() => {
+    const style = getComputedStyle(document.getElementById('site-menu'))
+    return {
+      visibility: style.visibility,
+      opacity: style.opacity,
+      transition: style.transitionProperty,
+      inert: document.getElementById('site-menu').hasAttribute('inert'),
+    }
+  })
+  check(
+    closed.visibility === 'hidden' && closed.opacity === '0' && closed.inert,
+    `el menú cerrado está apagado (${closed.visibility}, opacidad ${closed.opacity}, inert ${closed.inert})`,
+  )
+  check(
+    closed.transition.includes('opacity'),
+    `el menú aparece con fundido (transición: ${closed.transition})`,
+  )
+
   await toggle.click()
-  const panel = page.locator('#mobile-menu')
+  const panel = page.locator('#site-menu')
   const opened = await panel
     .waitFor({ state: 'visible', timeout: 4000 })
     .then(() => true)
@@ -124,13 +164,13 @@ async function main() {
   // Fallo nº 1: el texto del menú en color papel sobre fondo papel. Se comprueba que
   // hay contraste de verdad entre el color del enlace y el fondo del panel.
   const legible = await page.evaluate(() => {
-    const link = document.querySelector('#mobile-menu a')
+    const link = document.querySelector('#site-menu a')
     if (!link) return false
     const luminance = (color) => {
       const [r, g, b] = color.match(/\d+(\.\d+)?/g).map(Number)
       return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
     }
-    const panelBackground = getComputedStyle(document.getElementById('mobile-menu')).backgroundColor
+    const panelBackground = getComputedStyle(document.getElementById('site-menu')).backgroundColor
     return Math.abs(luminance(getComputedStyle(link).color) - luminance(panelBackground)) > 0.4
   })
   check(legible, 'el texto del menú contrasta con su fondo')
@@ -141,7 +181,7 @@ async function main() {
   const offCentre = await page.evaluate(() => {
     const middle = window.innerWidth / 2
     return Math.max(
-      ...[...document.querySelectorAll('#mobile-menu nav > a')].map((link) => {
+      ...[...document.querySelectorAll('#site-menu nav > a')].map((link) => {
         const box = link.getBoundingClientRect()
         return Math.abs((box.left + box.right) / 2 - middle)
       }),
@@ -154,12 +194,24 @@ async function main() {
     await toggle.isVisible(),
     'el botón sigue accesible con el menú abierto (se convierte en «−»)',
   )
-  await toggle.click()
-  check(!(await panel.isVisible()), 'el «−» cierra el menú')
+  // Al cerrar hay que ESPERAR el fundido de salida: con `allow-discrete`, la visibilidad
+  // conmuta al TERMINAR la transición, así que medir justo después del clic da «sigue
+  // abierto» aunque ya se esté apagando. Se espera al estado, no un tiempo fijo.
+  const closes = async (label) => {
+    const hidden = await panel
+      .waitFor({ state: 'hidden', timeout: 4000 })
+      .then(() => true)
+      .catch(() => false)
+    check(hidden, label)
+  }
 
   await toggle.click()
+  await closes('el «−» cierra el menú')
+
+  await toggle.click()
+  await panel.waitFor({ state: 'visible', timeout: 4000 })
   await page.keyboard.press('Escape')
-  check(!(await panel.isVisible()), 'Escape cierra el menú')
+  await closes('Escape cierra el menú')
 
   // --- Áreas pulsables de la cabecera (WCAG 2.2: mínimo 24×24) -----------------
   const tightHeader = await page.evaluate(() =>
