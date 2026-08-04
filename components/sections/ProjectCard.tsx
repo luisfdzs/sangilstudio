@@ -44,9 +44,9 @@ export function ProjectCard({ project, locale, priority = false }: Props) {
 
         <div className="mt-4">
           <h3 className="text-small font-medium tracking-wide uppercase">{project.title}</h3>
-          <p className="mt-1 text-small text-ink-soft">
-            {project.location[locale]} · {project.year}
-          </p>
+          {/* Sólo la ubicación: el año se quitó de la rejilla por decisión del estudio.
+              Sigue en la ficha del proyecto, y el buscador sigue encontrando por año. */}
+          <p className="mt-1 text-small text-ink-soft">{project.location[locale]}</p>
         </div>
       </Link>
     </article>

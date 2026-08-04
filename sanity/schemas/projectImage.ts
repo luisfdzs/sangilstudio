@@ -8,8 +8,17 @@ import { defineField, defineType } from 'sanity'
  * ancho y recorte). Es lo que sustituye al script local de optimización para todo lo
  * que se suba desde aquí.
  *
- * El texto alternativo es obligatorio: es lo que oyen las personas que navegan con
- * lector de pantalla y lo que lee Google. Sin él, una foto es un hueco vacío.
+ * **Sólo la imagen es obligatoria: la descripción NO.** Antes lo era, y con una galería
+ * de veinte fotos el panel se convertía en veinte textos por escribir y por traducir; si
+ * faltaba uno, el botón «Publicar» se bloqueaba y el proyecto entero se quedaba sin
+ * subir. El estudio pidió poder arrastrar las fotos y publicar, y así es.
+ *
+ * Lo que se pierde al dejarla vacía: quien navega con lector de pantalla no oye qué hay
+ * en la foto, y Google no la lee. La web lo amortigua —una imagen sin descripción sale
+ * con `alt=""`, que un lector de pantalla salta en silencio en lugar de leer el nombre
+ * del fichero, y en la ficha la primera foto toma el nombre del proyecto—, y en la
+ * rejilla y en la portada la propia tarjeta o el enlace ya llevan el título. Aun así,
+ * rellenarla sigue siendo lo recomendable, y de ahí que el campo lo diga.
  */
 export const projectImage = defineType({
   name: 'projectImage',
@@ -30,12 +39,12 @@ export const projectImage = defineType({
     }),
     defineField({
       name: 'alt',
-      title: 'Descripción para accesibilidad',
-      type: 'localizedString',
-      validation: (rule) => rule.required(),
+      title: 'Descripción para accesibilidad (opcional)',
+      type: 'localizedStringOptional',
       description:
-        'Describe lo que se ve, sin repetir el nombre del proyecto. ' +
-        'Ejemplo: «Patio central con lámina de agua, entre muros de piedra».',
+        'Opcional: se puede publicar sin escribir nada. Si la rellenas, describe lo que ' +
+        'se ve, sin repetir el nombre del proyecto. Ejemplo: «Patio central con lámina ' +
+        'de agua, entre muros de piedra».',
     }),
   ],
   preview: {

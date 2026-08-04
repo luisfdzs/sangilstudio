@@ -21,6 +21,26 @@ export const localizedString = defineType({
   ],
 })
 
+/**
+ * La misma pieza, pero **sin obligar a rellenar nada**. Existe por las descripciones de
+ * las imágenes de un proyecto: el estudio sube una galería de veinte fotos y no quiere
+ * escribir veinte textos, y con `localizedString` el panel no dejaba publicar (los dos
+ * idiomas eran obligatorios). Ver `projectImage`.
+ *
+ * No sustituye a `localizedString`: en todo lo que es contenido de verdad —títulos,
+ * ubicaciones, memoria— el texto sigue siendo obligatorio en los dos idiomas.
+ */
+export const localizedStringOptional = defineType({
+  name: 'localizedStringOptional',
+  title: 'Texto (opcional)',
+  type: 'object',
+  options: { columns: 2 },
+  fields: [
+    defineField({ name: 'es', title: 'Español', type: 'string' }),
+    defineField({ name: 'en', title: 'Inglés', type: 'string' }),
+  ],
+})
+
 export const localizedText = defineType({
   name: 'localizedText',
   title: 'Texto largo',
