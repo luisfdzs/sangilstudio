@@ -45,10 +45,10 @@ export function ScrollToSection({ id }: { id: string }) {
      * Y otra vez cuando las fuentes estén listas.
      *
      * Van con `display: swap` (ver el layout de idioma): el primer pintado usa la
-     * tipografía del sistema y al llegar Instrument Serif cambian los altos de todo el
-     * texto que hay por encima. Con la portada entera por medio eso movía la sección
-     * más de 50 px, y el salto —que ya había ocurrido— dejaba el encabezado tapado por
-     * la barra. Medido en `/es/studio` a 1920×855: caía en 72 px teniendo la barra 96.
+     * tipografía del sistema y al llegar Montserrat cambian los altos de todo el texto
+     * que hay por encima. Con la portada entera por medio eso movía la sección más de
+     * 50 px, y el salto —que ya había ocurrido— dejaba el encabezado tapado por la
+     * barra. Medido en `/es/contact` a 1920×855: caía en 72 px teniendo la barra 96.
      *
      * Sólo se recoloca si la página sigue donde la dejamos. En una navegación dentro
      * del sitio las fuentes ya están cargadas y esto se resuelve al instante, sin

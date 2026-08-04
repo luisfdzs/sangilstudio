@@ -12,9 +12,10 @@
  *     al <header> en bloque contenedor de sus descendientes `fixed`.
  *  3. Enlaces con menos de 24 px de área pulsable (WCAG 2.2).
  *
- * Los dos primeros eran del menú desplegable de la cabecera, que ya no existe: la
- * navegación de móvil es ahora una barra fija de iconos abajo. Se quedan escritos porque
- * explican por qué esta lista mide lo que mide.
+ * Los dos primeros son de un menú desplegable en la cabecera, que es exactamente lo
+ * que el rediseño ha vuelto a poner —un «+» arriba a la derecha que despliega el menú
+ * a pantalla completa—, así que las dos comprobaciones vuelven a estar vivas y son la
+ * razón de que el panel se dibuje FUERA del <header> (ver `components/layout/Header`).
  *
  * Usa `playwright-core` con el Chrome ya instalado: no descarga navegadores.
  * Requiere el servidor levantado (`npm run dev`) o un despliegue:
@@ -74,141 +75,91 @@ async function main() {
     'la navegación de escritorio está oculta',
   )
 
-  // --- La barra inferior de iconos --------------------------------------------
-  // Sustituyó al botón «Menú» de la cabecera. Lo que se comprueba aquí es lo que la
-  // hace útil: que esté a la vista SIEMPRE —también tras bajar hasta el pie—, que no
-  // tape nada y que el pulgar la alcance.
-  const bar = page.locator('nav[aria-label="Navegación"]')
-  check(await bar.isVisible(), 'la barra de iconos se ve en móvil')
-
-  const slots = bar.locator('a, button')
-  check((await slots.count()) === 5, `la barra tiene cinco huecos (${await slots.count()})`)
-
-  // Todos los huecos, con el dedo: WCAG 2.2 pide 24×24 px como mínimo.
-  const tightSlots = []
-  for (let index = 0; index < (await slots.count()); index += 1) {
-    const box = await slots.nth(index).boundingBox()
-    if (!box || box.width < 24 || box.height < 24) tightSlots.push(index)
-  }
+  // La portada son dos bloques y nada más: el hero y el contacto. Sin pie de página.
   check(
-    tightSlots.length === 0,
-    `todos los huecos pasan de 24 px (fallan: ${tightSlots.join(', ') || '—'})`,
+    (await page.locator('main > *').count()) === 2,
+    `la portada tiene dos bloques (${await page.locator('main > *').count()})`,
+  )
+  check(!(await page.locator('footer').count()), 'no hay pie de página')
+
+  // El hero ocupa la pantalla y es un enlace a proyectos: es la única forma de entrar.
+  const hero = page.locator('[data-hero]')
+  const heroBox = await hero.boundingBox()
+  check(
+    Math.abs((heroBox?.height ?? 0) - 844) <= 2,
+    `el hero ocupa la pantalla completa (${Math.round(heroBox?.height ?? 0)} px)`,
+  )
+  check(
+    (await hero.getAttribute('href'))?.endsWith('/work') === true,
+    `el hero lleva a proyectos (${await hero.getAttribute('href')})`,
   )
 
-  // Fija de verdad: se baja hasta el final y la barra sigue en el borde inferior.
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
-  await page.waitForTimeout(600)
-  const barBox = await bar.boundingBox()
-  const viewport = page.viewportSize()
+  // --- El menú: el «+» de la esquina, a pantalla completa ----------------------
+  const toggle = page.locator('header button[aria-controls="mobile-menu"]')
+  check(await toggle.isVisible(), 'el botón «+» se ve en la esquina superior derecha')
+
+  // A la derecha del todo: si se descolocara, el pulgar buscaría donde no está.
+  const toggleBox = await toggle.boundingBox()
   check(
-    Math.abs((barBox?.y ?? 0) + (barBox?.height ?? 0) - viewport.height) <= 1,
-    'la barra sigue pegada abajo tras bajar hasta el pie',
+    (toggleBox?.x ?? 0) + (toggleBox?.width ?? 0) > 390 - 40,
+    `el «+» está pegado al borde derecho (${Math.round((toggleBox?.x ?? 0) + (toggleBox?.width ?? 0))} px)`,
   )
 
-  // El <body> se reserva el alto de la barra: si no, el copyright queda debajo.
-  const footerHidden = await page.evaluate(() => {
-    const last = document.querySelector('footer p:last-of-type')
-    if (!last) return null
-    const bottom = last.getBoundingClientRect().bottom
-    const nav = document.querySelector('nav[aria-label="Navegación"]')
-    return bottom > nav.getBoundingClientRect().top
-  })
-  check(footerHidden === false, 'el pie no queda tapado por la barra')
-
-  // --- El selector de idioma: abrir, cerrar, y que no tape la barra ------------
-  const localeButton = bar.locator('button[aria-controls="mobile-locales"]')
-  await localeButton.click()
-  const tray = page.locator('#mobile-locales')
-  const opened = await tray
+  await toggle.click()
+  const panel = page.locator('#mobile-menu')
+  const opened = await panel
     .waitFor({ state: 'visible', timeout: 4000 })
     .then(() => true)
     .catch(() => false)
-  check(opened, 'la bandeja de idiomas se abre')
+  check(opened, 'el menú se abre')
 
-  // La bandeja se apoya JUSTO encima de la barra: si el cálculo del alto fallara,
-  // se solaparían y el botón de cerrar dejaría de ser pulsable.
-  const trayBox = await tray.boundingBox()
-  const barTop = (await bar.boundingBox())?.y ?? 0
+  // Fallo nº 2 del historial: con el panel dentro de un header con `backdrop-blur`
+  // medía 0 px de alto. Tiene que ocupar la pantalla ENTERA.
+  const panelBox = await panel.boundingBox()
   check(
-    Math.abs((trayBox?.y ?? 0) + (trayBox?.height ?? 0) - barTop) <= 1,
-    'la bandeja se apoya justo encima de la barra',
+    Math.abs((panelBox?.height ?? 0) - 844) <= 2 && Math.abs((panelBox?.width ?? 0) - 390) <= 2,
+    `el menú ocupa toda la pantalla (${Math.round(panelBox?.width ?? 0)}×${Math.round(panelBox?.height ?? 0)})`,
   )
 
-  await page.keyboard.press('Escape')
-  check(!(await tray.isVisible()), 'Escape cierra la bandeja de idiomas')
-
-  // --- El wordmark, centrado en la cabecera de móvil --------------------------
-  // Sin menú al lado, la marca se centra. Se mide contra el centro de la pantalla.
-  await page.evaluate(() => window.scrollTo(0, 0))
-  await page.waitForTimeout(400)
-  const markOffset = await page.evaluate(() => {
-    const mark = document.querySelector('.header-bar a[aria-label] svg')
-    if (!mark) return null
-    const box = mark.getBoundingClientRect()
-    return Math.abs(box.left + box.width / 2 - window.innerWidth / 2)
+  // Fallo nº 1: el texto del menú en color papel sobre fondo papel. Se comprueba que
+  // hay contraste de verdad entre el color del enlace y el fondo del panel.
+  const legible = await page.evaluate(() => {
+    const link = document.querySelector('#mobile-menu a')
+    if (!link) return false
+    const luminance = (color) => {
+      const [r, g, b] = color.match(/\d+(\.\d+)?/g).map(Number)
+      return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
+    }
+    const panelBackground = getComputedStyle(document.getElementById('mobile-menu')).backgroundColor
+    return Math.abs(luminance(getComputedStyle(link).color) - luminance(panelBackground)) > 0.4
   })
-  check(markOffset !== null && markOffset < 4, `el wordmark va centrado (${markOffset} px del eje)`)
+  check(legible, 'el texto del menú contrasta con su fondo')
 
-  // --- Resto de plantillas ---------------------------------------------------
-  await page.goto(`${BASE}/${LOCALE}/work`, { waitUntil: 'networkidle' })
-  check((await horizontalOverflow(page)) <= 1, '/work no desborda en horizontal')
-
-  // Estudio y contacto son secciones de la portada, pero con RUTA propia (`/es/studio`,
-  // no `/es#studio`). Se entra por esa URL y se comprueba que devuelve la portada con la
-  // sección colocada bajo la barra fija, no tapada por ella. Es el contrato de la ruta:
-  // si el salto se hiciera antes de que la página asiente, el encabezado quedaría oculto
-  // —pasó con las fuentes, ver `ScrollToSection`— y esto lo cazaría.
-  for (const id of ['studio', 'contact']) {
-    await page.goto(`${BASE}/${LOCALE}/${id}`, { waitUntil: 'networkidle' })
-    // Se mide con la página ya asentada: las imágenes de la rejilla entran perezosamente
-    // y las fuentes cambian los altos, así que midiendo antes la sección aún se mueve.
-    await page.waitForTimeout(1500)
-    const top = await page.evaluate((anchor) => {
-      const section = document.getElementById(anchor)
-      return section ? Math.round(section.getBoundingClientRect().top) : null
-    }, id)
-    const barBottom = await page.evaluate(
-      () => document.querySelector('header')?.getBoundingClientRect().bottom ?? 0,
-    )
-    check(top !== null, `/${LOCALE}/${id} devuelve la portada con la sección ${id}`)
-    check(top !== null && top >= barBottom && top < 200, `${id} queda bajo la barra (${top} px)`)
-    check((await horizontalOverflow(page)) <= 1, `/${LOCALE}/${id} no desborda en horizontal`)
-    // La mejora es la URL: nada de almohadilla en la barra de direcciones.
-    check(
-      !(await page.evaluate(() => location.hash)),
-      `/${LOCALE}/${id} no deja almohadilla en la URL`,
-    )
-  }
-
-  // --- Enlaces absolutos, comprobado desde una página PROFUNDA -----------------
-  // `href()` devolvía rutas relativas (`es/work`): desde la portada funcionaban por
-  // casualidad y desde una ficha encadenaban → /es/work/es/work → 404. Se comprueba
-  // desde el nivel más profundo del sitio, que es donde se notaba.
-  await page.goto(`${BASE}/${LOCALE}/work`, { waitUntil: 'networkidle' })
-  const deep = await page.evaluate(
-    () => document.querySelector('main a[href*="/work/"]')?.getAttribute('href') ?? null,
+  // El «−» que lo cierra vive en la cabecera y tiene que quedar POR ENCIMA del panel.
+  check(
+    await toggle.isVisible(),
+    'el botón sigue accesible con el menú abierto (se convierte en «−»)',
   )
-  check(Boolean(deep), `hay fichas de proyecto enlazadas desde /work (${deep ?? 'ninguna'})`)
-  if (deep) {
-    await page.goto(`${BASE}${deep}`, { waitUntil: 'networkidle' })
-    const relatives = await page.evaluate(() =>
-      [...document.querySelectorAll('header a, footer a')]
-        .map((a) => a.getAttribute('href') ?? '')
-        .filter((href) => href && !/^(\/|#|https?:|mailto:|tel:)/.test(href)),
-    )
-    check(
-      relatives.length === 0,
-      relatives.length === 0
-        ? 'los enlaces de cabecera y pie son absolutos'
-        : `enlaces relativos (encadenarán y darán 404): ${relatives.join(', ')}`,
-    )
-  }
+  await toggle.click()
+  check(!(await panel.isVisible()), 'el «−» cierra el menú')
 
-  // --- Áreas pulsables (WCAG 2.2: mínimo 24×24) -------------------------------
-  const small = await page.evaluate(() =>
-    [...document.querySelectorAll('a, button')]
+  await toggle.click()
+  await page.keyboard.press('Escape')
+  check(!(await panel.isVisible()), 'Escape cierra el menú')
+
+  // --- Áreas pulsables de la cabecera (WCAG 2.2: mínimo 24×24) -----------------
+  const tightHeader = await page.evaluate(() =>
+    [...document.querySelectorAll('header a, header button')]
+      // Primero se descarta lo que no se ve, y sólo después se mide.
+      //
+      // El orden importa: la navegación de escritorio está en el DOM con `display:none`
+      // en móvil, así que su alto real es 0, pero la utilidad `tap` le sigue calculando
+      // un pseudo-elemento de 12,8 px. Sumando antes de filtrar, esos cinco enlaces
+      // invisibles se contaban como objetivos pequeños y el script fallaba señalando un
+      // problema que no existe. También cae aquí el enlace «saltar al contenido», que
+      // mide 1×1 mientras está oculto y crece al recibir foco: es el patrón correcto.
+      .filter((element) => element.getBoundingClientRect().height > 2)
       .map((element) => {
-        const rect = element.getBoundingClientRect()
         const before = getComputedStyle(element, '::before')
         // La utilidad `tap` agranda el área con un pseudo-elemento invisible.
         const grow =
@@ -217,20 +168,128 @@ async function main() {
             : 0
         return {
           text: element.textContent.trim().slice(0, 30),
-          height: rect.height + grow,
-          width: rect.width,
+          height: element.getBoundingClientRect().height + grow,
         }
       })
-      // El enlace "saltar al contenido" mide 1×1 mientras está oculto y crece al
-      // recibir foco: es el patrón correcto, no un objetivo pequeño.
-      .filter((element) => element.height > 2 && element.width > 2 && element.height < 24),
+      .filter((element) => element.height < 24),
   )
   check(
-    small.length === 0,
-    small.length === 0
-      ? 'todas las áreas pulsables llegan a 24 px'
-      : `áreas pulsables por debajo de 24 px: ${JSON.stringify(small.slice(0, 5))}`,
+    tightHeader.length === 0,
+    tightHeader.length === 0
+      ? 'los controles de la cabecera llegan a 24 px'
+      : `por debajo de 24 px: ${JSON.stringify(tightHeader)}`,
   )
+
+  // --- Contacto: sección de la portada, con ruta propia ------------------------
+  // Se entra por `/es/contact` y se comprueba que devuelve la portada con la sección
+  // colocada bajo la cabecera fija, no tapada por ella. Es el contrato de la ruta: si
+  // el salto se hiciera antes de que la página asiente, el encabezado quedaría oculto
+  // —pasó con las fuentes, ver `ScrollToSection`— y esto lo cazaría.
+  await page.goto(`${BASE}/${LOCALE}/contact`, { waitUntil: 'networkidle' })
+  await page.waitForTimeout(1500)
+  const contactTop = await page.evaluate(() => {
+    const section = document.getElementById('contact')
+    return section ? Math.round(section.getBoundingClientRect().top) : null
+  })
+  const headerBottom = await page.evaluate(
+    () => document.querySelector('header')?.getBoundingClientRect().bottom ?? 0,
+  )
+  check(contactTop !== null, `/${LOCALE}/contact devuelve la portada con la sección`)
+  check(
+    contactTop !== null && contactTop >= headerBottom && contactTop < 200,
+    `contacto queda bajo la cabecera (${contactTop} px)`,
+  )
+  check((await horizontalOverflow(page)) <= 1, '/contact no desborda en horizontal')
+  // La mejora es la URL: nada de almohadilla en la barra de direcciones.
+  check(!(await page.evaluate(() => location.hash)), '/contact no deja almohadilla en la URL')
+
+  // Los enlaces del bloque de contacto: los tres con icono tienen que ser pulsables.
+  const contactLinks = page.locator('#contact ul a')
+  check(
+    (await contactLinks.count()) >= 2,
+    `el contacto tiene sus enlaces (${await contactLinks.count()})`,
+  )
+
+  // --- El estudio ya es una página de verdad ----------------------------------
+  await page.goto(`${BASE}/${LOCALE}/studio`, { waitUntil: 'networkidle' })
+  check(
+    (await page.locator('h1').first().isVisible()) && !(await page.locator('[data-hero]').count()),
+    '/studio es una página propia, no la portada',
+  )
+  check((await horizontalOverflow(page)) <= 1, '/studio no desborda en horizontal')
+
+  // --- Proyectos: una columna, cuadradas, y el buscador filtra -----------------
+  await page.goto(`${BASE}/${LOCALE}/work`, { waitUntil: 'networkidle' })
+  check((await horizontalOverflow(page)) <= 1, '/work no desborda en horizontal')
+
+  const cards = page.locator('main article')
+  const total = await cards.count()
+  check(total > 0, `hay proyectos en la rejilla (${total})`)
+
+  // Una sola columna en móvil: todas las tarjetas empiezan en la misma x.
+  const columns = await page.evaluate(
+    () =>
+      new Set(
+        [...document.querySelectorAll('main article')].map((card) =>
+          Math.round(card.getBoundingClientRect().x),
+        ),
+      ).size,
+  )
+  check(columns === 1, `una sola columna en móvil (${columns})`)
+
+  // Las fotos son cuadradas, no verticales de móvil.
+  const squares = await page.evaluate(() => {
+    const boxes = [...document.querySelectorAll('main article img')].map((img) =>
+      img.getBoundingClientRect(),
+    )
+    return boxes.every((box) => Math.abs(box.width - box.height) <= 2)
+  })
+  check(squares, 'las imágenes de la rejilla son cuadradas')
+
+  // El buscador: contiene, sin mayúsculas y sin acentos.
+  const search = page.locator('#project-search')
+  check(await search.isVisible(), 'el buscador se ve')
+  await search.fill('zzzzzz')
+  await page.waitForTimeout(200)
+  check((await cards.count()) === 0, 'una búsqueda sin resultados vacía la rejilla')
+  await search.fill('')
+  await page.waitForTimeout(200)
+  check((await cards.count()) === total, 'al vaciar el buscador vuelven todos')
+
+  // --- Enlaces absolutos, comprobado desde una página PROFUNDA -----------------
+  // `href()` devolvía rutas relativas (`es/work`): desde la portada funcionaban por
+  // casualidad y desde una ficha encadenaban → /es/work/es/work → 404. Se comprueba
+  // desde el nivel más profundo del sitio, que es donde se notaba.
+  const deep = await page.evaluate(
+    () => document.querySelector('main a[href*="/work/"]')?.getAttribute('href') ?? null,
+  )
+  check(Boolean(deep), `hay fichas de proyecto enlazadas desde /work (${deep ?? 'ninguna'})`)
+  if (deep) {
+    await page.goto(`${BASE}${deep}`, { waitUntil: 'networkidle' })
+    const relatives = await page.evaluate(() =>
+      [...document.querySelectorAll('header a')]
+        .map((a) => a.getAttribute('href') ?? '')
+        .filter((href) => href && !/^(\/|#|https?:|mailto:|tel:)/.test(href)),
+    )
+    check(
+      relatives.length === 0,
+      relatives.length === 0
+        ? 'los enlaces de la cabecera son absolutos'
+        : `enlaces relativos (encadenarán y darán 404): ${relatives.join(', ')}`,
+    )
+
+    // La ficha: las imágenes van a una sola columna y a todo el ancho.
+    const galleryColumns = await page.evaluate(
+      () =>
+        new Set(
+          [...document.querySelectorAll('article img')].map((img) =>
+            Math.round(img.getBoundingClientRect().x),
+          ),
+        ).size,
+    )
+    check(galleryColumns === 1, `las imágenes de la ficha van a una columna (${galleryColumns})`)
+    check((await horizontalOverflow(page)) <= 1, 'la ficha no desborda en horizontal')
+  }
 
   // --- Indexación: sólo sangilstudio.com puede aparecer en Google ---------------
   // El proyecto de test despliega su rama como "production" de ese proyecto, así que

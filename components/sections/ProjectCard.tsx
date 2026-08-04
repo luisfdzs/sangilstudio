@@ -2,48 +2,50 @@ import Link from 'next/link'
 import { Media } from '@/components/ui/Media'
 import type { ProjectEntry } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
-import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href } from '@/lib/i18n/routes'
-import { cn } from '@/lib/cn'
 
 type Props = {
   project: ProjectEntry
   locale: Locale
-  /** La primera tarjeta de la página carga con prioridad (candidata a LCP). */
+  /** Las primeras tarjetas de la página cargan con prioridad (candidatas a LCP). */
   priority?: boolean
-  /** `wide` ocupa las dos columnas; se usa para romper el ritmo del grid. */
-  span?: 'half' | 'wide'
 }
 
-export function ProjectCard({ project, locale, priority = false, span = 'half' }: Props) {
-  const t = getDictionary(locale)
+/**
+ * Una obra en la rejilla de proyectos.
+ *
+ * **Cuadrada, siempre.** Antes cada tarjeta tomaba una proporción distinta según su
+ * sitio en la rejilla (16/9 a lo ancho, 4/3 a media columna) y las fotos verticales
+ * salían con formato de móvil. Ahora todas se recortan a 1:1: la rejilla se lee como
+ * una rejilla, y el hotspot que se marca en el panel decide qué parte no se recorta.
+ *
+ * **Respira al pasar el ratón.** La imagen crece un 4 % dentro de su cuadro, que no se
+ * mueve: el recorte lo hace el `overflow-hidden` que ya trae `Media`, así que la
+ * retícula se queda quieta y lo único que pasa es que la foto se acerca. El zoom se
+ * aplica al `<img>` con una variante de descendiente y no a la caja, porque escalar la
+ * caja movería también el pie de la tarjeta.
+ */
+export function ProjectCard({ project, locale, priority = false }: Props) {
   const cover = project.cover
 
   return (
-    <article className={cn('group', span === 'wide' && 'md:col-span-2')}>
+    <article className="group">
       <Link href={href(locale, 'work', project.slug)} className="block">
         {cover && (
           <Media
             image={cover}
             alt={cover.alt[locale]}
-            ratio={span === 'wide' ? '16 / 9' : '4 / 3'}
-            sizes={
-              span === 'wide' ? '(max-width: 768px) 100vw, 92vw' : '(max-width: 768px) 100vw, 46vw'
-            }
+            ratio="1 / 1"
+            sizes="(max-width: 768px) 100vw, 30vw"
             priority={priority}
-            className="transition-[transform,opacity] duration-[900ms] ease-(--ease-out-soft) group-hover:opacity-92"
+            className="[&_img]:transition-transform [&_img]:duration-[900ms] [&_img]:ease-(--ease-out-soft) group-hover:[&_img]:scale-[1.04]"
           />
         )}
 
-        {/* El pie de la tarjeta, centrado bajo su imagen. El año deja de ir en el extremo
-            opuesto al título: en una tarjeta a media columna esa fila abría un hueco
-            enorme entre dos palabras cortas, y en las anchas el año se iba tan lejos del
-            título que ya no se leían juntos. Ahora baja a la línea de metadatos, con la
-            ubicación y el estado, que es lo que es. */}
-        <div className="mt-4 text-center">
-          <h3 className="text-lead font-serif leading-tight text-balance">{project.title}</h3>
+        <div className="mt-4">
+          <h3 className="text-small font-medium tracking-wide uppercase">{project.title}</h3>
           <p className="mt-1 text-small text-ink-soft">
-            {project.location[locale]} · {t.status[project.status]} · {project.year}
+            {project.location[locale]} · {project.year}
           </p>
         </div>
       </Link>

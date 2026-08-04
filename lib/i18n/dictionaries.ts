@@ -11,42 +11,31 @@ const es = {
     work: 'Proyectos',
     studio: 'Estudio',
     contact: 'Contacto',
-    close: 'Cerrar',
-    skipToContent: 'Saltar al contenido',
-    /* Los tres de abajo sólo se oyen: nombran la barra de iconos de móvil y su botón de
-       idioma para quien navega con lector de pantalla. En la barra no hay rótulos —cinco
-       palabras no caben a lo ancho de un móvil—, así que el nombre accesible es lo único
-       que distingue un hueco de otro. */
+    /* Los cuatro de abajo casi no se leen: nombran el botón del menú de móvil —que es un
+       «+» sin rótulo—, el selector de idioma y el enlace de salto. Son lo único que
+       distingue esos controles para quien navega con lector de pantalla. */
+    menu: 'Abrir menú',
+    close: 'Cerrar menú',
     language: 'Idioma',
-    mobile: 'Navegación',
+    skipToContent: 'Saltar al contenido',
   },
   home: {
-    heroLead: 'Arquitectura en Navarra',
-    intro:
-      'Sangil Studio proyecta vivienda, rehabilitación y espacios de trabajo con una idea fija: que cada decisión —la luz, el material, la medida— tenga una razón.',
-    selectedWork: 'Obra seleccionada',
-    viewAllWork: 'Ver todos los proyectos',
+    /* La portada no tiene texto: son imágenes a pantalla completa que llevan a los
+       proyectos. Esto es el nombre accesible de ese enlace, que ocupa la pantalla
+       entera y sin él se anunciaría vacío. */
+    heroLink: 'Ver todos los proyectos',
   },
   work: {
     title: 'Proyectos',
-    lead: 'Obra construida, en curso y propuestas presentadas a concurso.',
-    all: 'Todos',
-    filterYear: 'Año',
-    empty: 'No hay proyectos en esta selección.',
+    search: 'Buscar proyecto',
+    empty: 'Ningún proyecto coincide con la búsqueda.',
+    /* Se anuncia por voz al filtrar, no se ve. `{n}` se sustituye por el número. */
+    results: '{n} proyectos',
+    resultsOne: '1 proyecto',
   },
   project: {
-    year: 'Año',
-    location: 'Ubicación',
-    status: 'Estado',
-    type: 'Tipo',
-    area: 'Superficie',
-    collaboration: 'Colaboración',
+    architects: 'Arquitectos',
     client: 'Promotor',
-    next: 'Siguiente proyecto',
-    previous: 'Proyecto anterior',
-    backToWork: 'Volver a proyectos',
-    gallery: 'Imágenes',
-    plans: 'Planos',
   },
   studio: {
     title: 'Estudio',
@@ -55,22 +44,6 @@ const es = {
   },
   contact: {
     title: 'Contacto',
-    lead: 'Cuéntanos qué tienes en mente.',
-    phone: 'Teléfono',
-    email: 'Email',
-    location: 'Dónde estamos',
-  },
-  footer: {
-    rights: 'Todos los derechos reservados.',
-    legal: 'Aviso legal',
-    privacy: 'Privacidad',
-    backToTop: 'Volver arriba',
-  },
-  status: {
-    built: 'Construido',
-    'in-progress': 'En obra',
-    project: 'En proyecto',
-    competition: 'Concurso',
   },
   type: {
     housing: 'Vivienda',
@@ -100,38 +73,24 @@ const en: Dictionary = {
     work: 'Work',
     studio: 'Studio',
     contact: 'Contact',
-    close: 'Close',
-    skipToContent: 'Skip to content',
+    menu: 'Open menu',
+    close: 'Close menu',
     language: 'Language',
-    mobile: 'Navigation',
+    skipToContent: 'Skip to content',
   },
   home: {
-    heroLead: 'Architecture in Navarre',
-    intro:
-      'Sangil Studio designs housing, refurbishments and workspaces with one fixed idea: every decision —light, material, measure— should have a reason behind it.',
-    selectedWork: 'Selected work',
-    viewAllWork: 'View all projects',
+    heroLink: 'View all projects',
   },
   work: {
     title: 'Work',
-    lead: 'Built and ongoing projects, and competition entries.',
-    all: 'All',
-    filterYear: 'Year',
-    empty: 'No projects in this selection.',
+    search: 'Search projects',
+    empty: 'No project matches your search.',
+    results: '{n} projects',
+    resultsOne: '1 project',
   },
   project: {
-    year: 'Year',
-    location: 'Location',
-    status: 'Status',
-    type: 'Type',
-    area: 'Area',
-    collaboration: 'Collaboration',
+    architects: 'Architects',
     client: 'Client',
-    next: 'Next project',
-    previous: 'Previous project',
-    backToWork: 'Back to work',
-    gallery: 'Images',
-    plans: 'Drawings',
   },
   studio: {
     title: 'Studio',
@@ -140,22 +99,6 @@ const en: Dictionary = {
   },
   contact: {
     title: 'Contact',
-    lead: 'Tell us what you have in mind.',
-    phone: 'Phone',
-    email: 'Email',
-    location: 'Where we are',
-  },
-  footer: {
-    rights: 'All rights reserved.',
-    legal: 'Legal notice',
-    privacy: 'Privacy',
-    backToTop: 'Back to top',
-  },
-  status: {
-    built: 'Built',
-    'in-progress': 'Under construction',
-    project: 'In design',
-    competition: 'Competition',
   },
   type: {
     housing: 'Housing',
