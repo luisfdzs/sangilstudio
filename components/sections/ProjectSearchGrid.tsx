@@ -137,7 +137,10 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
 
   return (
     <>
-      <div ref={containerRef} className="relative mt-10 w-full max-w-md md:mt-14">
+      {/* Centrado en su fila (`mx-auto`): sin el título encima, el campo es lo primero que
+          se ve al entrar y descolgado a la izquierda quedaba huérfano. La rejilla de abajo
+          sigue ocupando todo el ancho. */}
+      <div ref={containerRef} className="relative mx-auto w-full max-w-md">
         <label htmlFor="project-search" className="sr-only">
           {dictionary.work.search}
         </label>

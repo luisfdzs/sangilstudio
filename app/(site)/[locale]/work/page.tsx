@@ -26,6 +26,11 @@ export async function generateMetadata({
  * El listado y el buscador van en un componente de cliente (`ProjectSearchGrid`) porque
  * el filtrado ocurre mientras se escribe; los datos se leen aquí, en el servidor, y se
  * le pasan ya validados. La página sigue siendo estática.
+ *
+ * **Sin título a la vista (2026-08-04).** El estudio no quiere ver «PROYECTOS» escrito: la
+ * página abre directamente con el buscador centrado y la rejilla. El `<h1>` sigue en el
+ * HTML pero sólo para lectores de pantalla (`sr-only`): una página sin encabezado se
+ * anuncia sin nombre y se navega peor, y quitarlo del todo no ahorra nada porque no se ve.
  */
 export default async function WorkPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -36,7 +41,7 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
 
   return (
     <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
-      <h1 className="text-display tracking-tight uppercase">{t.work.title}</h1>
+      <h1 className="sr-only">{t.work.title}</h1>
       <ProjectSearchGrid projects={projects} locale={locale} dictionary={t} />
     </div>
   )

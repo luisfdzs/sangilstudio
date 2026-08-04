@@ -41,8 +41,6 @@ const es = {
   },
   studio: {
     title: 'Estudio',
-    team: 'Equipo',
-    collaborators: 'Colaboradores',
   },
   contact: {
     title: 'Contacto',
@@ -97,8 +95,6 @@ const en: Dictionary = {
   },
   studio: {
     title: 'Studio',
-    team: 'Team',
-    collaborators: 'Collaborators',
   },
   contact: {
     title: 'Contact',
