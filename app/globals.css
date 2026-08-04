@@ -9,18 +9,26 @@
    ========================================================================= */
 
 @theme {
-  /* --- Color: papel, tinta y grises. Nada más. --------------------------- */
-  --color-paper: #f4f2ee; /* fondo cálido, no blanco puro */
-  --color-paper-deep: #ebe8e2; /* bloques alternos, hovers */
-  --color-ink: #14140f; /* texto principal, casi negro */
-  --color-ink-soft: #6c6b64; /* texto secundario */
-  --color-ink-faint: #a8a6a0; /* metadatos, numeración */
-  --color-line: #d9d5cd; /* filetes de 1px */
-  --color-inverse: #0f0f0c; /* secciones oscuras (fichas, footer) */
+  /* --- Color: blanco, tinta y grises. Nada más. --------------------------
+     El fondo es BLANCO PURO por decisión del estudio. Antes era un papel cálido
+     (#f4f2ee); se cambió porque las fotografías de arquitectura —muchas con cielos
+     y hormigones claros— se recortaban contra ese beige y la web parecía tener dos
+     blancos. El nombre `paper` se conserva: nombra el papel de la página, no su
+     tono, y renombrarlo tocaría cien clases sin cambiar nada. */
+  --color-paper: #ffffff; /* fondo de toda la web */
+  --color-paper-deep: #f2f1ef; /* hueco de una imagen mientras carga, hovers */
+  --color-ink: #111111; /* texto principal */
+  --color-ink-soft: #6b6b6b; /* texto secundario */
+  --color-ink-faint: #9a9a9a; /* metadatos, numeración */
+  --color-line: #e4e4e4; /* filetes de 1px */
 
-  /* --- Tipografía: una sans neo-grotesca + una serif editorial ----------- */
-  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  /* --- Tipografía: UNA sola familia, Montserrat -------------------------
+     La web entera va en Montserrat. Antes convivían una neo-grotesca y una serif
+     editorial; el estudio pidió una sola voz. Al no haber segunda familia, la
+     jerarquía la marcan el tamaño, el peso y las versalitas, no el contraste entre
+     dos tipografías. La lista de reserva es sólo por si la fuente no llega: Next la
+     autoaloja y la sirve desde nuestro dominio. */
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
 
   /* Escala fluida: un solo valor por peldaño, sin variantes intermedias.
      clamp() evita media queries para tipografía y elimina saltos bruscos. */
@@ -30,26 +38,22 @@
   --text-small: 0.8125rem; /* 13px · metadatos */
   --text-small--line-height: 1.5;
   --text-body: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
-  --text-body--line-height: 1.65;
-  --text-lead: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
-  --text-lead--line-height: 1.5;
-  --text-title: clamp(1.5rem, 1.2rem + 1.4vw, 2.5rem);
-  --text-title--line-height: 1.15;
-  --text-display: clamp(2.25rem, 1.4rem + 4vw, 5.5rem);
-  --text-display--line-height: 0.98;
-  --text-display--letter-spacing: -0.02em;
+  --text-body--line-height: 1.7;
+  --text-lead: clamp(1.0625rem, 1rem + 0.4vw, 1.3125rem);
+  --text-lead--line-height: 1.55;
+  --text-title: clamp(1.375rem, 1.1rem + 1.2vw, 2.125rem);
+  --text-title--line-height: 1.2;
+  --text-display: clamp(1.75rem, 1.2rem + 2.6vw, 3.5rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: 0.01em;
 
-  /* --- Ritmo espacial: escala limitada, saltos claros -------------------- */
-  --spacing-gutter: clamp(1.25rem, 4vw, 3.5rem); /* margen lateral de página */
-  --spacing-section: clamp(4.5rem, 10vw, 11rem); /* aire vertical entre bloques */
-
-  /* Alto de la barra de navegación inferior de móvil. Vive en el sistema porque lo
-     necesitan cuatro sitios que tienen que cuadrar al píxel: la barra, la bandeja de
-     idiomas que se abre justo encima, el hueco que el hero se reserva para que su pie
-     de foto no quede debajo de ella y el que el <body> se reserva bajo el pie.
-     El `env()` es la franja del gesto de inicio del iPhone: sin sumarla, los iconos
-     caen debajo de la rayita del sistema. */
-  --spacing-nav-mobile: calc(4rem + env(safe-area-inset-bottom));
+  /* --- Ritmo espacial: escala limitada, saltos claros --------------------
+     El margen lateral es DELIBERADAMENTE grande en escritorio (referencia:
+     paredespedrosa.com). En un portátil de 1440 px deja unos 115 px a cada lado y
+     en un monitor de 1920 llega al tope de 12rem. En móvil baja a 1,25rem, donde un
+     margen ancho sólo estrecharía las fotos. */
+  --spacing-gutter: clamp(1.25rem, 8vw, 12rem);
+  --spacing-section: clamp(4rem, 9vw, 9rem); /* aire vertical entre bloques */
 
   /* --- Movimiento -------------------------------------------------------- */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
@@ -73,14 +77,14 @@
    ========================================================================= */
 
 @layer base {
-  /* Cabecera sobre hero a sangre: mientras no se ha hecho scroll, el texto pasa a
-     color papel para tener contraste sobre la foto. Se resuelve con :has() —
-     el header no necesita saber en qué página está, sólo si hay un hero debajo.
+  /* Cabecera sobre el hero a sangre: mientras no se ha hecho scroll, el texto pasa a
+     color papel para tener contraste sobre la foto. Se resuelve con :has() — el header
+     no necesita saber en qué página está, sólo si hay un hero debajo.
 
-     OJO: se aplica sólo a la BARRA (.header-bar), no a todo el <header>. El panel
-     del menú móvil también vive dentro del header pero sobre fondo papel: si
-     heredara este color, saldría blanco sobre blanco (pasó, y en escritorio no se
-     veía porque el menú móvil está oculto). */
+     OJO: se aplica sólo a la BARRA (.header-bar), no a todo el <header>. El panel del
+     menú móvil también vive dentro del header pero sobre fondo blanco: si heredara este
+     color, saldría blanco sobre blanco (pasó, y en escritorio no se veía porque el menú
+     móvil está oculto). */
   header[data-top='true'] .header-bar {
     color: var(--color-ink);
   }
@@ -111,16 +115,6 @@
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-  }
-
-  /* La barra de navegación de móvil va fija sobre el contenido, así que el documento se
-     reserva su alto por debajo del pie. Sin esto, el copyright y los enlaces del pie
-     quedan tapados justo en el final de la página, que es donde más se nota. Sólo por
-     debajo de `md`, que es donde existe la barra. */
-  @media (width < 48rem) {
-    body {
-      padding-bottom: var(--spacing-nav-mobile);
-    }
   }
 
   /* Foco visible y coherente en todo el sitio (accesibilidad). */
@@ -192,10 +186,40 @@
   }
 }
 
+/* Enlace que se pone EN NEGRITA al pasar el ratón (bloque de contacto).
+   El problema de un hover en negrita es que la palabra ensancha y empuja lo que tiene
+   al lado; con varias líneas seguidas, la columna entera tiembla. La solución es
+   reservar de antemano el ancho de la versión gruesa: el pseudo-elemento repite el
+   texto en negrita, sin alto y sin verse, así que la caja ya mide lo que va a medir y
+   al engordar la letra no se mueve nada.
+
+   Requiere `data-text` con el MISMO texto que hay dentro. Se pone en el <span> del
+   texto y no en el enlace entero, para que el icono de delante no engorde con él. */
+@utility hover-bold {
+  display: inline-flex;
+  flex-direction: column;
+
+  &::after {
+    content: attr(data-text);
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    font-weight: 700;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  a:hover &,
+  a:focus-visible &,
+  &:hover,
+  &:focus-visible {
+    font-weight: 700;
+  }
+}
+
 /* Amplía el área pulsable a los 24 px que exige WCAG 2.2 sin cambiar el diseño:
-   el texto sigue midiendo lo que mide y el subrayado sigue pegado a él; lo que
-   crece es una capa invisible por encima. Imprescindible en los enlaces pequeños
-   (pie, contacto, redes) cuando se usan con el dedo. */
+   el texto sigue midiendo lo que mide; lo que crece es una capa invisible por encima.
+   Imprescindible en los enlaces pequeños cuando se usan con el dedo. */
 @utility tap {
   position: relative;
 

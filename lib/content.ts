@@ -55,6 +55,7 @@ const projectSchema = z.object({
   ]),
   area: z.string().nullish(),
   client: z.string().nullish(),
+  /** Nombres de los arquitectos que firman la obra, separados por comas. */
   collaboration: z.string().nullish(),
   featured: z.boolean().nullish(),
   summary: localizedString,
@@ -63,16 +64,41 @@ const projectSchema = z.object({
   plans: z.array(imageSchema).nullish(),
 })
 
+/**
+ * DATOS DE CONTACTO POR DEFECTO
+ *
+ * El bloque de contacto de la portada es un texto fijo, línea a línea, y se compone de
+ * campos del panel. Los cuatro de aquí abajo se añadieron con el rediseño, así que el
+ * documento que está publicado todavía no los trae: `initialValue` sólo se aplica a
+ * documentos nuevos, no a los que ya existen.
+ *
+ * Si se declararan obligatorios, la web entera dejaría de servirse hasta que alguien
+ * abriera el panel y volviera a publicar. Se declaran opcionales y se rellenan con
+ * estos valores —los que el estudio dio—, así que la web sale bien desde el primer
+ * despliegue y en cuanto Yago escriba los suyos mandan los del panel.
+ */
+const CONTACT_FALLBACK = {
+  street: 'Castillo de Maya 35, bajo',
+  postalCode: '31004',
+  phone: '+34 664 197 624',
+  website: 'https://www.sangilstudio.com',
+} as const
+
 const siteSettingsSchema = z.object({
+  hero: z.array(z.object({ image: imageSchema.nullish() })).nullish(),
   statement: localizedParagraphs,
   team: z
     .array(z.object({ name: z.string().min(1), role: localizedString, phone: z.string().min(1) }))
     .min(1),
   collaborators: z.array(z.string()).nullish(),
-  email: z.string().email(),
+  street: z.string().nullish(),
+  postalCode: z.string().nullish(),
   city: z.string().min(1),
   region: localizedString,
   country: localizedString,
+  phone: z.string().nullish(),
+  email: z.string().email(),
+  website: z.string().url().nullish(),
   instagram: z.string().url().nullish(),
   linkedin: z.string().url().nullish(),
 })
@@ -82,7 +108,26 @@ export type ProjectEntry = z.infer<typeof projectSchema> & {
   plans: DescribedImage[]
   cover: DescribedImage
 }
-export type SiteSettings = z.infer<typeof siteSettingsSchema>
+
+/**
+ * Los ajustes ya resueltos: sin nulos en lo que el bloque de contacto necesita sí o sí,
+ * con las imágenes de la portada aplanadas y con el nombre de usuario de Instagram ya
+ * extraído de su dirección.
+ */
+export type SiteSettings = Omit<
+  z.infer<typeof siteSettingsSchema>,
+  'hero' | 'street' | 'postalCode' | 'phone' | 'website'
+> & {
+  heroImages: DescribedImage[]
+  street: string
+  postalCode: string
+  phone: string
+  website: string
+  /** `www.sangilstudio.com`: la dirección tal y como se enseña, sin protocolo. */
+  websiteLabel: string
+  /** `sangilstudio`: el usuario, sin arroba, sacado de la URL del perfil. */
+  instagramHandle: string | null
+}
 
 /**
  * Lee de Sanity y **cachea con etiqueta**: la web se sirve estática hasta que alguien
@@ -156,26 +201,32 @@ export async function getProject(slug: string): Promise<ProjectEntry | undefined
 }
 
 export async function getProjectSlugs(): Promise<string[]> {
-  const raw = await fetchContent<{ slug: string | null }[]>(PROJECT_SLUGS_QUERY)
-  return raw.map((row) => row.slug).filter((slug): slug is string => Boolean(slug))
-}
-
-/** Proyecto anterior y siguiente, en bucle, para navegar sin volver al índice. */
-export async function getProjectNeighbours(
-  slug: string,
-): Promise<{ previous: ProjectEntry; next: ProjectEntry } | null> {
-  const projects = await getProjects()
-  const index = projects.findIndex((project) => project.slug === slug)
-  if (index === -1 || projects.length < 2) return null
-  const previous = projects[(index - 1 + projects.length) % projects.length]
-  const next = projects[(index + 1) % projects.length]
-  if (!previous || !next) return null
-  return { previous, next }
+  const raw = await fetchContent<unknown[]>(PROJECT_SLUGS_QUERY)
+  return (raw as { slug: string | null }[])
+    .map((row) => row.slug)
+    .filter((slug): slug is string => Boolean(slug))
 }
 
 /**
- * Ajustes del estudio. Si faltan o están incompletos es un fallo grave (afecta al pie
- * de todas las páginas), así que aquí sí se lanza error con un mensaje claro.
+ * Las imágenes que se funden en la portada.
+ *
+ * Salen de los proyectos que el estudio elige en el panel. Si esa lista está vacía
+ * —o los proyectos elegidos se quedaron sin galería—, se recurre a los destacados: la
+ * portada de esta web es sólo imágenes, así que quedarse sin ninguna la dejaría en
+ * blanco, y eso no puede pasar por no haber rellenado un campo.
+ */
+export async function getHeroImages(limit = 6): Promise<DescribedImage[]> {
+  const settings = await getSiteSettings()
+  const chosen = settings.heroImages.slice(0, limit)
+  if (chosen.length > 0) return chosen
+
+  const featured = await getFeaturedProjects(limit)
+  return featured.map((project) => project.cover)
+}
+
+/**
+ * Ajustes del estudio. Si faltan o están incompletos es un fallo grave (afecta al
+ * bloque de contacto de la portada), así que aquí sí se lanza error con un mensaje claro.
  */
 export async function getSiteSettings(): Promise<SiteSettings> {
   const raw = await fetchContent<unknown>(SITE_SETTINGS_QUERY)
@@ -186,7 +237,42 @@ export async function getSiteSettings(): Promise<SiteSettings> {
         result.error.issues.map((i) => `${i.path.join('.')} ${i.message}`).join('; '),
     )
   }
-  return result.data
+
+  const { hero, street, postalCode, phone, website, ...rest } = result.data
+  const resolvedWebsite = website || CONTACT_FALLBACK.website
+
+  return {
+    ...rest,
+    // Un proyecto de la lista puede haberse quedado sin galería: ese hueco se cae aquí.
+    heroImages: (hero ?? [])
+      .map((entry) => entry.image)
+      .filter((image): image is DescribedImage => Boolean(image)),
+    street: street || CONTACT_FALLBACK.street,
+    postalCode: postalCode || CONTACT_FALLBACK.postalCode,
+    phone: phone || CONTACT_FALLBACK.phone,
+    website: resolvedWebsite,
+    websiteLabel: hostnameOf(resolvedWebsite),
+    instagramHandle: rest.instagram ? lastPathSegment(rest.instagram) : null,
+  }
+}
+
+/** `https://www.sangilstudio.com/` → `www.sangilstudio.com`. */
+function hostnameOf(url: string): string {
+  try {
+    return new URL(url).hostname
+  } catch {
+    return url
+  }
+}
+
+/** `https://instagram.com/sangilstudio/` → `sangilstudio`. */
+function lastPathSegment(url: string): string | null {
+  try {
+    const segments = new URL(url).pathname.split('/').filter(Boolean)
+    return segments.at(-1) ?? null
+  } catch {
+    return null
+  }
 }
 
 export type { Localized }

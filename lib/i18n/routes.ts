@@ -5,27 +5,31 @@ import type { Locale } from './config'
  * `/studio`) para que ambos idiomas compartan estructura de ficheros; si algún
  * día queremos slugs localizados (`/es/proyectos`), se hace con un mapa de
  * rewrites aquí sin tocar ninguna página.
+ *
+ * **El estudio es una página de verdad**, no una sección de la portada. Cambió con el
+ * rediseño: la portada se quedó en dos bloques —el hero y el contacto— y los datos del
+ * estudio se leen en su propia pantalla.
  */
 export const routes = {
   home: '',
   work: 'work',
+  studio: 'studio',
 } as const
 
 /**
- * Secciones de la portada. Estudio y contacto se leen sin salir del inicio, pero
- * **tienen URL de ruta**: `/es/studio`, no `/es#studio`. Una dirección con almohadilla
- * se lee como «un trozo de otra página»; con barra se lee como un sitio al que se
- * puede ir, que es lo que son. La ruta la sirve `[section]/page.tsx`, que renderiza
- * la portada entera y deja la vista en la sección (ver `ScrollToSection`).
+ * Secciones de la portada. Contacto se lee sin salir del inicio, pero **tiene URL de
+ * ruta**: `/es/contact`, no `/es#contact`. Una dirección con almohadilla se lee como
+ * «un trozo de otra página»; con barra se lee como un sitio al que se puede ir, que es
+ * lo que es. La ruta la sirve `[section]/page.tsx`, que renderiza la portada entera y
+ * deja la vista en la sección (ver `ScrollToSection`).
  *
- * Se declaran aparte de `routes` porque no son páginas distintas: el HTML es el de la
- * portada, así que no entran en el sitemap y su canonical apunta a `/es`. Eso es lo
- * que distingue `isSection()`, no la forma del enlace.
+ * Se declara aparte de `routes` porque no es una página distinta: el HTML es el de la
+ * portada, así que no entra en el sitemap y su canonical apunta a `/es`. Eso es lo que
+ * distingue `isSection()`, no la forma del enlace.
  *
  * El identificador es a la vez el segmento de la URL y el `id` del `<section>`.
  */
 export const sections = {
-  studio: 'studio',
   contact: 'contact',
 } as const
 
@@ -46,8 +50,8 @@ export const sectionKeys = Object.keys(sections) as SectionKey[]
 
 /**
  * Traduce un segmento de URL a su sección, o `null` si no lo es. Lo usa la ruta
- * `[section]` para aceptar sólo `studio` y `contact` y devolver 404 en lo demás:
- * este mapa es la única lista de secciones válidas que existe.
+ * `[section]` para aceptar sólo `contact` y devolver 404 en lo demás: este mapa es la
+ * única lista de secciones válidas que existe.
  */
 export function sectionFromSegment(segment: string): SectionKey | null {
   return sectionKeys.find((key) => sections[key] === segment) ?? null
@@ -55,7 +59,7 @@ export function sectionFromSegment(segment: string): SectionKey | null {
 
 /**
  * Construye una URL **absoluta dentro del sitio**: href('en', 'work') → `/en/work`,
- * href('en', 'studio') → `/en/studio`.
+ * href('en', 'contact') → `/en/contact`.
  *
  * La barra inicial se añade aparte a propósito. Antes se metía como cadena vacía al
  * principio del array y `filter(Boolean)` se la comía, devolviendo `es/work`

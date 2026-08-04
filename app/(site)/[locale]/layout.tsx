@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from 'next'
-import { Instrument_Sans, Instrument_Serif } from 'next/font/google'
+import { Montserrat } from 'next/font/google'
 import { notFound } from 'next/navigation'
-import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
-import { MobileNav } from '@/components/layout/MobileNav'
 import { site } from '@/content/site'
 import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
@@ -11,25 +9,23 @@ import { isIndexable } from '@/lib/site-env'
 import '../../globals.css'
 
 /**
- * Fuentes autoalojadas por Next: se sirven desde nuestro dominio, con `swap` y
- * sin petición a Google. Es la diferencia entre texto que aparece al instante y
- * texto que salta cuando la fuente llega.
+ * MONTSERRAT, y sólo Montserrat, en toda la web (decisión del estudio).
+ *
+ * Autoalojada por Next: se sirve desde nuestro dominio, con `swap` y sin petición a
+ * Google. Es la diferencia entre texto que aparece al instante y texto que salta cuando
+ * la fuente llega. Se piden los tres pesos que usa el diseño y ni uno más —cada peso es
+ * un fichero que descargar—: 400 para el cuerpo, 500 para los rótulos y 700 para el
+ * hover en negrita del bloque de contacto.
  */
-const sans = Instrument_Sans({
+const montserrat = Montserrat({
   subsets: ['latin'],
+  weight: ['400', '500', '700'],
   display: 'swap',
-  variable: '--font-instrument-sans',
-})
-
-const serif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  display: 'swap',
-  variable: '--font-instrument-serif',
+  variable: '--font-montserrat',
 })
 
 export const viewport: Viewport = {
-  themeColor: '#f4f2ee',
+  themeColor: '#ffffff',
 }
 
 /** Las dos versiones de idioma se generan en build; no hay renderizado dinámico. */
@@ -84,6 +80,12 @@ export async function generateMetadata({
   }
 }
 
+/**
+ * Sin pie de página. Lo tenía, con la dirección, los teléfonos y cuatro enlaces, y se
+ * quitó de toda la web con el rediseño: el bloque de contacto de la portada dice ya
+ * exactamente eso, y repetirlo debajo era decirlo dos veces con media pantalla de por
+ * medio. La navegación vive entera en la cabecera, que está siempre a la vista.
+ */
 export default async function LocaleLayout({
   children,
   params,
@@ -101,15 +103,13 @@ export default async function LocaleLayout({
     <html
       lang={localeHtmlLang[typedLocale]}
       data-scroll-behavior="smooth"
-      className={`${sans.variable} ${serif.variable}`}
+      className={montserrat.variable}
     >
       <body className="flex min-h-svh flex-col">
         <Header locale={typedLocale} dictionary={dictionary} />
         <main id="main" className="flex-1">
           {children}
         </main>
-        <Footer locale={typedLocale} />
-        <MobileNav locale={typedLocale} dictionary={dictionary} />
       </body>
     </html>
   )

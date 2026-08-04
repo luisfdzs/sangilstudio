@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { ProjectCard } from '@/components/sections/ProjectCard'
-import { Reveal } from '@/components/ui/Reveal'
+import { ProjectSearchGrid } from '@/components/sections/ProjectSearchGrid'
 import { getProjects } from '@/lib/content'
 import { isLocale, locales } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
@@ -21,6 +20,13 @@ export async function generateMetadata({
   return { title: getDictionary(locale).work.title }
 }
 
+/**
+ * Todos los proyectos. La página a la que lleva la portada al pulsarla.
+ *
+ * El listado y el buscador van en un componente de cliente (`ProjectSearchGrid`) porque
+ * el filtrado ocurre mientras se escribe; los datos se leen aquí, en el servidor, y se
+ * le pasan ya validados. La página sigue siendo estática.
+ */
 export default async function WorkPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
@@ -29,33 +35,9 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
   const projects = await getProjects()
 
   return (
-    <div className="page-gutter pt-16 pb-(--spacing-section) text-center md:pt-24">
-      {/* `mx-auto` en los dos: llevan ancho máximo, y una caja estrecha sin centrar deja
-          el texto centrado dentro de un bloque pegado a la izquierda. */}
-      <header className="mx-auto max-w-2xl">
-        <h1 className="text-display font-serif text-balance">{t.work.title}</h1>
-        <p className="mx-auto mt-6 max-w-xl text-lead text-ink-soft">{t.work.lead}</p>
-      </header>
-
-      <div className="mt-16 grid gap-x-8 gap-y-16 md:mt-24 md:grid-cols-2 md:gap-y-24">
-        {projects.map((project, index) => {
-          const wide = index % 5 === 0
-          return (
-            <Reveal
-              key={project.slug}
-              step={index % 2}
-              className={wide ? 'md:col-span-2' : undefined}
-            >
-              <ProjectCard
-                project={project}
-                locale={locale}
-                priority={index === 0}
-                span={wide ? 'wide' : 'half'}
-              />
-            </Reveal>
-          )
-        })}
-      </div>
+    <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
+      <h1 className="text-display tracking-tight uppercase">{t.work.title}</h1>
+      <ProjectSearchGrid projects={projects} locale={locale} dictionary={t} />
     </div>
   )
 }

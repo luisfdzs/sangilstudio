@@ -7,17 +7,18 @@ import { sectionFromSegment, sectionKeys, sections } from '@/lib/i18n/routes'
 import { HomeContent } from '../HomeContent'
 
 /**
- * Las secciones de la portada, con URL de ruta: `/es/studio`, `/es/contact`.
+ * Las secciones de la portada, con URL de ruta. Hoy sólo hay una: `/es/contact`.
  *
  * Devuelve la portada ENTERA y deja la vista en la sección pedida. No es una página
  * distinta con el mismo contenido: es la misma página abierta en otro punto, y de ahí
  * las dos consecuencias que se ven abajo —canonical al inicio y fuera del sitemap—.
  *
- * Es un segmento dinámico, no dos carpetas (`studio/`, `contact/`), para que la lista
- * de secciones siga estando en un único sitio (`lib/i18n/routes.ts`) en vez de
- * repetida en el árbol de ficheros. `work` es un segmento estático y por tanto tiene
- * prioridad sobre este: `/es/work` sigue yendo a su página. Cualquier otro segmento
- * —`/es/cualquier-cosa`— no está en el mapa y devuelve 404, igual que antes.
+ * Sigue siendo un segmento dinámico y no una carpeta `contact/`, aunque ahora quede
+ * una sola sección: la lista vive en un único sitio (`lib/i18n/routes.ts`) y añadir o
+ * quitar secciones no toca el árbol de ficheros. `work` y `studio` son segmentos
+ * estáticos y por tanto tienen prioridad sobre este: `/es/studio` va a su página, que
+ * desde el rediseño es una página de verdad. Cualquier otro segmento —`/es/lo-que-sea`—
+ * no está en el mapa y devuelve 404, igual que antes.
  */
 export function generateStaticParams() {
   return locales.flatMap((locale) => sectionKeys.map((section) => ({ locale, section })))
