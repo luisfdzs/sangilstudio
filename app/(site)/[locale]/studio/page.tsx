@@ -43,6 +43,12 @@ export async function generateMetadata({
  *
  * Alineada a la izquierda, como el bloque de contacto: son los dos sitios de la web
  * donde se lee texto seguido, y leerlos con criterios distintos se notaría.
+ *
+ * **Sólo el manifiesto (2026-08-04).** Se fueron las dos columnas de «Equipo» y
+ * «Colaboradores» que iban debajo. Los socios siguen leyéndose en el bloque de contacto de
+ * la portada, y los dos campos (`team`, `collaborators`) siguen vivos en el panel y en el
+ * esquema: se dejan de pintar aquí, no se borran, igual que se hizo con los campos que
+ * salieron de la ficha de proyecto.
  */
 export default async function StudioPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -63,39 +69,6 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
             <p className={index === 0 ? 'text-lead' : 'text-ink-soft'}>{paragraph}</p>
           </Reveal>
         ))}
-      </div>
-
-      <div className="mt-(--spacing-section) grid gap-14 md:grid-cols-2 md:gap-20">
-        <section>
-          <h2 className="eyebrow border-b border-line pb-4">{t.studio.team}</h2>
-          <ul className="mt-8 space-y-6">
-            {settings.team.map((member) => (
-              <li key={member.name}>
-                <p className="text-lead">{member.name}</p>
-                <p className="mt-1 text-small text-ink-soft">{member.role[locale]}</p>
-                <a
-                  className="link-underline tap mt-2 inline-block text-small"
-                  href={`tel:${member.phone.replaceAll(' ', '')}`}
-                >
-                  {member.phone}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {(settings.collaborators ?? []).length > 0 && (
-          <section>
-            <h2 className="eyebrow border-b border-line pb-4">{t.studio.collaborators}</h2>
-            <ul className="mt-8 space-y-3">
-              {(settings.collaborators ?? []).map((name) => (
-                <li key={name} className="text-small text-ink-soft">
-                  {name}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
       </div>
     </div>
   )

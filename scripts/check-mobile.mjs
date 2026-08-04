@@ -218,9 +218,30 @@ async function main() {
   )
   check((await horizontalOverflow(page)) <= 1, '/studio no desborda en horizontal')
 
+  // El estudio es SÓLO el manifiesto: las columnas de equipo y colaboradores se quitaron
+  // el 2026-08-04 (los socios se leen en el bloque de contacto de la portada).
+  check(!(await page.locator('main section').count()), '/studio no lleva equipo ni colaboradores')
+
   // --- Proyectos: una columna, cuadradas, y el buscador filtra -----------------
   await page.goto(`${BASE}/${LOCALE}/work`, { waitUntil: 'networkidle' })
   check((await horizontalOverflow(page)) <= 1, '/work no desborda en horizontal')
+
+  // El título «PROYECTOS» no se ve, pero el <h1> sigue en el HTML para lectores de
+  // pantalla: si alguien lo borrara del todo, la página se anunciaría sin nombre.
+  //
+  // Se mide el tamaño y no `isVisible()`: un elemento `sr-only` mide 1×1 px y sigue
+  // teniendo caja, así que Playwright lo da por visible. Lo que se comprueba es que el
+  // encabezado exista y no ocupe sitio.
+  const h1 = await page.evaluate(() => {
+    const nodes = document.querySelectorAll('main h1')
+    if (nodes.length !== 1) return { count: nodes.length, width: -1 }
+    const box = nodes[0].getBoundingClientRect()
+    return { count: 1, width: Math.max(box.width, box.height) }
+  })
+  check(
+    h1.count === 1 && h1.width <= 2,
+    `el título de /work está en el HTML pero no a la vista (${h1.count} h1, ${h1.width} px)`,
+  )
 
   const cards = page.locator('main article')
   const total = await cards.count()
@@ -249,6 +270,14 @@ async function main() {
   // El buscador: contiene, sin mayúsculas y sin acentos.
   const search = page.locator('#project-search')
   check(await search.isVisible(), 'el buscador se ve')
+
+  // Centrado en su fila: sin título encima es lo primero que se ve, y descolgado a la
+  // izquierda quedaba huérfano. Se mide que sobre lo mismo a un lado que al otro.
+  const centred = await page.evaluate(() => {
+    const box = document.getElementById('project-search').getBoundingClientRect()
+    return Math.abs(box.left - (window.innerWidth - box.right))
+  })
+  check(centred <= 2, `el buscador está centrado (${Math.round(centred)} px de diferencia)`)
   await search.fill('zzzzzz')
   await page.waitForTimeout(200)
   check((await cards.count()) === 0, 'una búsqueda sin resultados vacía la rejilla')
