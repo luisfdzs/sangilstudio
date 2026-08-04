@@ -231,6 +231,20 @@
   }
 }
 
+/* Barra de scroll fina y en gris de filete, para paneles que se desplazan por dentro
+   (hoy: el desplegable de títulos del buscador). La barra ancha de Windows, gris marengo
+   sobre una lista blanca, es lo único que delataba un control de sistema en una página
+   que por lo demás es papel y tipografía.
+
+   Sólo las dos propiedades estándar: el equivalente antiguo, `::-webkit-scrollbar`, hace
+   que Lightning CSS descarte la utilidad entera sin avisar —se comprobó leyendo el CSS
+   compilado: la clase no llegaba a generarse—, y hoy `scrollbar-width` lo soportan
+   Chrome, Safari y Firefox. Donde no, se ve la barra de siempre y no se rompe nada. */
+@utility scrollbar-hairline {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
 /* Aparición al entrar en viewport. La hace CSS con scroll-driven animations
    cuando el navegador las soporta (cero JS); si no, el contenido se ve fijo. */
 @utility reveal {

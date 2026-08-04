@@ -256,6 +256,31 @@ async function main() {
   await page.waitForTimeout(200)
   check((await cards.count()) === total, 'al vaciar el buscador vuelven todos')
 
+  // El desplegable de títulos: cuelga del campo al enfocarlo, se reduce a los que casan
+  // y al elegir uno se va a su ficha. En móvil importa además que no desborde a lo ancho.
+  const options = page.locator('#project-search-listbox [role="option"]')
+  await search.click()
+  await page.waitForTimeout(200)
+  check((await options.count()) === total, `el desplegable lista los títulos (${total})`)
+  check((await horizontalOverflow(page)) <= 1, 'el desplegable no desborda en horizontal')
+
+  await search.fill('hous')
+  await page.waitForTimeout(200)
+  const narrowed = await options.count()
+  check(
+    narrowed > 0 && narrowed < total,
+    `el desplegable se reduce al escribir (${narrowed} de ${total})`,
+  )
+  check(narrowed === (await cards.count()), 'el desplegable y la rejilla muestran lo mismo')
+
+  const firstOption = await options.first().textContent()
+  await options.first().click()
+  await page.waitForURL(/\/work\/.+/, { timeout: 5000 })
+  check(/\/work\/.+/.test(page.url()), `elegir un título abre su ficha (${firstOption?.trim()})`)
+
+  // Elegir un título nos ha dejado en una ficha: lo de abajo mira la rejilla otra vez.
+  await page.goto(`${BASE}/${LOCALE}/work`, { waitUntil: 'networkidle' })
+
   // --- Enlaces absolutos, comprobado desde una página PROFUNDA -----------------
   // `href()` devolvía rutas relativas (`es/work`): desde la portada funcionaban por
   // casualidad y desde una ficha encadenaban → /es/work/es/work → 404. Se comprueba
