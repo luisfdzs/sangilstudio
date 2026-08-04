@@ -29,6 +29,8 @@ const es = {
     title: 'Proyectos',
     search: 'Buscar proyecto',
     empty: 'Ningún proyecto coincide con la búsqueda.',
+    /* Nombre accesible del desplegable de títulos que cuelga del buscador. */
+    suggestions: 'Títulos de proyecto',
     /* Se anuncia por voz al filtrar, no se ve. `{n}` se sustituye por el número. */
     results: '{n} proyectos',
     resultsOne: '1 proyecto',
@@ -85,6 +87,7 @@ const en: Dictionary = {
     title: 'Work',
     search: 'Search projects',
     empty: 'No project matches your search.',
+    suggestions: 'Project titles',
     results: '{n} projects',
     resultsOne: '1 project',
   },
