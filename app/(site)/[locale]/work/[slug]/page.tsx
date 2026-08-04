@@ -100,7 +100,11 @@ export default async function ProjectPage({
           <Reveal key={image.id}>
             <Media
               image={image}
-              alt={image.alt[locale]}
+              // La descripción es opcional en el panel. Sin ella se emite `alt=""` y el
+              // lector de pantalla salta la foto, que es lo correcto para una imagen sin
+              // describir; sólo la primera toma el nombre del proyecto, para que la
+              // galería no se anuncie entera en silencio ni repita el título veinte veces.
+              alt={index === 0 ? image.alt[locale] || project.title : image.alt[locale]}
               // La primera es la candidata a LCP de esta página; ni una más.
               priority={index === 0}
               sizes="(max-width: 768px) 100vw, 76vw"

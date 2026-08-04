@@ -77,22 +77,12 @@
    ========================================================================= */
 
 @layer base {
-  /* Cabecera sobre el hero a sangre: mientras no se ha hecho scroll, el texto pasa a
-     color papel para tener contraste sobre la foto. Se resuelve con :has() — el header
-     no necesita saber en qué página está, sólo si hay un hero debajo.
-
-     OJO: se aplica sólo a la BARRA (.header-bar), no a todo el <header>. El panel del
-     menú móvil también vive dentro del header pero sobre fondo blanco: si heredara este
-     color, saldría blanco sobre blanco (pasó, y en escritorio no se veía porque el menú
-     móvil está oculto). */
-  header[data-top='true'] .header-bar {
-    color: var(--color-ink);
-  }
-
-  body:has(main > [data-hero]:first-child) header[data-top='true'] .header-bar {
-    color: var(--color-paper);
-    text-shadow: 0 1px 24px rgb(0 0 0 / 0.35);
-  }
+  /* Aquí vivía una regla con :has() que, cuando la primera cosa de la página era el hero a
+     sangre, pintaba el texto de la barra en color papel con una sombra para que se leyera
+     sobre la foto. Se quitó con los márgenes de toda la web (2026-08-04): la cabecera ya no
+     se apoya sobre ninguna imagen, tiene su propio espacio en blanco, y el texto es tinta
+     en todas las páginas. Un blanco sobre blanco ya costó un menú invisible una vez; sin la
+     regla, no puede volver a pasar. */
 
   ::selection {
     background: var(--color-ink);
@@ -104,6 +94,11 @@
     scroll-behavior: smooth;
     /* El header es sticky: los anclajes no deben quedar debajo. */
     scroll-padding-top: 6rem;
+    /* El hueco de la barra de scroll se reserva siempre. Al abrir el menú se bloquea el
+       desplazamiento del fondo (`overflow: hidden` en el body), y en escritorio eso hacía
+       desaparecer la barra: la página entera daba un salto de unos 15 px al abrir y otro al
+       cerrar. Con el menú ya en escritorio (2026-08-04), el salto se veía en cada apertura. */
+    scrollbar-gutter: stable;
   }
 
   body {

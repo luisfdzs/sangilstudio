@@ -27,13 +27,33 @@ const localizedParagraphs = z.object({
   en: z.array(z.string().min(1)).min(1),
 })
 
+/**
+ * La descripción de una imagen **puede no estar**, y eso no invalida la imagen.
+ *
+ * El panel ya no la exige (ver `sanity/schemas/projectImage.ts`: el estudio sube galerías
+ * de veinte fotos y no va a escribir veinte textos en dos idiomas). Aquí importa porque un
+ * documento se valida entero: con `alt` obligatorio, una sola foto sin describir tumbaba
+ * la validación del proyecto completo y `keepValid` lo descartaba de la web —el proyecto
+ * desaparecía por no haber escrito un texto—.
+ *
+ * Se normaliza a cadena vacía en vez de dejarlo opcional para que el resto del código siga
+ * leyendo `image.alt[locale]` sin comprobar nada, y porque `alt=""` es exactamente lo que
+ * hay que emitir en HTML para una imagen sin descripción: un lector de pantalla la salta
+ * en lugar de leer el nombre del fichero. Donde la imagen va sola y necesita nombre, la
+ * vista pone el título del proyecto.
+ */
+const optionalLocalizedString = z
+  .object({ es: z.string().nullish(), en: z.string().nullish() })
+  .nullish()
+  .transform((value) => ({ es: value?.es ?? '', en: value?.en ?? '' }))
+
 const imageSchema = z.object({
   id: z.string(),
   src: z.string().url(),
   width: z.number().int().positive(),
   height: z.number().int().positive(),
   blur: z.string().startsWith('data:image/'),
-  alt: localizedString,
+  alt: optionalLocalizedString,
 })
 
 const projectSchema = z.object({

@@ -21,10 +21,22 @@ const HOLD_MS = 5000
 const FADE_MS = 1600
 
 /**
- * LA PORTADA: imágenes de proyectos a pantalla completa que se van sustituyendo unas a
- * otras jugando con la opacidad. Sin texto encima —ni titular, ni pie, ni flecha—: es
- * lo que pidió el estudio, y es también lo que hace que la fotografía se lea como
- * fotografía y no como el fondo de un cartel.
+ * LA PORTADA: imágenes de proyectos que se van sustituyendo unas a otras jugando con la
+ * opacidad. Sin texto encima —ni titular, ni pie, ni flecha—: es lo que pidió el estudio,
+ * y es también lo que hace que la fotografía se lea como fotografía y no como el fondo de
+ * un cartel.
+ *
+ * **Con los márgenes de la web, no a sangre (2026-08-04).** Antes ocupaba el ancho
+ * completo y se metía por debajo de la cabecera (`-mt-20`), que quedaba flotando sobre la
+ * foto con el texto en blanco y una sombra. El estudio pidió lo contrario: que los
+ * márgenes —superior y laterales— sean de toda la web y no sólo de la ficha de proyecto,
+ * y que el logo y el menú tengan siempre su propio espacio en blanco sin necesidad de
+ * resaltarse encima de una imagen. Así que la imagen respeta el `page-gutter` de siempre y
+ * arranca por debajo de la cabecera.
+ *
+ * De ahí que el alto sea un `calc`: la altura de la ventana menos la barra —5rem en móvil,
+ * 6rem a partir de `md`— menos un hueco equivalente por debajo, para que la portada se lea
+ * como una pantalla y aun así se vea que hay algo más abajo.
  *
  * Toda la pantalla es un enlace a la página de proyectos. Al no haber texto, ese enlace
  * necesita nombre accesible o se anunciaría vacío: de ahí el `aria-label`.
@@ -54,45 +66,44 @@ export function Hero({ images, locale, label, workHref }: Props) {
   if (images.length === 0) return null
 
   return (
-    <Link
-      href={workHref}
-      aria-label={label}
-      data-hero
-      className="relative -mt-20 block h-[100svh] min-h-[30rem] w-full overflow-hidden md:-mt-24"
-    >
-      {images.map((image, position) => (
-        <Image
-          key={image.id}
-          src={image.src}
-          alt={position === 0 ? image.alt[locale] : ''}
-          // Sólo la primera se nombra. Las demás son la MISMA ilustración cambiando: si
-          // cada una llevara su texto alternativo, un lector de pantalla leería seis
-          // descripciones seguidas de una sola cosa.
-          aria-hidden={position !== 0}
-          fill
-          priority={position === 0}
-          fetchPriority={position === 0 ? 'high' : 'auto'}
-          loading={position === 0 ? undefined : 'lazy'}
-          sizes="100vw"
-          quality={82}
-          placeholder="blur"
-          blurDataURL={image.blur}
-          className="object-cover transition-opacity ease-(--ease-in-out-soft)"
-          style={{
-            opacity: position === index ? 1 : 0,
-            transitionDuration: `${FADE_MS}ms`,
-          }}
-        />
-      ))}
+    <div className="page-gutter">
+      <Link
+        href={workHref}
+        aria-label={label}
+        data-hero
+        className="relative block h-[calc(100svh-9rem)] min-h-[20rem] w-full overflow-hidden md:h-[calc(100svh-11rem)]"
+      >
+        {images.map((image, position) => (
+          <Image
+            key={image.id}
+            src={image.src}
+            alt={position === 0 ? image.alt[locale] : ''}
+            // Sólo la primera se nombra. Las demás son la MISMA ilustración cambiando: si
+            // cada una llevara su texto alternativo, un lector de pantalla leería seis
+            // descripciones seguidas de una sola cosa. (Y la descripción es opcional en el
+            // panel: si está vacía, el nombre del enlace lo pone el `aria-label`.)
+            aria-hidden={position !== 0}
+            fill
+            priority={position === 0}
+            fetchPriority={position === 0 ? 'high' : 'auto'}
+            loading={position === 0 ? undefined : 'lazy'}
+            // Ya no ocupa el ancho de la ventana: le quitan los márgenes laterales.
+            sizes="(max-width: 768px) 92vw, 84vw"
+            quality={82}
+            placeholder="blur"
+            blurDataURL={image.blur}
+            className="object-cover transition-opacity ease-(--ease-in-out-soft)"
+            style={{
+              opacity: position === index ? 1 : 0,
+              transitionDuration: `${FADE_MS}ms`,
+            }}
+          />
+        ))}
 
-      {/* Un velo muy corto en el borde superior, sólo donde se apoya la cabecera. Sin él,
-          el wordmark y el «+» se pierden en cuanto una de las imágenes entra en blanco
-          por arriba, que con cielos y fachadas claras pasa a menudo. No es un velo sobre
-          la foto: son 160 px y se acaba antes de llegar al primer tercio. */}
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/30 to-transparent"
-      />
-    </Link>
+        {/* Aquí había un velo negro degradado en el borde superior, para que el wordmark y
+            el «+» no se perdieran sobre un cielo claro. Ya no hace falta: la cabecera tiene
+            su propio espacio en blanco por encima de la imagen. */}
+      </Link>
+    </div>
   )
 }

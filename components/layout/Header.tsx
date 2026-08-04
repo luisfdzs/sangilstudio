@@ -15,28 +15,35 @@ type Props = {
   dictionary: Dictionary
 }
 
+/** El panel del menú. Se nombra una vez: lo usan el `id` y el `aria-controls` del botón. */
+const MENU_ID = 'site-menu'
+
 /**
  * La cabecera, y con ella toda la navegación del sitio.
  *
- * En escritorio: wordmark a la izquierda, menú y los dos idiomas a la derecha.
+ * **El mismo menú en todas las pantallas (2026-08-04).** Wordmark a la izquierda y un
+ * **«+» en la esquina superior derecha** que despliega el menú a pantalla completa, con
+ * las entradas centradas; el «+» se convierte en «−» y es lo que lo contrae. Nació en
+ * móvil (referencia: Swiftmet) y el estudio pidió que en escritorio fuera igual, así que
+ * la fila de enlaces y los dos códigos de idioma que vivían a la derecha de la barra
+ * desaparecieron: ahora los idiomas están dentro del panel, con todo lo demás. Un solo
+ * menú, una sola manera de navegar y una barra que es sólo marca y botón.
  *
- * En móvil: wordmark a la izquierda y un **«+» en la esquina superior derecha** que
- * despliega el menú **a pantalla completa, con las entradas centradas** (2026-08-04, con
- * la web de Swiftmet como referencia); el «+» se convierte en «−» y es lo que lo
- * contrae. Antes esto era una barra fija de iconos abajo, y se quitó por decisión del
- * estudio: la barra comía cuatro centímetros de foto en todas las pantallas del sitio,
- * que en una web que es fotografía a sangre es justo lo que no sobra.
- *
- * Dos detalles del montaje que no son gratuitos:
+ * Tres detalles del montaje que no son gratuitos:
  *
  * 1. **El panel se dibuja FUERA del `<header>`.** El header lleva `backdrop-blur` al
  *    hacer scroll, y un filtro convierte al elemento en bloque contenedor de sus
  *    descendientes `fixed`: dentro, el panel medía 0 px de alto. Ya pasó una vez con el
  *    menú anterior, y por eso el componente devuelve un fragmento con el header y el
  *    panel como hermanos.
- * 2. **Con el menú abierto, `data-top` pasa a `false`.** Ese atributo es lo que en
- *    `globals.css` pinta el texto de la barra en color papel cuando hay un hero debajo.
- *    Con el panel blanco de fondo, ese blanco sobre blanco dejaba el «−» invisible.
+ * 2. **El panel aparece con un fundido**, que también pidió el estudio. Eso obliga a que
+ *    esté siempre en el DOM —un `hidden` no se puede transicionar—, así que cerrado se
+ *    apaga con `opacity: 0` + `visibility: hidden` y `transition-behavior: allow-discrete`,
+ *    que es lo que hace que la visibilidad conmute al principio del fundido de entrada y
+ *    al final del de salida. Con sólo la opacidad, el panel seguiría interceptando clics
+ *    y siendo visible para un lector de pantalla; de ahí también el `inert`.
+ * 3. **El botón queda por encima del panel** (z-50 contra z-40): el «−» que cierra vive en
+ *    la barra, y el hueco superior del panel (`pt-20`) deja libre esa altura.
  */
 export function Header({ locale, dictionary }: Props) {
   const pathname = usePathname()
@@ -97,10 +104,9 @@ export function Header({ locale, dictionary }: Props) {
   return (
     <>
       <header
-        data-top={!scrolled && !open}
         className={cn(
           'sticky top-0 z-50 transition-colors duration-500',
-          open ? 'bg-paper' : scrolled ? 'bg-paper/95 text-ink backdrop-blur-md' : 'bg-transparent',
+          open ? 'bg-paper' : scrolled ? 'bg-paper/95 backdrop-blur-md' : 'bg-transparent',
         )}
       >
         <a
@@ -110,7 +116,7 @@ export function Header({ locale, dictionary }: Props) {
           {dictionary.nav.skipToContent}
         </a>
 
-        <div className="header-bar page-gutter flex h-20 items-center justify-between gap-6 md:h-24">
+        <div className="page-gutter flex h-20 items-center justify-between gap-6 md:h-24">
           {/* `tap`: el wordmark mide 20 px de alto, por debajo del mínimo de 24 px que
               exige WCAG 2.2 para un objetivo pulsable. Lo detectó `npm run check:mobile`
               —nadie lo ve mirando la pantalla, y es el enlace más usado de la cabecera—.
@@ -120,82 +126,50 @@ export function Header({ locale, dictionary }: Props) {
             <Wordmark className="h-5 w-auto md:h-7" />
           </Link>
 
-          <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
-            {navigation.map((key) => (
-              <Link
-                key={key}
-                href={href(locale, key)}
-                aria-current={isCurrent(pathname, href(locale, key)) ? 'page' : undefined}
-                // El color lo hereda del header (ver globals.css): sobre el hero es
-                // papel, sobre fondo blanco es tinta. La jerarquía la marca la opacidad.
-                className={cn(
-                  'link-underline tap text-small tracking-wide transition-opacity',
-                  isCurrent(pathname, href(locale, key))
-                    ? 'opacity-100'
-                    : 'opacity-65 hover:opacity-100',
-                )}
-              >
-                {dictionary.nav[key]}
-              </Link>
-            ))}
-
-            <span aria-hidden className="h-3 w-px bg-current opacity-30" />
-
-            {/* El globo delante de los dos códigos de idioma. Sin él, «ES EN» seguido
-                del menú se lee como dos entradas más de navegación; con él, el grupo se
-                identifica de un vistazo y sin necesidad de traducir la palabra «idioma»
-                —ni de poner banderas, que representan países y no lenguas—. */}
-            <div className="flex items-center gap-2">
-              <GlobeIcon className="mr-1 h-3.5 w-3.5 shrink-0 opacity-50" />
-              {locales.map((option) => (
-                <Link
-                  key={option}
-                  href={swapLocale(option)}
-                  hrefLang={option}
-                  aria-current={option === locale ? 'true' : undefined}
-                  className={cn(
-                    'text-micro tap uppercase transition-opacity',
-                    option === locale ? 'opacity-100' : 'opacity-50 hover:opacity-100',
-                  )}
-                >
-                  {localeNames[option]}
-                </Link>
-              ))}
-            </div>
-          </nav>
-
-          {/* El «+». Va a la derecha del todo y mide 44 px de lado: es el único control
-              de navegación que hay en un móvil, así que se toca sin apuntar. */}
+          {/* El «+». Va a la derecha del todo y mide 44 px de lado: es el ÚNICO control de
+              navegación que hay en la barra, en móvil y en escritorio, así que se toca sin
+              apuntar. */}
           <button
             type="button"
             onClick={() => setOpenedAt(open ? null : pathname)}
             aria-expanded={open}
-            aria-controls="mobile-menu"
+            aria-controls={MENU_ID}
             aria-label={open ? dictionary.nav.close : dictionary.nav.menu}
-            className="-mr-2 flex h-11 w-11 items-center justify-center md:hidden"
+            className="-mr-2 flex h-11 w-11 items-center justify-center"
           >
             {open ? <MinusIcon className="h-6 w-6" /> : <PlusIcon className="h-6 w-6" />}
           </button>
         </div>
       </header>
 
-      {/* EL MENÚ, A PANTALLA COMPLETA. `hidden` en vez de un return condicional: así el
-          botón conserva su `aria-controls` apuntando a un nodo que siempre existe.
+      {/* EL MENÚ, A PANTALLA COMPLETA Y EN TODAS LAS PANTALLAS.
+          Siempre montado: es lo que permite el fundido, y de paso el botón conserva su
+          `aria-controls` apuntando a un nodo que existe siempre.
+
+          Cerrado: transparente, invisible e `inert` —sin clics, sin foco y sin voz—. El
+          `[transition-behavior:allow-discrete]` es lo que sincroniza la `visibility` con el
+          fundido: entrando conmuta al empezar, saliendo al terminar. Se escribe como
+          propiedad arbitraria y no con una utilidad porque es exactamente una línea de CSS
+          y así queda al lado de la transición a la que pertenece.
 
           Por debajo del header en el eje Z (z-40 contra z-50) a propósito: el «−» que lo
           cierra vive en la cabecera y tiene que quedar por encima del panel para poder
           pulsarse. De ahí también el hueco superior, que deja libre la altura de la
           barra. */}
       <div
-        id="mobile-menu"
-        hidden={!open}
-        className="page-gutter fixed inset-0 z-40 overflow-y-auto bg-paper pt-20 pb-16 md:hidden"
+        id={MENU_ID}
+        inert={!open}
+        className={cn(
+          'page-gutter fixed inset-0 z-40 overflow-y-auto bg-paper pt-20 pb-16 md:pt-24',
+          'transition-[opacity,visibility] duration-500 ease-(--ease-out-soft)',
+          '[transition-behavior:allow-discrete]',
+          open ? 'visible opacity-100' : 'invisible opacity-0',
+        )}
       >
         {/* El menú va CENTRADO en la pantalla, como en Swiftmet: con cinco entradas y nada
             más, alineadas arriba y a la izquierda dejaban la pantalla medio vacía y el ojo
-            no sabía dónde ir. El centrado lo pone este `<nav>` y no el panel de fuera: una
-            utilidad de `display` ahí discutiría con el atributo `hidden`, que es quien
-            apaga el panel cerrado.
+            no sabía dónde ir. El centrado lo pone este `<nav>` y no el panel de fuera, que
+            tiene que quedar libre para el `overflow-y-auto` y la transición.
 
             `min-h-full` y no `h-full`: llena el panel para poder centrar, y si algún día
             las entradas no caben en una pantalla baja, crece y el `overflow-y-auto` del
