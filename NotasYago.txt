@@ -1,0 +1,78 @@
+0. El fondo de la web totalmente blanco.
+
+1. En la versión movil el menu de navegación no lo queremos tipo app abajo con iconos, queremos un icono en la esquina superior derecha que despliegue el menú ocupando toda la pantalla. un + para expandirlo y un - para contraerlo. 
+
+2. Queremos dos secciones en la pantalla principal: la portada (el hero principal) y la sección de contacto. Nada mas.
+
+3. El hero principal son imágenes de distintos proyectos (incluir en el panel de admin de sanity cuales exactamente) que se van cambiando jugando con la opacidad. 
+
+4. La seccion de contacto será de la siguiente forma: el texto está totalmente a la izquierda, en una única columna de varias filas, tal cual así, todo literal: 
+
+    - CONTACTO
+
+    (hueco equivalente a un salto de línea)
+
+    - Castillo de Maya 35, bajo
+    - 31004 Pamplona, España
+    - T +34 664 197 624
+
+    (hueco equivalente a dos saltos de línea)
+
+    - (icono correo) sangil@sangilstudio.com
+    - (icono pag web) www.sangilstudio.com
+    - (icono instagram) sangilstudio               --> (todos estos son links clickables con un efecto hover negrita)
+
+    (hueco equivalente a dos saltos de línea)
+
+    - Yago Fernández Sangil
+    - Juan Luis Irigaray Huarte
+    
+
+5. La seccion de contacto como hemos dicho es una sección dentro de la pantalla principal, no una página independiente. Se puede ir a contacto haciendo scroll o haciendo click en el botón, pero no hay una página independiente. 
+
+6. En el hero principal, cuando hacemos click vamos a la página independiente de proyectos.
+
+7. En la sección de proyectos, queremos filas de tres columnas para la versión desktop y de una columna para la versión mobile. Las fotos de los proyectos que sean cuadradas, no tipo fotos de móvil vertical. 
+
+8. Un buscador de proyectos que funcione tipo desplegable que solo muestra los proyectos que hacen match con el texto que hay en cada momento en el buscador. buscador que hace match si en alguna parte del texto está nuestro valor buscado, no que empiece por sino que contenga. Que no distinga mayúsculas de minúsculas. Que no distinga tampoco acentos.
+
+9. Cuando el ratón pasa por encima de un proyecto, este "respira" aumenta ligeramente el tamaño de la imagen pero manteniendo el mismo tamaño total, es decir, la imagen hace zoom sin salirse del recuadro.
+
+10. Los datos del estudio van en una pantalla independiente.
+
+11. Toda la página web tiene que tener unos márgenes laterales considerables para la versión desktop, tipo paredespedrosa.com
+
+12. Dentro de la pantalla de un proyecto específico /proyectos/proyectoX, queremos lo siguiente:
+
+    - Título del proyecto en mayúsculas y tamaño grande
+    - ubicación, año
+    - tipo de proyecto (vivienda, oficina, etc)
+    - Arquitectos: (nombres de los arquitectos que han trabajado separados por comas)
+    - Promotor: (nombre del promotor) --> esto solo cuando lo haya
+    Imagenes del proyecto, en filas de una sola columna.
+
+13. Usar tipografía Montserrat en toda la web, sino la Neuer.
+
+------------------------------------------------------------------------------------------------------------------------------
+
+1. En el panel de administración de sanity se debe de poder añadir imágenes a un proyecto concreto sin necesidad de título ni descripción, solo queremos la imagen, no necesitamos texto, al menos en la sección de un proyecto concreto. Ahora mismo en sanity si intentamos añadir una imagen a un proyecto sin textos, marca error y no deja publicar.
+
+2. Queremos márgenes en toda la web. Márgen superior para que el logo y el menú no necesiten resaltarse en blanco, siempre tienen su propio espacio y un cierto margen con el resto del contenido. Además también queremos márgenes laterales, para dar más sensación de limpio, pulcro, minimalista, sencillo, elegante. Esto ya se ha aplicado perfectamente en la pantalla de un proyecto específico, falta aplicarlo exactamente igual en la pantalla principal y en el resto de pantallas, esto tiene que estar a nivel layout de toda la web, no solo en las pantallas de cada proyecto. Realmente solo falta aplicar esto en el hero principal, en el resto ya está bien. Comprobarlo y si es así, solo tocar el hero. Si queda algún sitio más, aplicar.
+
+3. En la página de proyectos, cada proyecto tiene dos textos: el título y la ubicación/año, quitar el año para que quede solamente la ubicación.
+
+4. El menú con el + y el - está perfecto en la versión movil, pero lo quiero igual en la versión ordenador. Además quiero un efecto de fade in, que el menú aparezca aumentando su opacidad progresivamente.
+
+5. El buscador de proyectos tapa las imagenes de debajo, ponerlo con cierta transparencia para que se vea tanto el buscador como las imágenes de debajo.
+
+------------------------------------------------------------------------------------------------------------------------------
+
+1. En el hero principal solo se muestran las 6 primeras imagenes, quiero todas. 
+
+2. En la página de un proyecto concreto, hay algunas imágenes verticales y ahora mismo se suben ocupando todo el ancho de su sección y hace que la imagen se vuelva enorme y haya que scrollear para verla entera. En la versión móvil, se recortan también mucho las imagenes. Dame varias opciones distintas con un panel para solucionar el problema y que todas las imágenes se puedan ver sin modificar enteras en las pantallas tanto del móvil como del ordenador.
+
+3. Quitar "Inicio" en el menú
+
+4. Flecha para ir de la página de un proyecto concreto a la página anterior de la lista de todos los proyectos, un "volver a los proyectos" que se limite a renderizarse y funcionar ahí. Su aspecto es algo así como "< BACK" (respetar la Flecha minimalista, sin línea) abajo de todo. Reservamos una fila html entera solo para poner este elemento a la izquierda de todo y que sea inmovil respecto a la página en la que se encuentra, para que siempre sea accesible al usuario, que no se mueva.
+
+5. 

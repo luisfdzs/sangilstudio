@@ -4,21 +4,6 @@ import { client } from '@/sanity/client'
 import { PROJECTS_QUERY, PROJECT_SLUGS_QUERY, SITE_SETTINGS_QUERY } from '@/sanity/queries'
 import type { Localized } from '@/lib/i18n/config'
 
-/**
- * ÚNICA PUERTA DE ACCESO AL CONTENIDO
- *
- * Ninguna página consulta Sanity directamente: todas pasan por aquí. Cuando el
- * contenido vivía en ficheros del repositorio, este módulo era el que lo leía; ahora
- * lee del CMS y **las vistas no cambiaron**. Era exactamente para esto.
- *
- * Diferencia importante de criterio respecto a la etapa de ficheros: antes, un
- * proyecto sin imágenes **rompía el build a propósito**. Ahora el contenido lo edita
- * una persona desde el navegador, así que un documento a medio rellenar **no puede
- * tumbar la web**: se descarta ese documento, se avisa por consola y el resto sigue
- * publicándose.
- */
-
-/** Etiqueta de caché: el webhook de Sanity la invalida al publicar. */
 export const CONTENT_TAG = 'sanity-content'
 
 const localizedString = z.object({ es: z.string().min(1), en: z.string().min(1) })
@@ -27,21 +12,6 @@ const localizedParagraphs = z.object({
   en: z.array(z.string().min(1)).min(1),
 })
 
-/**
- * La descripción de una imagen **puede no estar**, y eso no invalida la imagen.
- *
- * El panel ya no la exige (ver `sanity/schemas/projectImage.ts`: el estudio sube galerías
- * de veinte fotos y no va a escribir veinte textos en dos idiomas). Aquí importa porque un
- * documento se valida entero: con `alt` obligatorio, una sola foto sin describir tumbaba
- * la validación del proyecto completo y `keepValid` lo descartaba de la web —el proyecto
- * desaparecía por no haber escrito un texto—.
- *
- * Se normaliza a cadena vacía en vez de dejarlo opcional para que el resto del código siga
- * leyendo `image.alt[locale]` sin comprobar nada, y porque `alt=""` es exactamente lo que
- * hay que emitir en HTML para una imagen sin descripción: un lector de pantalla la salta
- * en lugar de leer el nombre del fichero. Donde la imagen va sola y necesita nombre, la
- * vista pone el título del proyecto.
- */
 const optionalLocalizedString = z
   .object({ es: z.string().nullish(), en: z.string().nullish() })
   .nullish()
@@ -75,7 +45,6 @@ const projectSchema = z.object({
   ]),
   area: z.string().nullish(),
   client: z.string().nullish(),
-  /** Nombres de los arquitectos que firman la obra, separados por comas. */
   collaboration: z.string().nullish(),
   featured: z.boolean().nullish(),
   summary: localizedString,
@@ -84,19 +53,6 @@ const projectSchema = z.object({
   plans: z.array(imageSchema).nullish(),
 })
 
-/**
- * DATOS DE CONTACTO POR DEFECTO
- *
- * El bloque de contacto de la portada es un texto fijo, línea a línea, y se compone de
- * campos del panel. Los cuatro de aquí abajo se añadieron con el rediseño, así que el
- * documento que está publicado todavía no los trae: `initialValue` sólo se aplica a
- * documentos nuevos, no a los que ya existen.
- *
- * Si se declararan obligatorios, la web entera dejaría de servirse hasta que alguien
- * abriera el panel y volviera a publicar. Se declaran opcionales y se rellenan con
- * estos valores —los que el estudio dio—, así que la web sale bien desde el primer
- * despliegue y en cuanto Yago escriba los suyos mandan los del panel.
- */
 const CONTACT_FALLBACK = {
   street: 'Castillo de Maya 35, bajo',
   postalCode: '31004',
@@ -129,11 +85,6 @@ export type ProjectEntry = z.infer<typeof projectSchema> & {
   cover: DescribedImage
 }
 
-/**
- * Los ajustes ya resueltos: sin nulos en lo que el bloque de contacto necesita sí o sí,
- * con las imágenes de la portada aplanadas y con el nombre de usuario de Instagram ya
- * extraído de su dirección.
- */
 export type SiteSettings = Omit<
   z.infer<typeof siteSettingsSchema>,
   'hero' | 'street' | 'postalCode' | 'phone' | 'website'
@@ -143,36 +94,17 @@ export type SiteSettings = Omit<
   postalCode: string
   phone: string
   website: string
-  /** `www.sangilstudio.com`: la dirección tal y como se enseña, sin protocolo. */
   websiteLabel: string
-  /** `sangilstudio`: el usuario, sin arroba, sacado de la URL del perfil. */
   instagramHandle: string | null
 }
 
-/**
- * Lee de Sanity y **cachea con etiqueta**: la web se sirve estática hasta que alguien
- * publica, y entonces el webhook invalida esta etiqueta y se regenera.
- *
- * Ojo, aquí hubo un fallo silencioso: antes se pasaba `{ next: { tags, revalidate } }`
- * como tercer argumento de `client.fetch`, pero **`@sanity/client` ignora esa opción**
- * (no usa el `fetch` de Next con sus extensiones). Resultado: los datos quedaban
- * horneados en el build sin etiqueta alguna, el webhook respondía 200 y la web no se
- * actualizaba nunca. La forma correcta en Next 16 es la directiva `use cache` con
- * `cacheTag`, que sí registra la dependencia. Verificado midiendo el tiempo real desde
- * «Publicar» hasta ver el cambio.
- */
 async function fetchContent<T>(query: string): Promise<T> {
   'use cache'
   cacheTag(CONTENT_TAG)
-  // 'max': se sirve de caché indefinidamente y sólo cambia cuando se publica algo.
   cacheLife('max')
   return client.fetch<T>(query)
 }
 
-/**
- * Valida cada documento por separado y descarta los que no cumplen, en vez de fallar
- * en bloque. Así un proyecto sin imágenes o sin traducir no deja la web fuera de servicio.
- */
 function keepValid<T>(items: unknown[], schema: z.ZodType<T>, label: string): T[] {
   const valid: T[] = []
   for (const item of items) {
@@ -194,17 +126,11 @@ function keepValid<T>(items: unknown[], schema: z.ZodType<T>, label: string): T[
   return valid
 }
 
-/**
- * Todos los proyectos, **incluidos los concursos**: son proyectos con
- * `status: 'competition'`, no otro tipo de documento. Si alguna vista necesitara
- * separarlos, se filtra por `status` aquí mismo y no hace falta otra consulta.
- */
 export async function getProjects(): Promise<ProjectEntry[]> {
   const raw = await fetchContent<unknown[]>(PROJECTS_QUERY)
   return keepValid(raw, projectSchema, 'el proyecto').map((project) => ({
     ...project,
     plans: project.plans ?? [],
-    // La portada es siempre la primera de la galería; el esquema garantiza que existe.
     cover: project.images[0]!,
   }))
 }
@@ -227,27 +153,14 @@ export async function getProjectSlugs(): Promise<string[]> {
     .filter((slug): slug is string => Boolean(slug))
 }
 
-/**
- * Las imágenes que se funden en la portada.
- *
- * Salen de los proyectos que el estudio elige en el panel. Si esa lista está vacía
- * —o los proyectos elegidos se quedaron sin galería—, se recurre a los destacados: la
- * portada de esta web es sólo imágenes, así que quedarse sin ninguna la dejaría en
- * blanco, y eso no puede pasar por no haber rellenado un campo.
- */
-export async function getHeroImages(limit = 6): Promise<DescribedImage[]> {
+export async function getHeroImages(): Promise<DescribedImage[]> {
   const settings = await getSiteSettings()
-  const chosen = settings.heroImages.slice(0, limit)
-  if (chosen.length > 0) return chosen
+  if (settings.heroImages.length > 0) return settings.heroImages
 
-  const featured = await getFeaturedProjects(limit)
+  const featured = await getFeaturedProjects()
   return featured.map((project) => project.cover)
 }
 
-/**
- * Ajustes del estudio. Si faltan o están incompletos es un fallo grave (afecta al
- * bloque de contacto de la portada), así que aquí sí se lanza error con un mensaje claro.
- */
 export async function getSiteSettings(): Promise<SiteSettings> {
   const raw = await fetchContent<unknown>(SITE_SETTINGS_QUERY)
   const result = siteSettingsSchema.safeParse(raw)
@@ -263,7 +176,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 
   return {
     ...rest,
-    // Un proyecto de la lista puede haberse quedado sin galería: ese hueco se cae aquí.
     heroImages: (hero ?? [])
       .map((entry) => entry.image)
       .filter((image): image is DescribedImage => Boolean(image)),
@@ -276,7 +188,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   }
 }
 
-/** `https://www.sangilstudio.com/` → `www.sangilstudio.com`. */
 function hostnameOf(url: string): string {
   try {
     return new URL(url).hostname
@@ -285,7 +196,6 @@ function hostnameOf(url: string): string {
   }
 }
 
-/** `https://instagram.com/sangilstudio/` → `sangilstudio`. */
 function lastPathSegment(url: string): string | null {
   try {
     const segments = new URL(url).pathname.split('/').filter(Boolean)
