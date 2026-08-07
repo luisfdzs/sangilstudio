@@ -68,9 +68,11 @@ export default async function ProjectPage({
       >
         <article className="page-gutter pt-16 pb-32 md:pt-24 md:pb-(--spacing-section)">
           <header>
-            <h1 className="text-display tracking-tight uppercase">{project.title}</h1>
+            <h1 data-t="projectTitle" className="text-display tracking-tight uppercase">
+              {project.title}
+            </h1>
 
-            <div className="mt-6 text-body md:mt-8">
+            <div data-t="projectMeta" className="mt-6 text-body md:mt-8">
               <p>
                 {project.location[locale]}, {project.year}
               </p>

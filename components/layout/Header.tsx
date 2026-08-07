@@ -114,6 +114,7 @@ export function Header({ locale, dictionary }: Props) {
             <Link
               key={key}
               href={href(locale, key)}
+              data-t="menuLink"
               onClick={close}
               aria-current={isCurrent(pathname, href(locale, key)) ? 'page' : undefined}
               className={cn(
@@ -131,6 +132,7 @@ export function Header({ locale, dictionary }: Props) {
               <Link
                 key={option}
                 href={swapLocale(option)}
+                data-t="menuLocale"
                 hrefLang={option}
                 onClick={close}
                 aria-current={option === locale ? 'true' : undefined}
@@ -146,6 +148,7 @@ export function Header({ locale, dictionary }: Props) {
 
           <Link
             href={href(locale, 'legal')}
+            data-t="menuLegal"
             onClick={close}
             aria-current={isCurrent(pathname, href(locale, 'legal')) ? 'page' : undefined}
             className="tap eyebrow mt-2 hover:text-ink-soft"

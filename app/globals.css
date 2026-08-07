@@ -75,6 +75,12 @@
     outline-offset: 3px;
   }
 
+  button:not(:disabled),
+  [role='button']:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+
   img,
   video {
     display: block;

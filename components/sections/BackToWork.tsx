@@ -19,7 +19,9 @@ export function BackToWork({ href, label, title }: Props) {
           direction="left"
           className="h-4 w-2 transition-transform duration-300 ease-(--ease-out-soft) group-hover:-translate-x-1"
         />
-        <span className="text-micro uppercase">{label}</span>
+        <span data-t="backLink" className="text-micro uppercase">
+          {label}
+        </span>
       </Link>
     </div>
   )
