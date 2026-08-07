@@ -50,6 +50,7 @@ export function GalleryToggle({ dictionary }: { dictionary: Dictionary }) {
         <button
           key={option}
           type="button"
+          data-t="galleryToggle"
           onClick={() => applyMode(option)}
           aria-pressed={mode === option}
           className={`tap text-micro tracking-[0.12em] uppercase transition-colors duration-300 ease-(--ease-out-soft) ${

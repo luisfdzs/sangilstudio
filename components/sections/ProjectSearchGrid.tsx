@@ -108,6 +108,7 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
         </label>
         <input
           id="project-search"
+          data-t="search"
           type="search"
           value={query}
           onChange={(event) => {
@@ -140,6 +141,7 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
             <li
               key={project.slug}
               id={`project-search-option-${index}`}
+              data-t="searchOption"
               role="option"
               aria-selected={index === active}
               onPointerEnter={() => setActive(index)}

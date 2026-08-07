@@ -37,12 +37,19 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
 
   return (
     <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
-      <h1 className="text-display tracking-tight uppercase">{t.studio.title}</h1>
+      <h1 data-t="studioTitle" className="text-display tracking-tight uppercase">
+        {t.studio.title}
+      </h1>
 
       <div className="mt-10 grid max-w-2xl gap-6 md:mt-14">
         {settings.statement[locale].map((paragraph, index) => (
           <Reveal key={paragraph.slice(0, 24)} step={index}>
-            <p className={index === 0 ? 'text-lead' : 'text-ink-soft'}>{paragraph}</p>
+            <p
+              data-t={index === 0 ? 'studioLead' : 'studioBody'}
+              className={index === 0 ? 'text-lead' : 'text-ink-soft'}
+            >
+              {paragraph}
+            </p>
           </Reveal>
         ))}
       </div>

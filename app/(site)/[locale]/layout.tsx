@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Montserrat } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { Header } from '@/components/layout/Header'
+import { TypeLabOverlay } from '@/components/typelab/TypeLabOverlay'
 import { GALLERY_BOOT_SCRIPT, GALLERY_DEFAULT } from '@/components/ui/GalleryToggle'
 import { site } from '@/content/site'
 import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
@@ -86,6 +87,7 @@ export default async function LocaleLayout({
         <main id="main" className="flex-1">
           {children}
         </main>
+        <TypeLabOverlay />
       </body>
     </html>
   )

@@ -48,9 +48,11 @@ export function ContactSection({ locale, settings }: { locale: Locale; settings:
         id={sections.contact}
         className="page-gutter scroll-mt-8 pb-(--spacing-section) text-left"
       >
-        <h2 className="text-small tracking-[0.18em] uppercase">{t.contact.title}</h2>
+        <h2 data-t="contactHeading" className="text-small tracking-[0.18em] uppercase">
+          {t.contact.title}
+        </h2>
 
-        <address className="mt-[1.7em] text-body not-italic">
+        <address data-t="contactBody" className="mt-[1.7em] text-body not-italic">
           <span className="block">{settings.street}</span>
           <span className="block">
             {settings.postalCode} {settings.city}, {settings.country[locale]}
@@ -58,7 +60,7 @@ export function ContactSection({ locale, settings }: { locale: Locale; settings:
           <span className="block">T {settings.phone}</span>
         </address>
 
-        <ul className="mt-[3.4em] space-y-1 text-body">
+        <ul data-t="contactBody" className="mt-[3.4em] space-y-1 text-body">
           {links.map(({ key, href: target, text, Icon, external }) => (
             <li key={key}>
               <a
@@ -75,7 +77,7 @@ export function ContactSection({ locale, settings }: { locale: Locale; settings:
           ))}
         </ul>
 
-        <ul className="mt-[3.4em] text-body">
+        <ul data-t="contactBody" className="mt-[3.4em] text-body">
           {settings.team.map((member) => (
             <li key={member.name}>{member.name}</li>
           ))}

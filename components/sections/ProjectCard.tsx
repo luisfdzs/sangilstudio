@@ -29,8 +29,12 @@ export function ProjectCard({ project, locale, priority = false }: Props) {
         </div>
 
         <div className="mt-4">
-          <h3 className="text-small font-medium tracking-wide uppercase">{project.title}</h3>
-          <p className="mt-1 text-small text-ink-soft">{project.location[locale]}</p>
+          <h3 data-t="cardTitle" className="text-small font-medium tracking-wide uppercase">
+            {project.title}
+          </h3>
+          <p data-t="cardLocation" className="mt-1 text-small text-ink-soft">
+            {project.location[locale]}
+          </p>
         </div>
       </Link>
     </article>
