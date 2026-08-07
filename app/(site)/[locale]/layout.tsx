@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Montserrat } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { Header } from '@/components/layout/Header'
+import { SwipeLabOverlay } from '@/components/swipe/SwipeLabOverlay'
 import { TypeLabOverlay } from '@/components/typelab/TypeLabOverlay'
 import { GALLERY_BOOT_SCRIPT, GALLERY_DEFAULT } from '@/components/ui/GalleryToggle'
 import { site } from '@/content/site'
@@ -88,6 +89,7 @@ export default async function LocaleLayout({
           {children}
         </main>
         <TypeLabOverlay />
+        <SwipeLabOverlay />
       </body>
     </html>
   )
