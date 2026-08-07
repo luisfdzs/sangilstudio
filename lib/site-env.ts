@@ -1,4 +1,4 @@
-export const INDEXABLE_BRANCH = 'main'
+export const INDEXABLE_BRANCH = 'prod'
 
 export function isIndexable(): boolean {
   return (
