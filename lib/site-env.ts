@@ -17,7 +17,7 @@
  *
  * Falla del lado seguro: si mañana falta la variable, no se indexa.
  */
-export const INDEXABLE_BRANCH = 'main'
+export const INDEXABLE_BRANCH = 'prod'
 
 export function isIndexable(): boolean {
   return (
