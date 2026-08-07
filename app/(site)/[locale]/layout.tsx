@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Montserrat } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { Header } from '@/components/layout/Header'
+import { GALLERY_BOOT_SCRIPT, GALLERY_DEFAULT } from '@/components/ui/GalleryToggle'
 import { site } from '@/content/site'
 import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
@@ -75,9 +76,12 @@ export default async function LocaleLayout({
     <html
       lang={localeHtmlLang[typedLocale]}
       data-scroll-behavior="smooth"
+      data-gallery={GALLERY_DEFAULT}
+      suppressHydrationWarning
       className={montserrat.variable}
     >
       <body className="flex min-h-svh flex-col">
+        <script dangerouslySetInnerHTML={{ __html: GALLERY_BOOT_SCRIPT }} />
         <Header locale={typedLocale} dictionary={dictionary} />
         <main id="main" className="flex-1">
           {children}

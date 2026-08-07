@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { BackToWork } from '@/components/sections/BackToWork'
 import { ProjectPager } from '@/components/sections/ProjectPager'
+import { Gallery, ratioOf } from '@/components/ui/Gallery'
+import { GalleryToggle } from '@/components/ui/GalleryToggle'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
 import { getProject, getProjects, getProjectSlugs } from '@/lib/content'
@@ -86,17 +88,27 @@ export default async function ProjectPage({
             </div>
           </header>
 
-          <div className="mt-12 flex flex-col gap-8 md:mt-16 md:gap-12">
-            {project.images.map((image, index) => (
-              <Reveal key={image.id}>
-                <Media
-                  image={image}
-                  alt={index === 0 ? image.alt[locale] || project.title : image.alt[locale]}
-                  priority={index === 0}
-                  sizes="(max-width: 768px) 100vw, 76vw"
-                />
-              </Reveal>
-            ))}
+          <div className="mt-12 flex justify-end md:mt-16">
+            <GalleryToggle dictionary={t} />
+          </div>
+
+          <div className="mt-6 md:mt-8">
+            <Gallery
+              items={project.images.map((image, index) => ({
+                key: image.id,
+                ratio: ratioOf(image),
+                content: (
+                  <Reveal className="gallery-frame">
+                    <Media
+                      image={image}
+                      alt={index === 0 ? image.alt[locale] || project.title : image.alt[locale]}
+                      priority={index === 0}
+                      sizes="(max-width: 768px) 100vw, 40vw"
+                    />
+                  </Reveal>
+                ),
+              }))}
+            />
           </div>
         </article>
       </ProjectPager>

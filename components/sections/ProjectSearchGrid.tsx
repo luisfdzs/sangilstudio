@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ProjectCard } from '@/components/sections/ProjectCard'
+import { Gallery, ratioOf } from '@/components/ui/Gallery'
+import { GalleryToggle } from '@/components/ui/GalleryToggle'
 import type { ProjectEntry } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
@@ -159,16 +161,21 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
       {visible.length === 0 ? (
         <p className="mt-16 text-body text-ink-soft">{dictionary.work.empty}</p>
       ) : (
-        <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-12 md:mt-16 md:grid-cols-3 md:gap-x-8 md:gap-y-16">
-          {visible.map((project, index) => (
-            <ProjectCard
-              key={project.slug}
-              project={project}
-              locale={locale}
-              priority={index < 3}
+        <>
+          <div className="mt-12 flex justify-end md:mt-16">
+            <GalleryToggle dictionary={dictionary} />
+          </div>
+
+          <div className="mt-6 md:mt-8">
+            <Gallery
+              items={visible.map((project, index) => ({
+                key: project.slug,
+                ratio: ratioOf(project.cover),
+                content: <ProjectCard project={project} locale={locale} priority={index < 3} />,
+              }))}
             />
-          ))}
-        </div>
+          </div>
+        </>
       )}
     </>
   )

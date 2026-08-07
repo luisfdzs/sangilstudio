@@ -7,28 +7,23 @@ type Props = {
   alt: string
   sizes: string
   priority?: boolean
-  ratio?: string
   className?: string
 }
 
-export function Media({ image, alt, sizes, priority = false, ratio, className }: Props) {
+export function Media({ image, alt, sizes, priority = false, className }: Props) {
   return (
-    <div
-      className={cn('relative w-full overflow-hidden bg-paper-deep', className)}
-      style={ratio ? { aspectRatio: ratio } : { aspectRatio: `${image.width} / ${image.height}` }}
-    >
-      <Image
-        src={image.src}
-        alt={alt}
-        fill
-        sizes={sizes}
-        priority={priority}
-        loading={priority ? undefined : 'lazy'}
-        placeholder="blur"
-        blurDataURL={image.blur}
-        quality={75}
-        className="object-cover"
-      />
-    </div>
+    <Image
+      src={image.src}
+      alt={alt}
+      width={image.width}
+      height={image.height}
+      sizes={sizes}
+      priority={priority}
+      loading={priority ? undefined : 'lazy'}
+      placeholder="blur"
+      blurDataURL={image.blur}
+      quality={75}
+      className={cn(className)}
+    />
   )
 }
