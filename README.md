@@ -77,6 +77,6 @@ Los mensajes rotativos se editan en el array `mensajes`.
 Hospedado en **Vercel**, con dos entornos que se publican **automáticamente al
 hacer *push*** (sirviendo la web estática desde la raíz del repositorio):
 
-- **Producción:** rama `main` → `sangilstudio.vercel.app` y el dominio
+- **Producción:** rama `prod` → `sangilstudio.vercel.app` y el dominio
   **`sangilstudio.com`** (DNS en IONOS, `www` canónico, SSL de Vercel).
 - **Test:** rama `test` → `sangilstudiotest.vercel.app`.
