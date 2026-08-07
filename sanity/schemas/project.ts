@@ -1,25 +1,6 @@
 import { defineField, defineType } from 'sanity'
 import { orderRankField } from '@sanity/orderable-document-list'
 
-/**
- * PROYECTO (obra construida, en curso, en proyecto o presentada a concurso)
- *
- * Es el único tipo de documento de contenido: **un concurso es un proyecto con el estado
- * «Concurso»**, no una categoría aparte. Antes había un segundo tipo `competition` con su
- * propia sección, y eso dejaba dos formas distintas de decir lo mismo (este mismo campo
- * `status` ya tenía el valor `competition`, y había un proyecto usándolo). Al unificar,
- * los concursos ganan ficha, memoria y planos como cualquier otra obra, y quien edita
- * tiene una sola lista y un solo formulario.
- *
- * Decisiones pensadas para quien edita:
- *
- * - Los estados y tipos son listas cerradas: la web tiene una traducción preparada
- *   para cada valor en los dos idiomas, así que no se pueden inventar.
- * - El orden en la web se cambia **arrastrando** en el listado (Proyectos › Ordenar),
- *   no escribiendo números.
- * - La primera imagen de la galería es siempre la portada: se dice en la ayuda del
- *   campo y así no hay un ajuste más que recordar.
- */
 export const project = defineType({
   name: 'project',
   title: 'Proyecto',
@@ -86,9 +67,6 @@ export const project = defineType({
       title: 'Tipo',
       type: 'string',
       group: 'ficha',
-      // Los cuatro últimos entraron con los concursos: museos y archivos caben en
-      // «Cultural», pero un estadio, una facultad, un mercado o un centro de salud no,
-      // y forzarlos ahí habría sido etiquetarlos mal para ahorrar cuatro líneas.
       options: {
         list: [
           { title: 'Vivienda', value: 'housing' },
@@ -118,13 +96,6 @@ export const project = defineType({
       group: 'ficha',
       description: 'Opcional. Ejemplo: «MUROA».',
     }),
-    /**
-     * Es el mismo campo que antes se llamaba «Colaboración»: se renombró al rediseñar
-     * la ficha, que ahora enseña una línea de «Arquitectos». Se conserva el nombre
-     * interno (`collaboration`) a propósito: cambiarlo obligaría a migrar los treinta y
-     * un documentos publicados para no perder lo que ya está escrito, y lo que hay
-     * escrito son precisamente los estudios que firman cada obra con nosotros.
-     */
     defineField({
       name: 'collaboration',
       title: 'Arquitectos',
@@ -185,7 +156,6 @@ export const project = defineType({
         'documentos técnicos.',
     }),
 
-    // Campo oculto que sostiene el orden por arrastre del listado.
     orderRankField({ type: 'project' }),
   ],
   preview: {

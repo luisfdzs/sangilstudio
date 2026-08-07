@@ -1,27 +1,4 @@
 #!/usr/bin/env node
-/**
- * PIPELINE DE IMÁGENES · `npm run images`
- *
- * Toma los originales del archivo maestro (`IMAGENES PROYECTOS/`, fuera de git,
- * PNG/JPG de hasta 95 MB) y genera para la web:
- *
- *   public/media/<coleccion>/<slug>/<nn>.webp   derivado único, máx. 2560 px
- *   content/media-manifest.json                 dimensiones + placeholder LQIP
- *
- * Por qué un solo derivado y no un srcset completo: `next/image` ya genera las
- * variantes responsive y las cachea en el CDN de Vercel. Duplicar aquí esa lógica
- * multiplicaría el peso del repo sin ganar nada. Lo que sí necesitamos versionar
- * es el manifiesto: con ancho y alto conocidos en build no hay salto de layout
- * (CLS = 0) y el placeholder difuminado evita el "flash" de hueco vacío.
- *
- * Es idempotente: sólo reprocesa lo que ha cambiado. `--force` rehace todo.
- *
- * NOTA (desde que existe el panel de administración): el contenido de la web ya no se
- * sirve desde aquí, sino desde Sanity, que optimiza por su cuenta lo que se sube. Este
- * script se conserva porque sigue siendo la forma cómoda de **preparar en lote**
- * derivados manejables a partir de los originales de 80–95 MB antes de subirlos al
- * panel, y porque generó las imágenes de la migración inicial.
- */
 
 import { createHash } from 'node:crypto'
 import { existsSync } from 'node:fs'
@@ -37,13 +14,10 @@ const MASTER = path.join(ROOT, MASTER_DIR)
 const OUT_DIR = path.join(ROOT, 'public', 'media')
 const MANIFEST = path.join(ROOT, 'content', 'media-manifest.json')
 
-/** Tope de ancho del derivado. Por encima de 2560 px nadie nota la diferencia. */
 const MAX_WIDTH = 2560
 const QUALITY = 82
-/** Los planos son documentos técnicos: interesa nitidez de línea, no ancho. */
 const PLAN_MAX_WIDTH = 2000
 const PLAN_QUALITY = 88
-/** Ancho del placeholder LQIP embebido en base64. */
 const BLUR_WIDTH = 16
 
 const force = process.argv.includes('--force')
@@ -62,7 +36,6 @@ async function main() {
     { name: 'competitions', entries: competitionsCuration },
   ]
 
-  /** @type {Record<string, Record<string, { images: unknown[], plans: unknown[] }>>} */
   const manifest = {}
   const stats = { processed: 0, skipped: 0, missing: 0, bytes: 0 }
 
@@ -111,10 +84,6 @@ async function main() {
   }
 }
 
-/**
- * Procesa un original y devuelve su entrada de manifiesto.
- * @returns {Promise<null | { id: string, src: string, width: number, height: number, blur: string, source: string }>}
- */
 async function processOne({ collection, slug, entry, source, index, stats, kind = 'image' }) {
   const absolute = path.resolve(MASTER, entry.dir, source)
   if (!existsSync(absolute)) {
@@ -166,14 +135,12 @@ async function processOne({ collection, slug, entry, source, index, stats, kind 
   }
 }
 
-/** Un derivado está al día si existe y es más nuevo que su original. */
 async function isUpToDate(source, output) {
   if (!existsSync(output)) return false
   const [a, b] = await Promise.all([stat(source), stat(output)])
   return b.mtimeMs >= a.mtimeMs
 }
 
-/** Placeholder difuminado, embebido como data URL en el manifiesto. */
 async function makeBlurDataUrl(source) {
   const buffer = await sharp(source, { limitInputPixels: false })
     .rotate()
@@ -183,7 +150,6 @@ async function makeBlurDataUrl(source) {
   return `data:image/webp;base64,${buffer.toString('base64')}`
 }
 
-/** Hash corto de contenido: útil si algún día queremos nombres cache-busting. */
 export async function contentHash(file) {
   return createHash('sha256')
     .update(await readFile(file))

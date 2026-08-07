@@ -1,34 +1,19 @@
 import type { Locale } from './config'
 
-/**
- * Textos de interfaz (no de contenido). El diccionario `es` es la fuente de
- * verdad de la forma: `en` debe encajar en el mismo tipo, así que si añades una
- * clave y no la traduces, falla el typecheck en lugar de aparecer vacía en la web.
- */
 const es = {
   nav: {
-    /* `home` ya NO es una entrada del menú (se quitó a petición del estudio): se queda
-       como nombre accesible del wordmark de la barra, que es lo que lleva al inicio. */
     home: 'Inicio',
     work: 'Proyectos',
     studio: 'Estudio',
     contact: 'Contacto',
-    /* La línea pequeña al final del panel del menú. */
     legal: 'Aviso legal',
-    /* Los cuatro de abajo casi no se leen: nombran el botón del menú de móvil —que es un
-       «+» sin rótulo—, el selector de idioma y el enlace de salto. Son lo único que
-       distingue esos controles para quien navega con lector de pantalla. */
     menu: 'Abrir menú',
     close: 'Cerrar menú',
     language: 'Idioma',
     skipToContent: 'Saltar al contenido',
   },
   home: {
-    /* La portada no tiene texto: son imágenes a pantalla completa que llevan a los
-       proyectos. Esto es el nombre accesible de ese enlace, que ocupa la pantalla
-       entera y sin él se anunciaría vacío. */
     heroLink: 'Ver todos los proyectos',
-    /* Nombre accesible de las flechas del hero: no llevan rótulo, sólo un chevron. */
     heroPrev: 'Imagen anterior',
     heroNext: 'Imagen siguiente',
   },
@@ -36,20 +21,15 @@ const es = {
     title: 'Proyectos',
     search: 'Buscar proyecto',
     empty: 'Ningún proyecto coincide con la búsqueda.',
-    /* Nombre accesible del desplegable de títulos que cuelga del buscador. */
     suggestions: 'Títulos de proyecto',
-    /* Se anuncia por voz al filtrar, no se ve. `{n}` se sustituye por el número. */
     results: '{n} proyectos',
     resultsOne: '1 proyecto',
   },
   project: {
     architects: 'Arquitectos',
     client: 'Promotor',
-    /* Flechas de la ficha: no llevan rótulo, y el nombre accesible se completa con el
-       título del proyecto al que llevan. */
     previous: 'Proyecto anterior',
     next: 'Proyecto siguiente',
-    /* Rótulo de la barra de volver, fija abajo en la ficha. Se pinta en versalitas. */
     back: 'Volver',
     backLong: 'Volver a los proyectos',
   },
@@ -59,10 +39,6 @@ const es = {
   contact: {
     title: 'Contacto',
   },
-  /* ⚠️ TEXTO PROVISIONAL. Lo pidió el estudio así, para tener la página y el enlace en su
-     sitio; el contenido definitivo lo dará el estudio (razón social, NIF y domicilio) y hay
-     que revisarlo antes de publicar en producción. No se inventa ningún dato: lo que falta
-     va entre corchetes, a la vista. */
   legal: {
     title: 'Aviso legal y privacidad',
     draft: 'Texto provisional, pendiente de revisión.',
@@ -103,11 +79,6 @@ const es = {
   },
 } as const
 
-/**
- * `en` tiene que tener EXACTAMENTE la forma de `es`, con cadenas donde `es` tiene cadenas.
- * Recursivo desde que el aviso legal metió una lista de bloques: al mapear una tupla, TS
- * conserva su longitud, así que si `es` declara cuatro bloques, `en` no puede traer tres.
- */
 type Translated<T> = T extends string ? string : { readonly [K in keyof T]: Translated<T[K]> }
 
 type Dictionary = Translated<typeof es>

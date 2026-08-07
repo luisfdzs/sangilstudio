@@ -1,10 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { defaultLocale, isLocale, locales } from '@/lib/i18n/config'
 
-/**
- * Única responsabilidad: si la URL no trae idioma, deducirlo del navegador y
- * redirigir. Todo lo demás del sitio es estático.
- */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -34,7 +30,5 @@ function negotiateLocale(request: NextRequest): string {
 }
 
 export const config = {
-  // `admin` queda fuera: el panel no tiene versión por idioma y redirigirlo a /es/admin
-  // lo dejaría inaccesible.
   matcher: ['/((?!api|admin|_next|media|favicon|robots.txt|sitemap.xml|.*\\.[\\w]+$).*)'],
 }

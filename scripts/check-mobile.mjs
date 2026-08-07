@@ -1,28 +1,4 @@
 #!/usr/bin/env node
-/**
- * VERIFICACIÓN EN MÓVIL · `npm run check:mobile`
- *
- * Abre el sitio en un Chrome real a 390×844 (tamaño de iPhone) y comprueba lo que
- * en escritorio no se ve. No es un test unitario: es la lista de cosas que ya se
- * han roto alguna vez en este proyecto.
- *
- * Historial de fallos que este script encontró (y que en escritorio eran invisibles):
- *  1. El menú se abría con el texto en color papel sobre fondo papel — ilegible.
- *  2. El panel del menú medía 0 px de alto: el `backdrop-blur` de la barra convierte
- *     al <header> en bloque contenedor de sus descendientes `fixed`.
- *  3. Enlaces con menos de 24 px de área pulsable (WCAG 2.2).
- *
- * Los dos primeros son de un menú desplegable en la cabecera, que es exactamente lo
- * que el rediseño ha vuelto a poner —un «+» arriba a la derecha que despliega el menú
- * a pantalla completa—, así que las dos comprobaciones vuelven a estar vivas y son la
- * razón de que el panel se dibuje FUERA del <header> (ver `components/layout/Header`).
- *
- * Usa `playwright-core` con el Chrome ya instalado: no descarga navegadores.
- * Requiere el servidor levantado (`npm run dev`) o un despliegue:
- *
- *   npm run check:mobile                       → http://localhost:3000
- *   BASE=https://sangilstudiotest.vercel.app npm run check:mobile
- */
 
 import process from 'node:process'
 import { chromium } from 'playwright-core'
@@ -30,7 +6,6 @@ import { chromium } from 'playwright-core'
 const BASE = process.env.BASE ?? 'http://localhost:3000'
 const LOCALE = process.env.LOCALE ?? 'es'
 
-/** Chrome instalado en el sistema. Se puede sobreescribir con CHROME_PATH. */
 const CHROME =
   process.env.CHROME_PATH ??
   (process.platform === 'win32'
@@ -45,7 +20,6 @@ const check = (ok, label) => {
   console.log(`${ok ? '  ✓' : '  ✗'} ${label}`)
 }
 
-/** Ningún sitio debe desbordar horizontalmente en móvil. */
 async function horizontalOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
 }
@@ -66,31 +40,20 @@ async function main() {
 
   console.log(`\nRevisión móvil (390×844) sobre ${BASE}/${LOCALE}\n`)
 
-  // --- Portada ---------------------------------------------------------------
   await page.goto(`${BASE}/${LOCALE}`, { waitUntil: 'networkidle' })
   check((await horizontalOverflow(page)) <= 1, 'la portada no desborda en horizontal')
 
-  // Ya no hay dos navegaciones: el menú del «+» es el mismo en móvil y en escritorio
-  // (2026-08-04), así que la fila de enlaces de la barra no existe en ninguna pantalla.
   check(
     !(await page.locator('header nav').count()),
     'la barra no lleva navegación propia: sólo marca y botón',
   )
 
-  // La portada son dos bloques y nada más: el hero y el contacto. Sin pie de página.
   check(
     (await page.locator('main > *').count()) === 2,
     `la portada tiene dos bloques (${await page.locator('main > *').count()})`,
   )
   check(!(await page.locator('footer').count()), 'no hay pie de página')
 
-  // El hero es un enlace a proyectos: es la única forma de entrar.
-  //
-  // Ya NO va a sangre (2026-08-04): respeta los márgenes de toda la web y arranca por
-  // debajo de la cabecera, que tiene su propio espacio en blanco. Se comprueban las dos
-  // cosas —que quede bajo la barra y que tenga margen lateral— porque justamente al ir a
-  // sangre la cabecera se pintaba en blanco encima de la foto, y ese blanco sobre blanco
-  // es el fallo nº 1 del historial de este script.
   const hero = page.locator('[data-hero]')
   const heroBox = await hero.boundingBox()
   const barBottom = await page.evaluate(
@@ -104,34 +67,25 @@ async function main() {
     (heroBox?.x ?? 0) >= 16 && (heroBox?.width ?? 390) <= 390 - 32,
     `el hero tiene márgenes laterales (${Math.round(heroBox?.x ?? 0)} px a cada lado)`,
   )
-  // Sigue siendo la pantalla de entrada: tiene que llenar lo que queda de ventana.
   check(
     (heroBox?.height ?? 0) > 844 * 0.7,
     `el hero llena la ventana bajo la cabecera (${Math.round(heroBox?.height ?? 0)} px)`,
   )
-  // El enlace ya no es el hero entero: cuelga de él, cubriéndolo, para poder convivir
-  // con las flechas —que son botones y no pueden ir dentro de un enlace—.
   const heroHref = await hero.locator('a[href]').first().getAttribute('href')
   check(heroHref?.endsWith('/work') === true, `el hero lleva a proyectos (${heroHref})`)
 
-  // En móvil se pasa de imagen deslizando: las flechas están en el DOM pero ocultas
-  // (`pointer-fine`), así que aquí no debe verse ninguna.
   const heroArrows = await hero.locator('button:visible').count()
   check(heroArrows === 0, `el hero no muestra flechas en móvil (${heroArrows})`)
 
-  // --- El menú: el «+» de la esquina, a pantalla completa ----------------------
   const toggle = page.locator('header button[aria-controls="site-menu"]')
   check(await toggle.isVisible(), 'el botón «+» se ve en la esquina superior derecha')
 
-  // A la derecha del todo: si se descolocara, el pulgar buscaría donde no está.
   const toggleBox = await toggle.boundingBox()
   check(
     (toggleBox?.x ?? 0) + (toggleBox?.width ?? 0) > 390 - 40,
     `el «+» está pegado al borde derecho (${Math.round((toggleBox?.x ?? 0) + (toggleBox?.width ?? 0))} px)`,
   )
 
-  // El panel está siempre en el DOM (es lo que permite el fundido), así que cerrado tiene
-  // que estar apagado de verdad: invisible, transparente y con la transición declarada.
   const closed = await page.evaluate(() => {
     const style = getComputedStyle(document.getElementById('site-menu'))
     return {
@@ -158,16 +112,12 @@ async function main() {
     .catch(() => false)
   check(opened, 'el menú se abre')
 
-  // Fallo nº 2 del historial: con el panel dentro de un header con `backdrop-blur`
-  // medía 0 px de alto. Tiene que ocupar la pantalla ENTERA.
   const panelBox = await panel.boundingBox()
   check(
     Math.abs((panelBox?.height ?? 0) - 844) <= 2 && Math.abs((panelBox?.width ?? 0) - 390) <= 2,
     `el menú ocupa toda la pantalla (${Math.round(panelBox?.width ?? 0)}×${Math.round(panelBox?.height ?? 0)})`,
   )
 
-  // Fallo nº 1: el texto del menú en color papel sobre fondo papel. Se comprueba que
-  // hay contraste de verdad entre el color del enlace y el fondo del panel.
   const legible = await page.evaluate(() => {
     const link = document.querySelector('#site-menu a')
     if (!link) return false
@@ -180,9 +130,6 @@ async function main() {
   })
   check(legible, 'el texto del menú contrasta con su fondo')
 
-  // Las entradas van CENTRADAS en la pantalla (2026-08-04, referencia: Swiftmet). Se mide
-  // el desvío del centro de cada enlace respecto al centro del panel; si alguien devolviera
-  // el `flex` al panel de fuera, el `hidden` volvería a discutir con él y esto lo cazaría.
   const offCentre = await page.evaluate(() => {
     const middle = window.innerWidth / 2
     return Math.max(
@@ -194,14 +141,10 @@ async function main() {
   })
   check(offCentre <= 2, `el menú está centrado (${Math.round(offCentre)} px de desvío)`)
 
-  // El «−» que lo cierra vive en la cabecera y tiene que quedar POR ENCIMA del panel.
   check(
     await toggle.isVisible(),
     'el botón sigue accesible con el menú abierto (se convierte en «−»)',
   )
-  // Al cerrar hay que ESPERAR el fundido de salida: con `allow-discrete`, la visibilidad
-  // conmuta al TERMINAR la transición, así que medir justo después del clic da «sigue
-  // abierto» aunque ya se esté apagando. Se espera al estado, no un tiempo fijo.
   const closes = async (label) => {
     const hidden = await panel
       .waitFor({ state: 'hidden', timeout: 4000 })
@@ -218,21 +161,11 @@ async function main() {
   await page.keyboard.press('Escape')
   await closes('Escape cierra el menú')
 
-  // --- Áreas pulsables de la cabecera (WCAG 2.2: mínimo 24×24) -----------------
   const tightHeader = await page.evaluate(() =>
     [...document.querySelectorAll('header a, header button')]
-      // Primero se descarta lo que no se ve, y sólo después se mide.
-      //
-      // El orden importa: la navegación de escritorio está en el DOM con `display:none`
-      // en móvil, así que su alto real es 0, pero la utilidad `tap` le sigue calculando
-      // un pseudo-elemento de 12,8 px. Sumando antes de filtrar, esos cinco enlaces
-      // invisibles se contaban como objetivos pequeños y el script fallaba señalando un
-      // problema que no existe. También cae aquí el enlace «saltar al contenido», que
-      // mide 1×1 mientras está oculto y crece al recibir foco: es el patrón correcto.
       .filter((element) => element.getBoundingClientRect().height > 2)
       .map((element) => {
         const before = getComputedStyle(element, '::before')
-        // La utilidad `tap` agranda el área con un pseudo-elemento invisible.
         const grow =
           before.content !== 'none' && before.position === 'absolute'
             ? Math.abs(Number.parseFloat(before.top) || 0) * 2
@@ -251,11 +184,6 @@ async function main() {
       : `por debajo de 24 px: ${JSON.stringify(tightHeader)}`,
   )
 
-  // --- Contacto: sección de la portada, con ruta propia ------------------------
-  // Se entra por `/es/contact` y se comprueba que devuelve la portada con la sección
-  // colocada bajo la cabecera fija, no tapada por ella. Es el contrato de la ruta: si
-  // el salto se hiciera antes de que la página asiente, el encabezado quedaría oculto
-  // —pasó con las fuentes, ver `ScrollToSection`— y esto lo cazaría.
   await page.goto(`${BASE}/${LOCALE}/contact`, { waitUntil: 'networkidle' })
   await page.waitForTimeout(1500)
   const contactTop = await page.evaluate(() => {
@@ -271,17 +199,14 @@ async function main() {
     `contacto queda bajo la cabecera (${contactTop} px)`,
   )
   check((await horizontalOverflow(page)) <= 1, '/contact no desborda en horizontal')
-  // La mejora es la URL: nada de almohadilla en la barra de direcciones.
   check(!(await page.evaluate(() => location.hash)), '/contact no deja almohadilla en la URL')
 
-  // Los enlaces del bloque de contacto: los tres con icono tienen que ser pulsables.
   const contactLinks = page.locator('#contact ul a')
   check(
     (await contactLinks.count()) >= 2,
     `el contacto tiene sus enlaces (${await contactLinks.count()})`,
   )
 
-  // --- El estudio ya es una página de verdad ----------------------------------
   await page.goto(`${BASE}/${LOCALE}/studio`, { waitUntil: 'networkidle' })
   check(
     (await page.locator('h1').first().isVisible()) && !(await page.locator('[data-hero]').count()),
@@ -289,20 +214,11 @@ async function main() {
   )
   check((await horizontalOverflow(page)) <= 1, '/studio no desborda en horizontal')
 
-  // El estudio es SÓLO el manifiesto: las columnas de equipo y colaboradores se quitaron
-  // el 2026-08-04 (los socios se leen en el bloque de contacto de la portada).
   check(!(await page.locator('main section').count()), '/studio no lleva equipo ni colaboradores')
 
-  // --- Proyectos: una columna, cuadradas, y el buscador filtra -----------------
   await page.goto(`${BASE}/${LOCALE}/work`, { waitUntil: 'networkidle' })
   check((await horizontalOverflow(page)) <= 1, '/work no desborda en horizontal')
 
-  // El título «PROYECTOS» no se ve, pero el <h1> sigue en el HTML para lectores de
-  // pantalla: si alguien lo borrara del todo, la página se anunciaría sin nombre.
-  //
-  // Se mide el tamaño y no `isVisible()`: un elemento `sr-only` mide 1×1 px y sigue
-  // teniendo caja, así que Playwright lo da por visible. Lo que se comprueba es que el
-  // encabezado exista y no ocupe sitio.
   const h1 = await page.evaluate(() => {
     const nodes = document.querySelectorAll('main h1')
     if (nodes.length !== 1) return { count: nodes.length, width: -1 }
@@ -318,7 +234,6 @@ async function main() {
   const total = await cards.count()
   check(total > 0, `hay proyectos en la rejilla (${total})`)
 
-  // Una sola columna en móvil: todas las tarjetas empiezan en la misma x.
   const columns = await page.evaluate(
     () =>
       new Set(
@@ -329,7 +244,6 @@ async function main() {
   )
   check(columns === 1, `una sola columna en móvil (${columns})`)
 
-  // Las fotos son cuadradas, no verticales de móvil.
   const squares = await page.evaluate(() => {
     const boxes = [...document.querySelectorAll('main article img')].map((img) =>
       img.getBoundingClientRect(),
@@ -338,12 +252,9 @@ async function main() {
   })
   check(squares, 'las imágenes de la rejilla son cuadradas')
 
-  // El buscador: contiene, sin mayúsculas y sin acentos.
   const search = page.locator('#project-search')
   check(await search.isVisible(), 'el buscador se ve')
 
-  // Centrado en su fila: sin título encima es lo primero que se ve, y descolgado a la
-  // izquierda quedaba huérfano. Se mide que sobre lo mismo a un lado que al otro.
   const centred = await page.evaluate(() => {
     const box = document.getElementById('project-search').getBoundingClientRect()
     return Math.abs(box.left - (window.innerWidth - box.right))
@@ -356,8 +267,6 @@ async function main() {
   await page.waitForTimeout(200)
   check((await cards.count()) === total, 'al vaciar el buscador vuelven todos')
 
-  // El desplegable de títulos: cuelga del campo al enfocarlo, se reduce a los que casan
-  // y al elegir uno se va a su ficha. En móvil importa además que no desborde a lo ancho.
   const options = page.locator('#project-search-listbox [role="option"]')
   await search.click()
   await page.waitForTimeout(200)
@@ -378,13 +287,8 @@ async function main() {
   await page.waitForURL(/\/work\/.+/, { timeout: 5000 })
   check(/\/work\/.+/.test(page.url()), `elegir un título abre su ficha (${firstOption?.trim()})`)
 
-  // Elegir un título nos ha dejado en una ficha: lo de abajo mira la rejilla otra vez.
   await page.goto(`${BASE}/${LOCALE}/work`, { waitUntil: 'networkidle' })
 
-  // --- Enlaces absolutos, comprobado desde una página PROFUNDA -----------------
-  // `href()` devolvía rutas relativas (`es/work`): desde la portada funcionaban por
-  // casualidad y desde una ficha encadenaban → /es/work/es/work → 404. Se comprueba
-  // desde el nivel más profundo del sitio, que es donde se notaba.
   const deep = await page.evaluate(
     () => document.querySelector('main a[href*="/work/"]')?.getAttribute('href') ?? null,
   )
@@ -403,7 +307,6 @@ async function main() {
         : `enlaces relativos (encadenarán y darán 404): ${relatives.join(', ')}`,
     )
 
-    // La ficha: las imágenes van a una sola columna y a todo el ancho.
     const galleryColumns = await page.evaluate(
       () =>
         new Set(
@@ -416,11 +319,6 @@ async function main() {
     check((await horizontalOverflow(page)) <= 1, 'la ficha no desborda en horizontal')
   }
 
-  // --- Indexación: sólo sangilstudio.com puede aparecer en Google ---------------
-  // El proyecto de test despliega su rama como "production" de ese proyecto, así que
-  // durante un tiempo sangilstudiotest.vercel.app se anunció como indexable y con
-  // `Allow: /`. Si esto falla en un entorno que no sea el dominio real, hay que
-  // revisar `lib/site-env.ts` antes de que Google lo indexe.
   if (!BASE.includes('sangilstudio.com')) {
     const robotsMeta = await page.evaluate(
       () => document.querySelector('meta[name="robots"]')?.getAttribute('content') ?? '(ninguna)',

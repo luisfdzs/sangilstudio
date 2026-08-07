@@ -1,13 +1,5 @@
 import { defineField, defineType } from 'sanity'
 
-/**
- * AJUSTES DEL ESTUDIO (documento único)
- *
- * Todo lo que no es un proyecto: los proyectos que se ven en la portada, el manifiesto
- * de la página Estudio, el equipo, los colaboradores y los datos de contacto. Es un
- * documento único (singleton): no se puede crear un segundo, para que no haya dudas de
- * cuál manda.
- */
 export const siteSettings = defineType({
   name: 'siteSettings',
   title: 'Estudio y contacto',
@@ -19,14 +11,6 @@ export const siteSettings = defineType({
     { name: 'contacto', title: 'Contacto' },
   ],
   fields: [
-    /**
-     * LA PORTADA. El estudio elige aquí, y sólo aquí, qué se ve al entrar en la web.
-     *
-     * Se eligen PROYECTOS, no imágenes sueltas, para que no haya que volver a subir
-     * fotos que ya están: de cada proyecto se usa la primera imagen de su galería, que
-     * es la portada de ese proyecto. Así, cambiar la portada de un proyecto cambia
-     * también lo que sale en el inicio, y no hay dos sitios que puedan contradecirse.
-     */
     defineField({
       name: 'heroProjects',
       title: 'Proyectos de la portada',
@@ -95,10 +79,6 @@ export const siteSettings = defineType({
       description: 'Estudios y empresas con los que se colabora. Uno por línea.',
     }),
 
-    /* --- Contacto -----------------------------------------------------------
-       Estos campos componen, literalmente y en este orden, el bloque de contacto de
-       la portada. Si alguno se deja vacío, la web usa el valor que tiene escrito por
-       defecto (ver `lib/content.ts`): así el bloque nunca sale a medias. */
     defineField({
       name: 'street',
       title: 'Calle y número',

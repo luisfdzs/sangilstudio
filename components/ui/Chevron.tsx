@@ -1,13 +1,3 @@
-/**
- * El chevron de la web: UNA línea, sin punta rellena y sin filete de acompañamiento.
- *
- * Lo eligió el estudio de entre cinco opciones (ver `diseno-web-referencias`) y se usa en
- * los tres sitios donde hay algo que pasar o de donde volver: las flechas de la portada,
- * las de la ficha y la barra de volver a proyectos. Vive aquí para que sigan siendo el
- * mismo dibujo: si engorda el trazo en uno, engorda en todos.
- *
- * `vector-effect` mantiene el grosor en 1,25 px sea cual sea el tamaño de la caja.
- */
 export function Chevron({
   direction,
   className = 'h-9 w-[1.125rem]',

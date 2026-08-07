@@ -1,21 +1,5 @@
-/**
- * CURADURÍA DE IMÁGENES — entrada del pipeline (`npm run images`).
- *
- * Este fichero dice, por proyecto: qué imágenes originales entran en la web y en
- * qué orden. La primera de `images` es la de portada (la que se ve en el grid y
- * la que hace de LCP en la ficha), así que debe ser la más potente.
- *
- * Los `sources` son rutas relativas a la carpeta maestra (por defecto
- * `IMAGENES PROYECTOS/`, fuera de git). Cuando existe la variante en
- * `maxima calidad/` se usa esa: son los PNG de 80–95 MB, el mejor origen posible.
- *
- * Regla de oro del estilo minimalista: **pocas imágenes y muy buenas**. Si dudas
- * entre incluir una imagen o no, no la incluyas.
- */
-
 export const MASTER_DIR = 'IMAGENES PROYECTOS'
 
-/** @type {Record<string, { dir: string, images: string[], plans?: string[] }>} */
 export const curation = {
   'z1-house-zizur': {
     dir: '02. Z1 House refurbishment Zizur, Navarra  2023   (colab O Arquitectura)',
@@ -54,8 +38,6 @@ export const curation = {
   },
 
   'is-house-pamplona': {
-    // Las carpetas 06 y 11 son el MISMO proyecto: 11 tiene los renders finales
-    // (RT*) y 06 aporta el plano. Se unifican aquí en una sola ficha.
     dir: '11. IS House refurbishment Pamplona, Navarra  2026',
     images: ['RT01(A).jpg', 'RT02.jpg', 'RT04(A).jpg', 'RT05(A).jpg'],
     plans: ['../06. IS House refurbishment Pamplona, Navarra  2026/plano.jpg'],
@@ -122,13 +104,6 @@ export const curation = {
   },
 }
 
-/**
- * Concursos. Ya no son una categoría aparte —son proyectos con estado «Concurso»—, pero
- * sus originales siguen viniendo de una carpeta maestra propia (`VIA - CONCURSOS/`) y se
- * mantienen en su propia colección de `public/media` para no renombrar 34 derivados ya
- * generados. Dos imágenes por entrada: es lo que hay en el archivo. Los datos
- * editoriales no viven en el repositorio, sino en el panel (Sanity).
- */
 export const competitionsCuration = {
   'music-center-zelazowa-wola': {
     dir: 'VIA - CONCURSOS/01. Music Center Zelazowa Wola, Poland 2018',
@@ -180,9 +155,6 @@ export const competitionsCuration = {
   },
   'health-center-pamplona': {
     dir: 'VIA - CONCURSOS/13. Health Center Pamplona, Navarra 2017',
-    // Es el único de la carpeta con una sola imagen aprovechable, y estuvo sin ninguna
-    // mientras los concursos fueron un índice sin ficha. Al pasar a ser proyectos la
-    // portada es obligatoria, así que entra el único render que hay.
     images: ['render_exterior_top.png'],
   },
   'kultural-center-barcelona': {

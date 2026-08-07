@@ -3,24 +3,6 @@
 import { useEffect, useState } from 'react'
 import { apiVersion, dataset, projectId } from '@/sanity/env'
 
-/**
- * AVISO DE CONEXIÓN BLOQUEADA
- *
- * El panel de Sanity necesita una conexión **en tiempo real** (Server-Sent Events) con
- * `api.sanity.io` para funcionar: es como se enteran los formularios de que un documento
- * ha cambiado. Si algo la bloquea, el panel **se queda en blanco o girando para siempre,
- * sin decir nada**, y quien lo usa concluye —con razón— que la web está rota.
- *
- * Eso pasó de verdad: en un portátil con **Sophos Intercept X** (antivirus corporativo
- * que inspecciona el tráfico HTTPS), el navegador no lograba abrir esa conexión, mientras
- * las peticiones normales y `curl` funcionaban sin problema. Diagnosticarlo llevó un
- * rato precisamente porque el panel no daba ninguna pista.
- *
- * Este componente hace la comprobación por su cuenta y, si falla, explica qué ocurre y
- * qué probar. No sustituye al panel: se muestra encima, para que el mensaje aparezca
- * aunque el panel no llegue a arrancar.
- */
-
 const TIMEOUT_MS = 9000
 
 type Estado = 'comprobando' | 'ok' | 'bloqueada'
@@ -29,7 +11,6 @@ export function ConnectionNotice() {
   const [estado, setEstado] = useState<Estado>('comprobando')
 
   useEffect(() => {
-    // Consulta mínima: sólo interesa si el canal se abre, no lo que devuelve.
     const query = encodeURIComponent('*[_id == "__health__"]{_id}')
     const url = `https://${projectId}.api.sanity.io/v${apiVersion}/data/listen/${dataset}?query=${query}&visibility=query`
     const source = new EventSource(url)

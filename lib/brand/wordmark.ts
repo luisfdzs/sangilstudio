@@ -1,67 +1,25 @@
-/**
- * TRAZOS DEL WORDMARK — única fuente de verdad
- *
- * Vectorizados del logotipo maestro, no una aproximación tipográfica: reproducen la "U"
- * invertida de STUDIO y la "A" geométrica sin travesaño.
- *
- * Viven aquí, y no dentro del componente, porque hay dos consumidores que tienen que
- * decir exactamente lo mismo: la cabecera de la web (`components/layout/Wordmark.tsx`,
- * SVG en línea para poder heredar `currentColor`) y los ficheros de marca
- * `public/wordmark-*.svg` (que genera `npm run wordmark`). Con los trazos duplicados,
- * tocar uno y olvidar el otro era cuestión de tiempo.
- *
- * GEOMETRÍA. Las dos palabras se dibujaron con la misma caja de altura de mayúsculas,
- * medida sobre las letras de remate plano (la I y la L, que no tienen desbordamiento de
- * curva): 150 unidades de alto. En SANGIL va de y=297 a la línea base y=447; en STUDIO,
- * de y=16 a y=166. De ahí salen los dos montajes, que son la MISMA pareja de trazos con
- * distinta transformación:
- *
- *   vertical    · STUDIO bajo SANGIL, con 31 unidades de interlínea (el montaje original)
- *   horizontal  · STUDIO a la derecha de SANGIL, línea base compartida — el que usa la web
- *
- * El espacio entre palabras del montaje horizontal (80) es el doble del espacio entre
- * letras del propio logotipo (~40, medido entre remates planos: I→L es 40,9). Con el
- * espacio de una letra, "SANGILSTUDIO" se leía como una sola palabra.
- */
-
-/** Altura de mayúsculas, común a las dos palabras. */
 export const CAP_HEIGHT = 150
 
-/** Línea base de cada palabra en las coordenadas en las que se vectorizó. */
 export const SANGIL_BASELINE = 447
 export const STUDIO_BASELINE = 166
 
-/** Borde derecho de SANGIL (remate plano de la L) y borde izquierdo de STUDIO. */
 const SANGIL_RIGHT = 932
 const STUDIO_LEFT = 164.7
 
-/** Espacio entre palabras: el doble del espacio entre letras. */
 export const WORD_SPACE = 80
 
-/**
- * Transformaciones del grupo de STUDIO. Los trazos NUNCA se recalculan: se mueve el
- * grupo, así que los dos montajes son incapaces de divergir en el dibujo de las letras.
- */
 export const STUDIO_TRANSFORM = {
   vertical: 'translate(0 462)',
   horizontal: `translate(${SANGIL_RIGHT + WORD_SPACE - STUDIO_LEFT} ${SANGIL_BASELINE - STUDIO_BASELINE})`,
 } as const
 
-/**
- * Cajas ajustadas al dibujo, con un pelo de aire. El montaje original declaraba
- * `0 0 1084 879` para un dibujo que ocupaba de y=290 a y=635: casi la mitad del lienzo
- * era vacío, y la cabecera lo compensaba pidiendo un alto desproporcionado (6,3 rem para
- * unos 39 px de tinta). Con la caja ajustada, el alto que se pide es el alto que se ve.
- */
 export const VIEW_BOX = {
   vertical: '160 288 782 349',
   horizontal: '160 288 1632 174',
 } as const
 
-/** STUDIO va más claro que SANGIL: misma jerarquía que tenía el montaje original. */
 export const STUDIO_OPACITY = 0.55
 
-/** Color de tinta de la marca (`--color-ink`), para los ficheros .svg sueltos. */
 export const INK = '#14140f'
 
 export const SANGIL_PATH =

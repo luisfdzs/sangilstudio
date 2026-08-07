@@ -21,11 +21,6 @@ const trackPointer = (event: ReactPointerEvent<HTMLElement>) => {
   event.currentTarget.style.setProperty('--mark-y', `${Math.min(92, Math.max(8, y))}%`)
 }
 
-/**
- * La variante `fixed` deja libre la cabecera arriba y **la barra de volver abajo**: si la
- * banda llegase al borde inferior, el chevron aparecería sobre el «‹ VOLVER» de la ficha y
- * se leerían como un solo control.
- */
 const FRAME = {
   absolute: 'absolute inset-y-0',
   fixed: 'fixed top-20 bottom-16 z-30 md:top-24 md:bottom-20',

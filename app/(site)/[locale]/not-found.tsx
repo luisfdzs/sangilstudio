@@ -3,11 +3,6 @@ import { defaultLocale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href } from '@/lib/i18n/routes'
 
-/**
- * 404 dentro del layout de idioma. No puede leer `params` (Next la renderiza sin
- * ellos), así que usa el idioma por defecto: es la única página del sitio que no
- * está traducida por ruta.
- */
 export default function NotFound() {
   const t = getDictionary(defaultLocale)
 

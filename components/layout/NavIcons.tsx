@@ -1,17 +1,3 @@
-/**
- * Los iconos del sitio: el «+» y el «−» que abren y cierran el menú de móvil, el globo
- * del selector de idioma y los tres del bloque de contacto (correo, web e Instagram).
- *
- * Van embebidos y no como `<img>` por una razón concreta: tienen que heredar el color
- * del texto (`stroke: currentColor`), y en la cabecera ese color cambia —papel sobre el
- * hero, tinta sobre fondo blanco—. Una imagen externa se quedaría de un color.
- *
- * Trazo a 1.25 en vez del 2 habitual de Lucide: esta web es blanco, filete de 1 px y
- * Montserrat en tamaños contenidos; un icono de trazo grueso pesaría más que la
- * tipografía que tiene al lado y rompería el gris de la página.
- *
- * Sin `title` ni `role`: el nombre accesible lo pone el enlace o el botón que los envuelve.
- */
 type IconProps = { className?: string }
 
 const common = {
@@ -23,7 +9,6 @@ const common = {
   strokeLinejoin: 'round',
 } as const
 
-/** «+»: abre el menú de móvil. Un signo, no tres rayas: es lo que pidió el estudio. */
 export function PlusIcon({ className }: IconProps) {
   return (
     <svg {...common} aria-hidden className={className}>
@@ -33,7 +18,6 @@ export function PlusIcon({ className }: IconProps) {
   )
 }
 
-/** «−»: lo contrae. Es el mismo signo sin la barra vertical, y se lee como tal. */
 export function MinusIcon({ className }: IconProps) {
   return (
     <svg {...common} aria-hidden className={className}>
@@ -42,7 +26,6 @@ export function MinusIcon({ className }: IconProps) {
   )
 }
 
-/** El globo del selector de idioma. Dos idiomas, y el sitio no bandera ninguno. */
 export function GlobeIcon({ className }: IconProps) {
   return (
     <svg {...common} aria-hidden className={className}>
@@ -53,7 +36,6 @@ export function GlobeIcon({ className }: IconProps) {
   )
 }
 
-/** Correo. Un sobre: aquí la consulta se resuelve escribiendo, no en un formulario. */
 export function MailIcon({ className }: IconProps) {
   return (
     <svg {...common} aria-hidden className={className}>
@@ -63,8 +45,6 @@ export function MailIcon({ className }: IconProps) {
   )
 }
 
-/** Página web. El mismo globo del idioma valdría, pero en el bloque de contacto van
- *  los dos seguidos y hay que poder distinguirlos: éste lleva meridianos, no ecuador. */
 export function WebIcon({ className }: IconProps) {
   return (
     <svg {...common} aria-hidden className={className}>
@@ -75,7 +55,6 @@ export function WebIcon({ className }: IconProps) {
   )
 }
 
-/** Instagram: el cuadrado redondeado con el objetivo y el punto del flash. */
 export function InstagramIcon({ className }: IconProps) {
   return (
     <svg {...common} aria-hidden className={className}>

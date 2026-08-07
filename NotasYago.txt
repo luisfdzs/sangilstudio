@@ -65,14 +65,16 @@
 
 5. El buscador de proyectos tapa las imagenes de debajo, ponerlo con cierta transparencia para que se vea tanto el buscador como las imágenes de debajo.
 
-------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------ACTUAL---------------------------------------------------------------
 
-1. En el hero principal solo se muestran las 6 primeras imagenes, quiero todas. 
+1. Quitar "Inicio" en el menú
 
-2. En la página de un proyecto concreto, hay algunas imágenes verticales y ahora mismo se suben ocupando todo el ancho de su sección y hace que la imagen se vuelva enorme y haya que scrollear para verla entera. En la versión móvil, se recortan también mucho las imagenes. Dame varias opciones distintas con un panel para solucionar el problema y que todas las imágenes se puedan ver sin modificar enteras en las pantallas tanto del móvil como del ordenador.
+2. Ver el tema legal, hay que poner algo sobre privacidad aunque no se recojan, cookies, algo de la empresa de sangilstudio que haya que poner, tipo disclaimer, no sé si hay que poner algo. Si solo fuese una frase con un enlace o algo así, podría ir en el menú, así solo se vé con el menu desplegado y no la estan viendo los usuarios todo el rato por toda la web.
 
-3. Quitar "Inicio" en el menú
+3. Flecha para ir de la página de un proyecto concreto a la página anterior de la lista de todos los proyectos, un "volver a los proyectos" que se limite a renderizarse y funcionar ahí. Su aspecto es algo así como "< BACK" (respetar la Flecha minimalista, sin línea) abajo de todo. Reservamos una fila html entera solo para poner este elemento a la izquierda de todo y que sea inmovil respecto a la página en la que se encuentra, para que siempre sea accesible al usuario, que no se mueva.
 
-4. Flecha para ir de la página de un proyecto concreto a la página anterior de la lista de todos los proyectos, un "volver a los proyectos" que se limite a renderizarse y funcionar ahí. Su aspecto es algo así como "< BACK" (respetar la Flecha minimalista, sin línea) abajo de todo. Reservamos una fila html entera solo para poner este elemento a la izquierda de todo y que sea inmovil respecto a la página en la que se encuentra, para que siempre sea accesible al usuario, que no se mueva.
+4. Darme un panel de administrador para elegir el tipo de fuente, color, opacidad, ... todas las propiedades css de los textos en cuanto a su forma, color, tamaño, etc. y con los valores que yo elija, renderizar todos los textos de la web (preguntar antes de aplicar a textos que se vean distinto, como títulos etc)
 
-5. 
+5. En la página de un proyecto concreto, hay algunas imágenes verticales y ahora mismo se suben ocupando todo el ancho de su sección y hace que la imagen se vuelva enorme y haya que scrollear para verla entera. En la versión móvil, se recortan también mucho las imagenes. Dame varias opciones distintas con un panel para solucionar el problema y que todas las imágenes se puedan ver sin modificar enteras en las pantallas tanto del móvil como del ordenador.
+
+----------------------------------------------------------------------------------------------------------------------
