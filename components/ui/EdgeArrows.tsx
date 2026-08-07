@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import type { PointerEvent as ReactPointerEvent } from 'react'
+import { Chevron } from '@/components/ui/Chevron'
 
 type Props = {
   prevLabel: string
@@ -14,35 +15,20 @@ type Props = {
   tone?: 'paper' | 'ink'
 }
 
-function Chevron({ direction }: { direction: 'left' | 'right' }) {
-  return (
-    <svg
-      viewBox="0 0 20 40"
-      fill="none"
-      aria-hidden="true"
-      className="h-9 w-[1.125rem] overflow-visible"
-    >
-      <path
-        d={direction === 'left' ? 'M15 4 5 20l10 16' : 'M5 4l10 16L5 36'}
-        stroke="currentColor"
-        strokeWidth={1.25}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
-  )
-}
-
 const trackPointer = (event: ReactPointerEvent<HTMLElement>) => {
   const box = event.currentTarget.getBoundingClientRect()
   const y = ((event.clientY - box.top) / box.height) * 100
   event.currentTarget.style.setProperty('--mark-y', `${Math.min(92, Math.max(8, y))}%`)
 }
 
+/**
+ * La variante `fixed` deja libre la cabecera arriba y **la barra de volver abajo**: si la
+ * banda llegase al borde inferior, el chevron aparecería sobre el «‹ VOLVER» de la ficha y
+ * se leerían como un solo control.
+ */
 const FRAME = {
   absolute: 'absolute inset-y-0',
-  fixed: 'fixed top-20 bottom-0 z-30 md:top-24',
+  fixed: 'fixed top-20 bottom-16 z-30 md:top-24 md:bottom-20',
 }
 
 const TONE = {

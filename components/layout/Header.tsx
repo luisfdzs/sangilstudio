@@ -92,7 +92,7 @@ export function Header({ locale, dictionary }: Props) {
   const home = href(locale, 'home')
 
   /** Estando ya en la portada, Next no navega y el clic no haría nada: quien esté abajo
-   *  se quedaría abajo. La marca y el «Inicio» deben llevar siempre al principio. */
+   *  se quedaría abajo. La marca debe llevar siempre al principio. */
   const goHome = (event: React.MouseEvent) => {
     close()
     if (pathname === home) {
@@ -179,9 +179,9 @@ export function Header({ locale, dictionary }: Props) {
           aria-label={dictionary.nav.menu}
           className="flex min-h-full flex-col items-center justify-center gap-6 text-center"
         >
-          <Link href={home} onClick={goHome} className="text-title tracking-tight">
-            {dictionary.nav.home}
-          </Link>
+          {/* Sin «Inicio» (2026-08-07, petición del estudio): al inicio se va con el
+              wordmark de la barra, que está siempre a la vista y ya lleva ahí. Una entrada
+              más que dice lo mismo que la marca sólo alarga la lista. */}
           {navigation.map((key) => (
             <Link
               key={key}
@@ -218,6 +218,18 @@ export function Header({ locale, dictionary }: Props) {
               </Link>
             ))}
           </div>
+
+          {/* El aviso legal: una línea pequeña al final, no una entrada del menú. Vive aquí
+              y no en un pie porque esta web no tiene pie, así que sólo se lee con el menú
+              desplegado y no acompaña al usuario por todas las pantallas. */}
+          <Link
+            href={href(locale, 'legal')}
+            onClick={close}
+            aria-current={isCurrent(pathname, href(locale, 'legal')) ? 'page' : undefined}
+            className="tap eyebrow mt-2 hover:text-ink-soft"
+          >
+            {dictionary.nav.legal}
+          </Link>
         </nav>
       </div>
     </>

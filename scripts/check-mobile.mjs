@@ -109,8 +109,13 @@ async function main() {
     (heroBox?.height ?? 0) > 844 * 0.7,
     `el hero llena la ventana bajo la cabecera (${Math.round(heroBox?.height ?? 0)} px)`,
   )
+  // El enlace ya no es el hero entero: cuelga de él, cubriéndolo, para poder convivir
+  // con las flechas —que son botones y no pueden ir dentro de un enlace—.
   const heroHref = await hero.locator('a[href]').first().getAttribute('href')
   check(heroHref?.endsWith('/work') === true, `el hero lleva a proyectos (${heroHref})`)
+
+  // En móvil se pasa de imagen deslizando: las flechas están en el DOM pero ocultas
+  // (`pointer-fine`), así que aquí no debe verse ninguna.
   const heroArrows = await hero.locator('button:visible').count()
   check(heroArrows === 0, `el hero no muestra flechas en móvil (${heroArrows})`)
 

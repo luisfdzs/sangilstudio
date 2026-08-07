@@ -14,6 +14,7 @@ export const routes = {
   home: '',
   work: 'work',
   studio: 'studio',
+  legal: 'legal',
 } as const
 
 /**
@@ -73,7 +74,11 @@ export function href(locale: Locale, key: LinkKey, ...segments: string[]): strin
 }
 
 /** Entradas del menú. `as const` para que el tipo sea la unión exacta de claves
- *  (sin `home`) y el diccionario pueda indexarse sin comprobaciones extra. */
+ *  (sin `home`) y el diccionario pueda indexarse sin comprobaciones extra.
+ *
+ *  `legal` NO entra: es una página de verdad, pero se enlaza como una línea pequeña al
+ *  final del panel, no como una entrada más del menú. Quien busca el aviso legal lo busca;
+ *  no debería competir de tamaño con Proyectos, Estudio y Contacto. */
 export const navigation = ['work', 'studio', 'contact'] as const satisfies readonly LinkKey[]
 
 export type NavKey = (typeof navigation)[number]

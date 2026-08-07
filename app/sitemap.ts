@@ -28,6 +28,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     }
 
+    // El aviso legal no está en `navigation` —se enlaza con una línea pequeña al final del
+    // menú—, pero es una página de verdad y tiene que poder encontrarse. Prioridad baja: es
+    // información obligatoria, no contenido por el que se venga a la web.
+    entries.push({
+      url: `${site.url}${href(locale, 'legal')}`,
+      changeFrequency: 'yearly',
+      priority: 0.2,
+    })
+
     for (const slug of slugs) {
       entries.push({
         url: `${site.url}${href(locale, 'work', slug)}`,
