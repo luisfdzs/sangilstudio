@@ -5,16 +5,6 @@ dependencias ni build: un único `index.html` con todo el CSS y JS en línea.
 
 🌐 **En producción:** [sangilstudio.com](https://sangilstudio.com)
 
-> **📁 Contexto del proyecto y skill `/retomar`**
-> El contexto compartido (memoria, decisiones, convenciones) y la skill `/retomar` **no están en esta
-> rama de código**: viven en la rama Git huérfana **`claude`**. Para consultarlos tras clonar:
-> ```bash
-> git checkout claude          # o, para tenerlo junto al código:
-> git worktree add ../sangil-claude claude
-> ```
-> En esa rama, empieza con `/retomar` para ponerte al día. Si vas a hacer *push*, reaplica la
-> config local de git/`gh` descrita en la memoria `cuenta-git-gh`.
-
 ## Características
 
 - **Fondo interactivo de "s"**: una retícula dibujada en `<canvas>` donde las
