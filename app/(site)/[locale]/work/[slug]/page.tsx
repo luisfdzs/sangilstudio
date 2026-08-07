@@ -61,10 +61,14 @@ export default async function ProjectPage({
   return (
     <>
       <ProjectPager
+        previous={previous}
+        next={next}
         prevHref={href(locale, 'work', previous.slug)}
         nextHref={href(locale, 'work', next.slug)}
         prevLabel={`${t.project.previous}: ${previous.title}`}
         nextLabel={`${t.project.next}: ${next.title}`}
+        locale={locale}
+        dictionary={t}
       >
         <article className="page-gutter pt-16 pb-32 md:pt-24 md:pb-(--spacing-section)">
           <header>
