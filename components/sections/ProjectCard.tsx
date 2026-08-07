@@ -15,17 +15,18 @@ export function ProjectCard({ project, locale, priority = false }: Props) {
 
   return (
     <article className="group">
-      <Link href={href(locale, 'work', project.slug)} className="block">
-        {cover && (
+      <Link
+        href={href(locale, 'work', project.slug)}
+        className="block [&_img]:transition-opacity [&_img]:duration-500 [&_img]:ease-(--ease-out-soft) group-hover:[&_img]:opacity-80"
+      >
+        <div className="gallery-frame">
           <Media
             image={cover}
             alt={cover.alt[locale]}
-            ratio="1 / 1"
-            sizes="(max-width: 768px) 100vw, 30vw"
+            sizes="(max-width: 768px) 100vw, 40vw"
             priority={priority}
-            className="[&_img]:transition-transform [&_img]:duration-[900ms] [&_img]:ease-(--ease-out-soft) group-hover:[&_img]:scale-[1.04]"
           />
-        )}
+        </div>
 
         <div className="mt-4">
           <h3 className="text-small font-medium tracking-wide uppercase">{project.title}</h3>

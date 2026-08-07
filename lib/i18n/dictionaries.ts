@@ -24,6 +24,9 @@ const es = {
     suggestions: 'Títulos de proyecto',
     results: '{n} proyectos',
     resultsOne: '1 proyecto',
+    layout: 'Vista de las imágenes',
+    squares: 'Cuadrados',
+    rows: 'Filas',
   },
   project: {
     architects: 'Arquitectos',
@@ -57,7 +60,7 @@ const es = {
       },
       {
         heading: 'Cookies',
-        body: 'Esta web no instala cookies de analítica, publicidad ni seguimiento. El idioma se decide a partir de la configuración del navegador y de la dirección visitada, sin guardar nada en el dispositivo.',
+        body: 'Esta web no instala cookies de analítica, publicidad ni seguimiento. El idioma se decide a partir de la configuración del navegador y de la dirección visitada. Lo único que se guarda en el dispositivo es la vista de imágenes que elija cada visitante —cuadrados o filas—, para respetarla al pasar de una página a otra.',
       },
     ],
   },
@@ -107,6 +110,9 @@ const en: Dictionary = {
     suggestions: 'Project titles',
     results: '{n} projects',
     resultsOne: '1 project',
+    layout: 'Image layout',
+    squares: 'Squares',
+    rows: 'Rows',
   },
   project: {
     architects: 'Architects',
@@ -140,7 +146,7 @@ const en: Dictionary = {
       },
       {
         heading: 'Cookies',
-        body: 'This website sets no analytics, advertising or tracking cookies. The language comes from your browser settings and from the address you visit, with nothing stored on your device.',
+        body: 'This website sets no analytics, advertising or tracking cookies. The language comes from your browser settings and from the address you visit. The only thing stored on your device is the image layout you choose —squares or rows—, so that it carries over from one page to the next.',
       },
     ],
   },

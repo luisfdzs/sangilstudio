@@ -244,13 +244,31 @@ async function main() {
   )
   check(columns === 1, `una sola columna en móvil (${columns})`)
 
-  const squares = await page.evaluate(() => {
-    const boxes = [...document.querySelectorAll('main article img')].map((img) =>
-      img.getBoundingClientRect(),
-    )
-    return boxes.every((box) => Math.abs(box.width - box.height) <= 2)
-  })
-  check(squares, 'las imágenes de la rejilla son cuadradas')
+  const whole = await page.evaluate(() =>
+    [...document.querySelectorAll('main article img')]
+      .map((img) => {
+        const box = img.getBoundingClientRect()
+        const natural = img.naturalWidth / img.naturalHeight
+        return {
+          ratio: box.width / box.height,
+          natural,
+          height: box.height,
+          fit: getComputedStyle(img).objectFit,
+        }
+      })
+      .filter(
+        (img) =>
+          img.fit !== 'contain' ||
+          Math.abs(img.ratio - img.natural) > 0.02 ||
+          img.height > window.innerHeight,
+      ),
+  )
+  check(
+    whole.length === 0,
+    whole.length === 0
+      ? 'las portadas se ven enteras y caben en pantalla'
+      : `portadas recortadas o más altas que la ventana: ${JSON.stringify(whole.slice(0, 3))}`,
+  )
 
   const search = page.locator('#project-search')
   check(await search.isVisible(), 'el buscador se ve')
