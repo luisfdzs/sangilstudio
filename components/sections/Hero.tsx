@@ -2,7 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import type { MouseEvent as ReactMouseEvent } from 'react'
+import { EdgeArrows } from '@/components/ui/EdgeArrows'
+import { useHorizontalSwipe } from '@/components/ui/useHorizontalSwipe'
 import type { DescribedImage } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -10,37 +13,52 @@ type Props = {
   images: DescribedImage[]
   locale: Locale
   label: string
+  prevLabel: string
+  nextLabel: string
   workHref: string
 }
 
 const HOLD_MS = 5000
 const FADE_MS = 1600
 
-export function Hero({ images, locale, label, workHref }: Props) {
+export function Hero({ images, locale, label, prevLabel, nextLabel, workHref }: Props) {
   const [{ index, reach }, setFrame] = useState({ index: 0, reach: 2 })
+
+  const step = useCallback(
+    (delta: number) => {
+      setFrame((current) => {
+        const total = images.length
+        const next = (current.index + delta + total) % total
+        return { index: next, reach: Math.max(current.reach, next + 2) }
+      })
+    },
+    [images.length],
+  )
+
+  const { swipedRef, handlers } = useHorizontalSwipe(step)
 
   useEffect(() => {
     if (images.length < 2) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    const timer = setInterval(() => {
-      setFrame((current) => {
-        const next = (current.index + 1) % images.length
-        return { index: next, reach: Math.max(current.reach, next + 2) }
-      })
-    }, HOLD_MS)
-    return () => clearInterval(timer)
-  }, [images.length])
+    const timer = setTimeout(() => step(1), HOLD_MS)
+    return () => clearTimeout(timer)
+  }, [index, images.length, step])
 
   if (images.length === 0) return null
 
+  const onLinkClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+    if (!swipedRef.current) return
+    event.preventDefault()
+    swipedRef.current = false
+  }
+
   return (
     <div className="page-gutter">
-      <Link
-        href={workHref}
-        aria-label={label}
+      <div
         data-hero
-        className="relative block h-[calc(100svh-9rem)] min-h-[20rem] w-full overflow-hidden md:h-[calc(100svh-11rem)]"
+        {...handlers}
+        className="relative h-[calc(100svh-9rem)] min-h-[20rem] w-full touch-pan-y overflow-hidden select-none md:h-[calc(100svh-11rem)]"
       >
         {images.slice(0, reach).map((image, position) => (
           <Image
@@ -56,6 +74,7 @@ export function Hero({ images, locale, label, workHref }: Props) {
             quality={82}
             placeholder="blur"
             blurDataURL={image.blur}
+            draggable={false}
             className="object-cover transition-opacity ease-(--ease-in-out-soft)"
             style={{
               opacity: position === index ? 1 : 0,
@@ -63,7 +82,23 @@ export function Hero({ images, locale, label, workHref }: Props) {
             }}
           />
         ))}
-      </Link>
+
+        <Link
+          href={workHref}
+          aria-label={label}
+          onClick={onLinkClick}
+          className="absolute inset-0 block"
+        />
+
+        {images.length > 1 && (
+          <EdgeArrows
+            prevLabel={prevLabel}
+            nextLabel={nextLabel}
+            onPrev={() => step(-1)}
+            onNext={() => step(1)}
+          />
+        )}
+      </div>
     </div>
   )
 }

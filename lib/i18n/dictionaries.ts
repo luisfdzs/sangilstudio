@@ -24,6 +24,8 @@ const es = {
        proyectos. Esto es el nombre accesible de ese enlace, que ocupa la pantalla
        entera y sin él se anunciaría vacío. */
     heroLink: 'Ver todos los proyectos',
+    heroPrev: 'Imagen anterior',
+    heroNext: 'Imagen siguiente',
   },
   work: {
     title: 'Proyectos',
@@ -38,6 +40,8 @@ const es = {
   project: {
     architects: 'Arquitectos',
     client: 'Promotor',
+    previous: 'Proyecto anterior',
+    next: 'Proyecto siguiente',
   },
   studio: {
     title: 'Estudio',
@@ -80,6 +84,8 @@ const en: Dictionary = {
   },
   home: {
     heroLink: 'View all projects',
+    heroPrev: 'Previous image',
+    heroNext: 'Next image',
   },
   work: {
     title: 'Work',
@@ -92,6 +98,8 @@ const en: Dictionary = {
   project: {
     architects: 'Architects',
     client: 'Client',
+    previous: 'Previous project',
+    next: 'Next project',
   },
   studio: {
     title: 'Studio',

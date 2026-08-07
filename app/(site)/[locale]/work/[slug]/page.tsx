@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { ProjectPager } from '@/components/sections/ProjectPager'
 import { Media } from '@/components/ui/Media'
 import { Reveal } from '@/components/ui/Reveal'
-import { getProject, getProjectSlugs } from '@/lib/content'
+import { getProject, getProjects, getProjectSlugs } from '@/lib/content'
 import { isLocale, locales } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href } from '@/lib/i18n/routes'
@@ -42,10 +43,6 @@ export async function generateMetadata({
  * más. Es literalmente lo que pidió el estudio.
  *
  * Lo que había antes y ya no está: portada a sangre, resumen, memoria de varios
- * párrafos, superficie, estado, sección de planos y la navegación anterior/siguiente.
- * Los campos **siguen existiendo en el panel** y se siguen leyendo —el resumen es la
- * descripción de la página para Google y para quien comparte el enlace, ahí arriba—,
- * pero no se pintan: la ficha es la obra, y la obra son las fotos.
  *
  * Las imágenes van a **una sola columna**, cada una a todo el ancho de la caja de texto
  * y con su proporción real, sin recortar. Un proyecto se entiende viendo las fotos
@@ -64,54 +61,57 @@ export default async function ProjectPage({
 
   const t = getDictionary(locale)
 
-  return (
-    <article className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
-      <header>
-        <h1 className="text-display tracking-tight uppercase">{project.title}</h1>
+  const projects = await getProjects()
+  const position = projects.findIndex((entry) => entry.slug === slug)
+  const previous = projects[(position - 1 + projects.length) % projects.length]!
+  const next = projects[(position + 1) % projects.length]!
 
-        {/* Las líneas de datos, una debajo de otra y pegadas al margen. Sin filete, sin
+  return (
+    <ProjectPager
+      prevHref={href(locale, 'work', previous.slug)}
+      nextHref={href(locale, 'work', next.slug)}
+      prevLabel={`${t.project.previous}: ${previous.title}`}
+      nextLabel={`${t.project.next}: ${next.title}`}
+    >
+      <article className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
+        <header>
+          <h1 className="text-display tracking-tight uppercase">{project.title}</h1>
+
+          {/* Las líneas de datos, una debajo de otra y pegadas al margen. Sin filete, sin
             rejilla y sin rótulos salvo donde hace falta decir qué es cada nombre: en
             «Pamplona, Navarra · 2023» y «Vivienda» ya se ve, y en una lista de personas,
             no. */}
-        <div className="mt-6 text-body md:mt-8">
-          <p>
-            {project.location[locale]}, {project.year}
-          </p>
-          <p>{t.type[project.type]}</p>
-          {/* El campo se llama `collaboration` en el panel desde antes de que la ficha
-              tuviera esta forma; lo que se enseña es lo que el estudio quiere leer aquí:
-              quién firma la obra. */}
-          {project.collaboration && (
+          <div className="mt-6 text-body md:mt-8">
             <p>
-              {t.project.architects}: {project.collaboration}
+              {project.location[locale]}, {project.year}
             </p>
-          )}
-          {/* Promotor: sólo cuando lo hay. Muchos concursos no tienen. */}
-          {project.client && (
-            <p>
-              {t.project.client}: {project.client}
-            </p>
-          )}
-        </div>
-      </header>
+            <p>{t.type[project.type]}</p>
+            {project.collaboration && (
+              <p>
+                {t.project.architects}: {project.collaboration}
+              </p>
+            )}
+            {project.client && (
+              <p>
+                {t.project.client}: {project.client}
+              </p>
+            )}
+          </div>
+        </header>
 
-      <div className="mt-12 flex flex-col gap-8 md:mt-16 md:gap-12">
-        {project.images.map((image, index) => (
-          <Reveal key={image.id}>
-            <Media
-              image={image}
-              // La descripción es opcional en el panel. Sin ella se emite `alt=""` y el
-              // lector de pantalla salta la foto, que es lo correcto para una imagen sin
-              // describir; sólo la primera toma el nombre del proyecto, para que la
-              // galería no se anuncie entera en silencio ni repita el título veinte veces.
-              alt={index === 0 ? image.alt[locale] || project.title : image.alt[locale]}
-              // La primera es la candidata a LCP de esta página; ni una más.
-              priority={index === 0}
-              sizes="(max-width: 768px) 100vw, 76vw"
-            />
-          </Reveal>
-        ))}
-      </div>
-    </article>
+        <div className="mt-12 flex flex-col gap-8 md:mt-16 md:gap-12">
+          {project.images.map((image, index) => (
+            <Reveal key={image.id}>
+              <Media
+                image={image}
+                alt={index === 0 ? image.alt[locale] || project.title : image.alt[locale]}
+                priority={index === 0}
+                sizes="(max-width: 768px) 100vw, 76vw"
+              />
+            </Reveal>
+          ))}
+        </div>
+      </article>
+    </ProjectPager>
   )
 }

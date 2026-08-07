@@ -31,6 +31,8 @@ export async function HomeContent({ locale }: { locale: Locale }) {
         images={heroImages}
         locale={locale}
         label={t.home.heroLink}
+        prevLabel={t.home.heroPrev}
+        nextLabel={t.home.heroNext}
         workHref={href(locale, 'work')}
       />
       <ContactSection locale={locale} settings={settings} />

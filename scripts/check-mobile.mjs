@@ -109,10 +109,10 @@ async function main() {
     (heroBox?.height ?? 0) > 844 * 0.7,
     `el hero llena la ventana bajo la cabecera (${Math.round(heroBox?.height ?? 0)} px)`,
   )
-  check(
-    (await hero.getAttribute('href'))?.endsWith('/work') === true,
-    `el hero lleva a proyectos (${await hero.getAttribute('href')})`,
-  )
+  const heroHref = await hero.locator('a[href]').first().getAttribute('href')
+  check(heroHref?.endsWith('/work') === true, `el hero lleva a proyectos (${heroHref})`)
+  const heroArrows = await hero.locator('button:visible').count()
+  check(heroArrows === 0, `el hero no muestra flechas en móvil (${heroArrows})`)
 
   // --- El menú: el «+» de la esquina, a pantalla completa ----------------------
   const toggle = page.locator('header button[aria-controls="site-menu"]')
