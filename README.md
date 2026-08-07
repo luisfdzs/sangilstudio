@@ -6,18 +6,6 @@ desplegada en Vercel.
 
 🌐 **Producción:** [sangilstudio.com](https://sangilstudio.com) · **Test:** [sangilstudiotest.vercel.app](https://sangilstudiotest.vercel.app)
 
-> **📁 Contexto del proyecto y skill `/retomar`**
-> El contexto compartido (memoria, decisiones, convenciones) y la skill `/retomar` **no están en esta
-> rama de código**: viven en la rama Git huérfana **`claude`**. Para consultarlos tras clonar:
->
-> ```bash
-> git checkout claude          # o, para tenerlo junto al código:
-> git worktree add ../sangil-claude claude
-> ```
->
-> En esa rama, empieza con `/retomar` para ponerte al día. Si vas a hacer _push_, reaplica la
-> config local de git/`gh` descrita en la memoria `cuenta-git-gh`.
-
 ## Puesta en marcha
 
 ```bash
