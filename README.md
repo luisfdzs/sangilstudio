@@ -148,7 +148,7 @@ Español e inglés desde el primer día, en `/es` y `/en`. Los segmentos de ruta
 
 Hospedado en **Vercel**, con dos entornos que se publican automáticamente al hacer _push_:
 
-- **Producción:** rama `main` → `sangilstudio.vercel.app` y **`sangilstudio.com`**
+- **Producción:** rama `prod` → `sangilstudio.vercel.app` y **`sangilstudio.com`**
   (DNS en IONOS, `www` canónico, SSL de Vercel).
 - **Test:** rama `test` → `sangilstudiotest.vercel.app`. Emite `noindex` y `robots: disallow`
   automáticamente (`VERCEL_ENV !== 'production'`) para no competir en Google con el dominio real.
