@@ -1,8 +1,8 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { useCallback } from 'react'
-import type { ReactNode } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { useCallback, useState } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { ProjectPeek } from '@/components/sections/ProjectPeek'
 import {
   enteringStyle,
@@ -10,7 +10,6 @@ import {
   outgoingStyle,
   transitionStyle,
 } from '@/components/swipe/motion'
-import { EdgeArrows } from '@/components/ui/EdgeArrows'
 import { useHorizontalSwipe } from '@/components/ui/useHorizontalSwipe'
 import type { ProjectEntry } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
@@ -21,63 +20,84 @@ type Props = {
   next: ProjectEntry
   prevHref: string
   nextHref: string
-  prevLabel: string
-  nextLabel: string
+  backHref: string
+  backLabel: string
+  backTitle: string
   locale: Locale
   dictionary: Dictionary
   children: ReactNode
 }
+
+type Committed = { direction: -1 | 1; project: ProjectEntry; from: string }
 
 export function ProjectPager({
   previous,
   next,
   prevHref,
   nextHref,
-  prevLabel,
-  nextLabel,
+  backHref,
+  backLabel,
+  backTitle,
   locale,
   dictionary,
   children,
 }: Props) {
   const router = useRouter()
+  const pathname = usePathname()
+  const [committed, setCommitted] = useState<Committed | null>(null)
 
   const go = useCallback(
     (delta: number) => {
-      router.push(delta < 0 ? prevHref : nextHref)
+      const direction: -1 | 1 = delta < 0 ? -1 : 1
+      setCommitted({ direction, project: direction < 0 ? previous : next, from: pathname })
+      router.push(direction < 0 ? prevHref : nextHref)
     },
-    [router, prevHref, nextHref],
+    [router, pathname, prevHref, nextHref, previous, next],
   )
 
   const { drag, handlers } = useHorizontalSwipe(go)
 
+  const held = committed?.from === pathname ? committed : null
+
   const gesturing = isGesturing(drag)
-  const arriving = drag.direction === 1 ? next : drag.direction === -1 ? previous : null
+  const arriving = held
+    ? held.project
+    : drag.direction === 1
+      ? next
+      : drag.direction === -1
+        ? previous
+        : null
+
+  const outgoing: CSSProperties | undefined = held
+    ? { transform: `translateX(${-held.direction * 100}%)` }
+    : gesturing
+      ? { ...transitionStyle(drag), ...outgoingStyle(drag) }
+      : undefined
+
+  const entering: CSSProperties = held
+    ? { transform: 'translateX(0%)' }
+    : { ...transitionStyle(drag), ...enteringStyle(drag) }
 
   return (
     <div {...handlers} className="relative touch-pan-y overflow-x-clip">
-      <div style={gesturing ? { ...transitionStyle(drag), ...outgoingStyle(drag) } : undefined}>
-        {children}
-      </div>
+      <div style={outgoing}>{children}</div>
 
       {arriving && (
         <div
           aria-hidden="true"
-          /* Arranca bajo la cabecera, justo donde arrancará la ficha al soltar. */
-          className="pointer-events-none fixed inset-x-0 top-20 bottom-0 z-20 md:top-24"
-          style={{ ...transitionStyle(drag), ...enteringStyle(drag) }}
+          className="pointer-events-none fixed inset-x-0 top-20 bottom-0 z-40 md:top-24"
+          style={entering}
         >
-          <ProjectPeek project={arriving} locale={locale} dictionary={dictionary} />
+          <ProjectPeek
+            project={arriving}
+            locale={locale}
+            dictionary={dictionary}
+            backHref={backHref}
+            backLabel={backLabel}
+            backTitle={backTitle}
+          />
         </div>
       )}
-
-      <EdgeArrows
-        anchor="fixed"
-        tone="ink"
-        prevLabel={prevLabel}
-        nextLabel={nextLabel}
-        prevHref={prevHref}
-        nextHref={nextHref}
-      />
     </div>
   )
 }

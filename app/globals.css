@@ -177,6 +177,31 @@
       display: block;
       flex: var(--ratio, 1) 1 0;
     }
+
+    .gallery-rows .gallery-row {
+      display: flex;
+    }
+
+    .gallery-rows .gallery-item {
+      flex: var(--ratio, 1) 1 0;
+    }
+
+    .gallery-rows .gallery-frame {
+      aspect-ratio: auto;
+      overflow: visible;
+      background-color: transparent;
+    }
+
+    .gallery-rows .gallery-frame img {
+      position: static;
+      width: 100%;
+      max-height: var(--media-cap);
+    }
+
+    .gallery-rows .gallery-fill {
+      display: block;
+      flex: var(--ratio, 1) 1 0;
+    }
   }
 }
 

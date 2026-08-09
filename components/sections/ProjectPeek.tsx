@@ -1,4 +1,6 @@
-import Image from 'next/image'
+import { ProjectBar } from '@/components/sections/ProjectBar'
+import { ProjectLead } from '@/components/sections/ProjectLead'
+import { ProjectMobile } from '@/components/sections/ProjectMobile'
 import type { ProjectEntry } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
@@ -7,41 +9,43 @@ type Props = {
   project: ProjectEntry
   locale: Locale
   dictionary: Dictionary
+  backHref: string
+  backLabel: string
+  backTitle: string
 }
 
-/**
- * Lo que asoma por el borde al arrastrar en la ficha: la cabecera del proyecto
- * vecino, igual que la verá al soltar. Su portada **es** la primera imagen de la
- * ficha (`cover === images[0]`), así que la llegada no da ningún salto.
- */
-export function ProjectPeek({ project, locale, dictionary }: Props) {
+export function ProjectPeek({
+  project,
+  locale,
+  dictionary,
+  backHref,
+  backLabel,
+  backTitle,
+}: Props) {
   return (
-    <div className="page-gutter flex h-full flex-col bg-paper pt-16 md:pt-24">
-      <h2 data-t="projectTitle" className="text-display tracking-tight uppercase">
-        {project.title}
-      </h2>
-
-      <div data-t="projectMeta" className="mt-6 text-body md:mt-8">
-        <p>
-          {project.location[locale]}, {project.year}
-        </p>
-        <p>{dictionary.type[project.type]}</p>
-      </div>
-
-      <div className="relative mt-12 min-h-0 flex-1 md:mt-16">
-        <Image
-          src={project.cover.src}
-          alt=""
-          aria-hidden="true"
-          fill
-          sizes="100vw"
-          quality={70}
-          placeholder="blur"
-          blurDataURL={project.cover.blur}
-          draggable={false}
-          className="object-contain object-top"
+    <div className="relative h-full overflow-hidden bg-paper">
+      <div className="page-gutter pt-16 md:hidden">
+        <ProjectMobile
+          project={project}
+          locale={locale}
+          dictionary={dictionary}
+          heading={false}
+          reveal={false}
         />
       </div>
+
+      <div className="page-gutter hidden pt-6 md:block">
+        <ProjectLead project={project} locale={locale} />
+      </div>
+
+      <ProjectBar
+        anchor="absolute"
+        href={backHref}
+        label={backLabel}
+        title={backTitle}
+        project={project.title}
+        architects={project.collaboration}
+      />
     </div>
   )
 }

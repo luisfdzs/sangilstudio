@@ -3,6 +3,65 @@
 Historial cronológico de cambios del proyecto. Se añade una entrada en **cada cambio relevante**
 (ver `convenciones-mantenimiento` en `.claude/memory/`). Formato de fecha: `AAAA-MM-DD`.
 
+## 2026-08-09 (18) — Cuarta tanda de `NotasYago.txt`: la ficha se convierte en una imagen a pantalla
+
+- **`/work` sólo en filas.** Fuera el selector «Cuadrados / Filas» de la rejilla y fuera el hueco
+  superior (`pt-16 md:pt-24` → nada) y el inferior del buscador (`py-4` → `pt-4 pb-0`). Como el modo
+  vive en `<html data-gallery>` y el selector sigue existiendo en la ficha, la rejilla necesitaba ser
+  **inmune** a él: `<Gallery rows>` añade la clase `.gallery-rows`, que impone filas por encima de
+  cualquier modo guardado.
+- **La ficha de proyecto es ahora una imagen a golpe de pantalla.** Nuevo
+  `components/sections/ProjectLead.tsx`: la portada del proyecto, entera y sin recortar
+  (`object-contain`), ocupando `calc(100svh - 11rem)` —13,5rem en escritorio—, con **pie a la derecha**
+  que lleva sólo **título y arquitectos**, con los mismos estilos que el título y la localidad de la
+  rejilla (`cardTitle` / `cardLocation`). Desaparecen el titular grande y el bloque de datos
+  (localidad, año, tipo, promotor), y con ellos los controles `projectTitle` y `projectMeta` del panel
+  de tipografía. El resto de imágenes siguen debajo (`images.slice(1)`, la primera ya es la grande).
+- **El menú principal marca en negrita lo que señala el ratón**, no la sección actual. Reutiliza la
+  utilidad `hover-bold`, que reserva el ancho de la negrita para que no baile la línea. El
+  `aria-current` se mantiene para quien navega con lector.
+- **Arreglado el parpadeo al deslizar entre proyectos** (nota 3): el gesto terminaba de salir y el
+  `hook` volvía a reposo **antes** de que Next pintara la ficha nueva, así que la vieja **reaparecía en
+  su sitio unos fotogramas**. `ProjectPager` retiene ahora la posición de salida hasta que cambia el
+  `pathname` (estado derivado, sin efecto). Medido: la ficha saliente se queda a −1905 px hasta que
+  llega la nueva, a los ~540 ms. La vista previa del arrastre muestra además exactamente la misma
+  composición que va a aterrizar, porque `ProjectPeek` reutiliza `ProjectLead`.
+- **La ficha nueva es SÓLO de escritorio** (pedido a mitad de la tanda): en móvil se mantiene tal cual
+  estaba —titular grande, datos y todas las imágenes a una columna—. Las dos versiones conviven en el
+  HTML y se reparten con `md:hidden` / `hidden md:block`; las ocultas no descargan nada porque van en
+  `loading="lazy"` y un `display:none` nunca entra en el viewport.
+- **En escritorio, `ProjectViewer`**: imagen grande a la izquierda y **el resto del proyecto en una
+  columna a la derecha**, todas pulsables, y las **flechas de los bordes ahora recorren las imágenes**
+  (`t.home.heroPrev/heroNext`, que ya decían «Imagen anterior/siguiente»). ⚠️ Como esas flechas eran
+  las que saltaban de proyecto, **en escritorio ya no se pasa de un proyecto a otro**: queda el
+  deslizamiento en móvil y volver a `/work`.
+- Con el visor, la galería inferior y el selector «Cuadrados / Filas» **desaparecen del escritorio**;
+  el selector sólo se veía ahí, así que el mecanismo `data-gallery` queda sin uso en toda la web
+  (código muerto pendiente de retirar).
+- **Las miniaturas van pegadas a la imagen** (8 px). Para eso la imagen grande dejó de ser un `fill`
+  dentro de una caja ancha —que la centraba y dejaba un desierto blanco hasta la columna— y pasa a
+  medir lo que mide: `h-full w-auto`, así su borde derecho es el borde de la imagen de verdad.
+- **La vista previa del deslizamiento lleva ahora la ficha entera** (`ProjectMobile`, compartido con la
+  página): título, localidad y año, tipo, **arquitectos, promotor y todas las imágenes**. Antes sólo
+  llevaba título, localidad y la portada, y por eso el gesto «se veía raro». En la vista previa se
+  desactiva `Reveal`, cuya animación va atada al scroll (`animation-timeline: view()`) y dentro de una
+  capa fija puede dejar las imágenes en opacidad 0.
+- **Las zonas de flecha ocupan todo el blanco lateral** en la ficha de escritorio. `EdgeArrows` gana
+  un modo `flow` —y se parte en `EdgeArrow`, de una en una, porque el orden importa dentro del
+  `flex`— que las convierte en `flex-1` a los lados de la imagen. El visor sale del `page-gutter` con
+  un margen negativo para llegar al borde de la pantalla: 502 px de zona a cada lado, contra los
+  ~120 px de antes.
+- **El chevrón sigue al ratón por toda la franja** (sólo en escritorio): antes iba clavado al borde y
+  sólo acompañaba en vertical. Se frena a 16 px del borde para no quedar cortado; medido, cae con
+  desvío 0 sobre el cursor. El hero de la portada conserva su comportamiento de siempre.
+- **Cambiar de imagen es ahora un fundido de 700 ms.** Las imágenes ya vistas se quedan montadas y se
+  cruzan por opacidad, y la caja acompaña el cambio de proporción con la misma duración. Clave: la
+  imagen actual va **debajo** (`z-index` 0) y la que sale por encima, así lo nuevo nunca aparece de
+  golpe —sólo se descubre—; al revés, una imagen con índice mayor daría un salto seco.
+- **El guion de móvil tenía un fallo propio**, el mismo de siempre: contaba imágenes en
+  `display:none` (x = 0) y acusaba a la ficha de ir a dos columnas. Ahora filtra por `offsetParent`.
+- `npm run check` limpio, build correcto y **`check:mobile` 49/49**.
+
 ## 2026-08-04 (17) — Rediseño completo: las trece notas del estudio, aplicadas
 
 - **Trece puntos de `NotasYago.txt`, todos aplicados.** Fondo **blanco puro**, **Montserrat** como

@@ -27,7 +27,7 @@ export default async function WorkPage({ params }: { params: Promise<{ locale: s
   const projects = await getProjects()
 
   return (
-    <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
+    <div className="page-gutter pb-(--spacing-section)">
       <h1 className="sr-only">{t.work.title}</h1>
       <ProjectSearchGrid projects={projects} locale={locale} dictionary={t} />
     </div>

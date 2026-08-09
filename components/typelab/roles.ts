@@ -104,7 +104,7 @@ export const ROLES: Role[] = [
   {
     id: 'cardTitle',
     label: 'Título de proyecto en la rejilla',
-    where: 'Proyectos · el nombre bajo cada foto',
+    where: 'Proyectos y ficha · el nombre bajo cada foto y el pie de la imagen grande',
     group: 'proyectos',
     sample: 'Vivienda unifamiliar en Zizur',
     today: 'text-small font-medium tracking-wide uppercase',
@@ -118,7 +118,7 @@ export const ROLES: Role[] = [
   {
     id: 'cardLocation',
     label: 'Localidad en la rejilla',
-    where: 'Proyectos · la línea gris bajo el título',
+    where: 'Proyectos y ficha · la línea gris bajo el título (localidad, o los arquitectos)',
     group: 'proyectos',
     sample: 'Pamplona, Navarra',
     today: 'text-small text-ink-soft',
@@ -163,7 +163,7 @@ export const ROLES: Role[] = [
   {
     id: 'projectTitle',
     label: 'Título de la ficha',
-    where: 'Ficha · el nombre del proyecto, a gran tamaño',
+    where: 'Ficha en móvil · el nombre del proyecto, a gran tamaño',
     group: 'ficha',
     sample: 'UDC Research Building',
     today: 'text-display tracking-tight uppercase',
@@ -172,7 +172,7 @@ export const ROLES: Role[] = [
   {
     id: 'projectMeta',
     label: 'Datos de la ficha',
-    where: 'Ficha · localidad, año, tipo, arquitectos y promotor',
+    where: 'Ficha en móvil · localidad, año, tipo, arquitectos y promotor',
     group: 'ficha',
     sample:
       'Ferrol, Galicia, 2023\nDocente\nArquitectos: Yago Fernández Sangil, Juan Luis Irigaray Huarte',

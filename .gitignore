@@ -76,6 +76,11 @@ next-env.d.ts
 *.tsbuildinfo
 .env*
 
+# --- Worktrees de trabajo (locales) ---
+# Cada worktree es una copia de trabajo del propio repo (con su .next y demás):
+# vive en la máquina de cada uno y nunca se versiona.
+.claude/worktrees/
+
 # --- Panel de tipografía (local) ---
 # Lo escribe /api/typelab cada vez que se mueve un control del panel. Es un
 # borrador de trabajo de la máquina de cada uno; lo que se decide acaba en

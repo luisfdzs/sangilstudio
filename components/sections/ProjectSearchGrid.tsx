@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ProjectCard } from '@/components/sections/ProjectCard'
 import { Gallery, ratioOf } from '@/components/ui/Gallery'
-import { GalleryToggle } from '@/components/ui/GalleryToggle'
 import type { ProjectEntry } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
@@ -127,7 +126,7 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
           aria-activedescendant={
             showList && active >= 0 ? `project-search-option-${active}` : undefined
           }
-          className="w-full border-b border-line bg-transparent py-4 text-center text-small tracking-wide placeholder:text-ink-faint focus:border-ink focus:outline-none"
+          className="w-full border-b border-line bg-transparent pt-4 pb-0 text-center text-small tracking-wide placeholder:text-ink-faint focus:border-ink focus:outline-none"
         />
 
         <ul
@@ -165,21 +164,16 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
           {dictionary.work.empty}
         </p>
       ) : (
-        <>
-          <div className="mt-12 flex justify-end md:mt-16">
-            <GalleryToggle dictionary={dictionary} />
-          </div>
-
-          <div className="mt-6 md:mt-8">
-            <Gallery
-              items={visible.map((project, index) => ({
-                key: project.slug,
-                ratio: ratioOf(project.cover),
-                content: <ProjectCard project={project} locale={locale} priority={index < 3} />,
-              }))}
-            />
-          </div>
-        </>
+        <div className="mt-12 md:mt-16">
+          <Gallery
+            rows
+            items={visible.map((project, index) => ({
+              key: project.slug,
+              ratio: ratioOf(project.cover),
+              content: <ProjectCard project={project} locale={locale} priority={index < 3} />,
+            }))}
+          />
+        </div>
       )}
     </>
   )
