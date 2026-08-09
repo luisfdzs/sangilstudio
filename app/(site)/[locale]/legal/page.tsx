@@ -40,10 +40,10 @@ export default async function LegalPage({ params }: { params: Promise<{ locale: 
       <div className="mt-10 grid max-w-2xl gap-10 md:mt-14">
         {t.legal.blocks.map((block) => (
           <section key={block.heading}>
-            <h2 data-t="legalHeading" className="text-body">
+            <h2 data-t="legalHeading" className="text-prose">
               {block.heading}
             </h2>
-            <p data-t="legalBody" className="mt-3 text-body whitespace-pre-line text-ink-soft">
+            <p data-t="legalBody" className="mt-3 text-prose whitespace-pre-line text-ink-soft">
               {block.body}
             </p>
           </section>

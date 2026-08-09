@@ -127,7 +127,7 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
           aria-activedescendant={
             showList && active >= 0 ? `project-search-option-${active}` : undefined
           }
-          className="w-full border-b border-line bg-transparent py-4 text-center text-lead tracking-wide placeholder:text-ink-faint focus:border-ink focus:outline-none"
+          className="w-full border-b border-line bg-transparent py-4 text-center text-small tracking-wide placeholder:text-ink-faint focus:border-ink focus:outline-none"
         />
 
         <ul
@@ -161,7 +161,9 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
       </p>
 
       {visible.length === 0 ? (
-        <p className="mt-16 text-body text-ink-soft">{dictionary.work.empty}</p>
+        <p data-t="searchEmpty" className="mt-16 text-body text-ink-soft">
+          {dictionary.work.empty}
+        </p>
       ) : (
         <>
           <div className="mt-12 flex justify-end md:mt-16">

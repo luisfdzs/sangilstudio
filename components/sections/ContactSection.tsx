@@ -48,7 +48,7 @@ export function ContactSection({ locale, settings }: { locale: Locale; settings:
         id={sections.contact}
         className="page-gutter scroll-mt-8 pb-(--spacing-section) text-left"
       >
-        <h2 data-t="contactHeading" className="text-small tracking-[0.18em] uppercase">
+        <h2 data-t="contactHeading" className="text-display tracking-tight uppercase">
           {t.contact.title}
         </h2>
 

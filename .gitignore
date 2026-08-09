@@ -76,6 +76,12 @@ next-env.d.ts
 *.tsbuildinfo
 .env*
 
+# --- Panel de tipografía (local) ---
+# Lo escribe /api/typelab cada vez que se mueve un control del panel. Es un
+# borrador de trabajo de la máquina de cada uno; lo que se decide acaba en
+# app/globals.css y en los componentes, no aquí.
+typelab.local.json
+
 # --- Migración a Sanity ---
 # Generado por npm run migrate:build a partir de content-snapshot.json.
 scripts/migration/import.ndjson

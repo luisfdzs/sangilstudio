@@ -46,7 +46,7 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
           <Reveal key={paragraph.slice(0, 24)} step={index}>
             <p
               data-t={index === 0 ? 'studioLead' : 'studioBody'}
-              className={index === 0 ? 'text-lead' : 'text-ink-soft'}
+              className={index === 0 ? 'text-lead' : 'text-prose text-ink-soft'}
             >
               {paragraph}
             </p>

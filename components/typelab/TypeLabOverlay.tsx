@@ -8,6 +8,8 @@ import {
   ROLE_BY_ID,
   changedRoles,
   exportCss,
+  getSaveStatus,
+  getSaveStatusServer,
   getServerSnapshot,
   getSnapshot,
   hydrate,
@@ -18,6 +20,14 @@ import {
   subscribe,
 } from './store'
 import { TypeControls } from './TypeControls'
+import type { SaveStatus } from './store'
+
+const SAVE_TEXT: Record<SaveStatus, string> = {
+  idle: 'Al mover un control se guarda en el proyecto.',
+  saving: 'Guardando en el proyecto…',
+  saved: 'Guardado en el proyecto. Ya se puede aplicar.',
+  error: 'No se ha podido guardar: ¿está «npm run dev» en marcha?',
+}
 
 const HIGHLIGHT = (roleId: string) =>
   `[data-t='${roleId}'] { outline: 1px dashed #9a9a9a; outline-offset: 6px; }`
@@ -26,6 +36,7 @@ export function TypeLabOverlay() {
   const pathname = usePathname()
   const styles = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
   const live = useSyncExternalStore(subscribe, isLive, isLiveServer)
+  const saveStatus = useSyncExternalStore(subscribe, getSaveStatus, getSaveStatusServer)
   const [selected, setSelected] = useState(ROLES[0]!.id)
   const [open, setOpen] = useState(true)
   const [highlight, setHighlight] = useState(true)
@@ -126,6 +137,9 @@ export function TypeLabOverlay() {
                 {changed.length === 0
                   ? 'Sin cambios'
                   : `${changed.length} de ${ROLES.length} modificados`}
+              </p>
+              <p className="mt-2 text-micro leading-relaxed text-ink-faint">
+                {SAVE_TEXT[saveStatus]}
               </p>
               <button
                 type="button"

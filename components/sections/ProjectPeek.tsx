@@ -17,9 +17,11 @@ type Props = {
 export function ProjectPeek({ project, locale, dictionary }: Props) {
   return (
     <div className="page-gutter flex h-full flex-col bg-paper pt-16 md:pt-24">
-      <h2 className="text-display tracking-tight uppercase">{project.title}</h2>
+      <h2 data-t="projectTitle" className="text-display tracking-tight uppercase">
+        {project.title}
+      </h2>
 
-      <div className="mt-6 text-body md:mt-8">
+      <div data-t="projectMeta" className="mt-6 text-body md:mt-8">
         <p>
           {project.location[locale]}, {project.year}
         </p>

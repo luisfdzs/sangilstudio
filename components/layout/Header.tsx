@@ -118,7 +118,7 @@ export function Header({ locale, dictionary }: Props) {
               onClick={close}
               aria-current={isCurrent(pathname, href(locale, key)) ? 'page' : undefined}
               className={cn(
-                'text-title tracking-tight',
+                'text-title tracking-tight text-ink-soft',
                 isCurrent(pathname, href(locale, key)) ? 'font-semibold' : undefined,
               )}
             >
