@@ -328,9 +328,9 @@ async function main() {
     const galleryColumns = await page.evaluate(
       () =>
         new Set(
-          [...document.querySelectorAll('article img')].map((img) =>
-            Math.round(img.getBoundingClientRect().x),
-          ),
+          [...document.querySelectorAll('article img')]
+            .filter((img) => img.offsetParent !== null)
+            .map((img) => Math.round(img.getBoundingClientRect().x)),
         ).size,
     )
     check(galleryColumns === 1, `las imágenes de la ficha van a una columna (${galleryColumns})`)

@@ -8,10 +8,20 @@ export default function NotFound() {
 
   return (
     <div className="page-gutter flex min-h-[60svh] flex-col items-center justify-center py-24 text-center">
-      <p className="eyebrow">404</p>
-      <h1 className="mt-6 max-w-2xl text-display text-balance">{t.notFound.title}</h1>
-      <p className="mt-6 max-w-md text-ink-soft">{t.notFound.lead}</p>
-      <Link href={href(defaultLocale, 'home')} className="link-underline tap mt-10 text-small">
+      <p data-t="notFoundTag" className="eyebrow">
+        404
+      </p>
+      <h1 data-t="notFoundTitle" className="mt-6 max-w-2xl text-display text-balance">
+        {t.notFound.title}
+      </h1>
+      <p data-t="notFoundBody" className="mt-6 max-w-md text-ink-soft">
+        {t.notFound.lead}
+      </p>
+      <Link
+        href={href(defaultLocale, 'home')}
+        data-t="notFoundLink"
+        className="link-underline tap mt-10 text-small"
+      >
         {t.notFound.cta}
       </Link>
     </div>

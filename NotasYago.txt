@@ -78,3 +78,23 @@
 5. En la página de un proyecto concreto, hay algunas imágenes verticales y ahora mismo se suben ocupando todo el ancho de su sección y hace que la imagen se vuelva enorme y haya que scrollear para verla entera. En la versión móvil, se recortan también mucho las imagenes. Dame varias opciones distintas con un panel para solucionar el problema y que todas las imágenes se puedan ver sin modificar enteras en las pantallas tanto del móvil como del ordenador.
 
 ----------------------------------------------------------------------------------------------------------------------
+
+1. En la página de /work eliminar el escogible "cuadrados/filas" y dejar simplemente filas. Quitar todo el hueco blanco que queda por la zona del buscador haciendo padding-top 0 al div <div class="page-gutter pt-16 pb-(--spacing-section) md:pt-24" style="
+    padding-top: 0px;
+">. y quitando cuadradas filas como te dije. Además, poner padding-bottom 0 a este elemento: <input id="project-search" data-t="search" placeholder="Buscar proyecto" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="project-search-listbox" aria-autocomplete="list" class="w-full border-b border-line bg-transparent py-4 text-center text-lead tracking-wide placeholder:text-ink-faint focus:border-ink focus:outline-none" type="search" value="" style="
+    padding-bottom: 0px;
+">
+
+2. en /work/<proyectoejemplo> Queremos cambiar toda la parte estética y visual. Lo primero que tiene que verse es una imagen del tamaño máximo que puedas conseguir dependiendo de cada imagen reuniendo las siguientes condiciones: Tiene que poder verse entera, a golpe de pantalla, sin recortar ni scrollear y tiene que conservar la misma resolucion. A pie de imagen, se tiene que ver el texto que antes era título y subtítulo, por ejemplo en /work/world-car-center-vigo quitar los textos "World Car Center - 1st prize
+Vigo, Galicia, 2018
+
+Oficinas
+
+Arquitectos: Yago Fernández Sangil, Juan Luis Irigaray Huarte, Vaillo + Architects" y meter a pie de la imagen algo similar, pero solo título y arquitectos. Este pie de foto se pone justificado a la derecha. Como referencia para tamaño y color de título y arquitectos, el nuevo pié de imagen de proyecto justificado abajo a la derecha, usa la referencia de título del proyecto y lugar de construcción del mismo que tiene cada imagen de proyecto en la página de /work.
+
+3. Cuando pasamos de un proyecto a otro deslizando en la versión movil se renderiza raro, pasan cosas raras.
+
+4. En el menú principal, el efecto negrita de la opción escogida la queremos para el efecto hover. Ahora mismo está en negrita la sección en la que está la url, yo lo que quiero es que se ponga en negrita la opción que tenga el ratón situado encima (efecto hover)
+
+----------------------------------------------------------------------------------------------------------------------
+

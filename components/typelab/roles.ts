@@ -16,7 +16,7 @@ export type RoleStyle = {
   opacity: number
 }
 
-export type RoleGroup = 'portada' | 'proyectos' | 'ficha' | 'estudio' | 'menu'
+export type RoleGroup = 'portada' | 'proyectos' | 'ficha' | 'estudio' | 'menu' | 'otras'
 
 export type Role = {
   id: string
@@ -34,6 +34,7 @@ export const GROUPS: { id: RoleGroup; label: string }[] = [
   { id: 'ficha', label: 'Ficha de proyecto' },
   { id: 'estudio', label: 'Estudio' },
   { id: 'menu', label: 'Menú' },
+  { id: 'otras', label: 'Aviso legal y página 404' },
 ]
 
 const INK = '#111111'
@@ -63,18 +64,19 @@ const micro: RoleStyle = {
   letterSpacing: 0.12,
   transform: 'uppercase',
 }
-const lead: RoleStyle = { ...base, sizeMobile: 18, sizeDesktop: 21, lineHeight: 1.55 }
+const lead: RoleStyle = { ...base, sizeMobile: 14, sizeDesktop: 16, lineHeight: 1.55 }
+const prose: RoleStyle = { ...base, sizeMobile: 14, sizeDesktop: 16 }
 const title: RoleStyle = {
   ...base,
   sizeMobile: 22,
-  sizeDesktop: 34,
+  sizeDesktop: 26,
   lineHeight: 1.2,
   letterSpacing: -0.025,
 }
 const display: RoleStyle = {
   ...base,
-  sizeMobile: 29,
-  sizeDesktop: 56,
+  sizeMobile: 21,
+  sizeDesktop: 28,
   lineHeight: 1.05,
   letterSpacing: -0.025,
   transform: 'uppercase',
@@ -87,8 +89,8 @@ export const ROLES: Role[] = [
     where: 'Portada · el «CONTACTO» sobre la dirección',
     group: 'portada',
     sample: 'Contacto',
-    today: 'text-small tracking-[0.18em] uppercase',
-    defaults: { ...small, letterSpacing: 0.18, transform: 'uppercase' },
+    today: 'text-display tracking-tight uppercase',
+    defaults: { ...display },
   },
   {
     id: 'contactBody',
@@ -102,7 +104,7 @@ export const ROLES: Role[] = [
   {
     id: 'cardTitle',
     label: 'Título de proyecto en la rejilla',
-    where: 'Proyectos · el nombre bajo cada foto',
+    where: 'Proyectos y ficha · el nombre bajo cada foto y el pie de la imagen grande',
     group: 'proyectos',
     sample: 'Vivienda unifamiliar en Zizur',
     today: 'text-small font-medium tracking-wide uppercase',
@@ -116,7 +118,7 @@ export const ROLES: Role[] = [
   {
     id: 'cardLocation',
     label: 'Localidad en la rejilla',
-    where: 'Proyectos · la línea gris bajo el título',
+    where: 'Proyectos y ficha · la línea gris bajo el título (localidad, o los arquitectos)',
     group: 'proyectos',
     sample: 'Pamplona, Navarra',
     today: 'text-small text-ink-soft',
@@ -128,8 +130,8 @@ export const ROLES: Role[] = [
     where: 'Proyectos · el campo de búsqueda centrado',
     group: 'proyectos',
     sample: 'Buscar proyecto',
-    today: 'text-lead tracking-wide',
-    defaults: { ...lead, letterSpacing: 0.025 },
+    today: 'text-small tracking-wide',
+    defaults: { ...small, letterSpacing: 0.025 },
   },
   {
     id: 'searchOption',
@@ -139,6 +141,15 @@ export const ROLES: Role[] = [
     sample: 'Centro de congresos en Pozuelo',
     today: 'text-body tracking-[0.14em] uppercase',
     defaults: { ...base, letterSpacing: 0.14, transform: 'uppercase', color: SOFT },
+  },
+  {
+    id: 'searchEmpty',
+    label: 'Aviso de «sin resultados»',
+    where: 'Proyectos · la frase que sale cuando la búsqueda no encuentra nada',
+    group: 'proyectos',
+    sample: 'No hay proyectos que coincidan con la búsqueda.',
+    today: 'text-body text-ink-soft',
+    defaults: { ...base, color: SOFT },
   },
   {
     id: 'galleryToggle',
@@ -152,7 +163,7 @@ export const ROLES: Role[] = [
   {
     id: 'projectTitle',
     label: 'Título de la ficha',
-    where: 'Ficha · el nombre del proyecto, a gran tamaño',
+    where: 'Ficha en móvil · el nombre del proyecto, a gran tamaño',
     group: 'ficha',
     sample: 'UDC Research Building',
     today: 'text-display tracking-tight uppercase',
@@ -161,7 +172,7 @@ export const ROLES: Role[] = [
   {
     id: 'projectMeta',
     label: 'Datos de la ficha',
-    where: 'Ficha · localidad, año, tipo, arquitectos y promotor',
+    where: 'Ficha en móvil · localidad, año, tipo, arquitectos y promotor',
     group: 'ficha',
     sample:
       'Ferrol, Galicia, 2023\nDocente\nArquitectos: Yago Fernández Sangil, Juan Luis Irigaray Huarte',
@@ -203,8 +214,8 @@ export const ROLES: Role[] = [
     group: 'estudio',
     sample:
       'Trabajamos vivienda, rehabilitación, oficinas y equipamiento, con especial atención a la luz, la materia y el lugar.',
-    today: 'text-body text-ink-soft',
-    defaults: { ...base, color: SOFT },
+    today: 'text-prose text-ink-soft',
+    defaults: { ...prose, color: SOFT },
   },
   {
     id: 'menuLink',
@@ -212,8 +223,8 @@ export const ROLES: Role[] = [
     where: 'Menú · Inicio, Proyectos, Estudio, Contacto',
     group: 'menu',
     sample: 'Proyectos',
-    today: 'text-title tracking-tight',
-    defaults: { ...title },
+    today: 'text-title tracking-tight text-ink-soft',
+    defaults: { ...title, color: SOFT },
   },
   {
     id: 'menuLocale',
@@ -232,6 +243,70 @@ export const ROLES: Role[] = [
     sample: 'Aviso legal',
     today: 'eyebrow (text-micro, uppercase)',
     defaults: { ...micro, color: FAINT },
+  },
+  {
+    id: 'legalTitle',
+    label: 'Título del aviso legal',
+    where: 'Aviso legal · el titular de la página',
+    group: 'otras',
+    sample: 'Aviso legal',
+    today: 'text-display tracking-tight uppercase',
+    defaults: { ...display },
+  },
+  {
+    id: 'legalHeading',
+    label: 'Rótulos del aviso legal',
+    where: 'Aviso legal · el encabezado de cada bloque (Titular, Propiedad intelectual…)',
+    group: 'otras',
+    sample: 'Propiedad intelectual',
+    today: 'text-prose',
+    defaults: { ...prose },
+  },
+  {
+    id: 'legalBody',
+    label: 'Texto del aviso legal',
+    where: 'Aviso legal · el párrafo de cada bloque, con sus saltos de línea',
+    group: 'otras',
+    sample:
+      'Responsable: SANGIL STUDIO S.L.P.\nCIF: B71549737\nCorreo electrónico: sangil@sangilstudio.com',
+    today: 'text-prose text-ink-soft',
+    defaults: { ...prose, color: SOFT },
+  },
+  {
+    id: 'notFoundTag',
+    label: 'El «404»',
+    group: 'otras',
+    where: 'Página no encontrada · el número de arriba',
+    sample: '404',
+    today: 'eyebrow (text-micro, uppercase)',
+    defaults: { ...micro, color: FAINT },
+  },
+  {
+    id: 'notFoundTitle',
+    label: 'Título de la 404',
+    where: 'Página no encontrada · el titular',
+    group: 'otras',
+    sample: 'Esta página no existe',
+    today: 'text-display',
+    defaults: { ...display, transform: 'none' },
+  },
+  {
+    id: 'notFoundBody',
+    label: 'Texto de la 404',
+    where: 'Página no encontrada · la frase bajo el titular',
+    group: 'otras',
+    sample: 'Puede que se haya movido o que el enlace esté mal escrito.',
+    today: 'text-body text-ink-soft',
+    defaults: { ...base, color: SOFT },
+  },
+  {
+    id: 'notFoundLink',
+    label: 'Enlace de la 404',
+    where: 'Página no encontrada · el enlace de vuelta a la portada',
+    group: 'otras',
+    sample: 'Volver a la portada',
+    today: 'text-small',
+    defaults: { ...small },
   },
 ]
 

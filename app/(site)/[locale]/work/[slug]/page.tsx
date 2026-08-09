@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { BackToWork } from '@/components/sections/BackToWork'
+import { ProjectBar } from '@/components/sections/ProjectBar'
+import { ProjectMobile } from '@/components/sections/ProjectMobile'
+import { ProjectViewer } from '@/components/sections/ProjectViewer'
 import { ProjectPager } from '@/components/sections/ProjectPager'
-import { Gallery, ratioOf } from '@/components/ui/Gallery'
-import { GalleryToggle } from '@/components/ui/GalleryToggle'
-import { Media } from '@/components/ui/Media'
-import { Reveal } from '@/components/ui/Reveal'
 import { getProject, getProjects, getProjectSlugs } from '@/lib/content'
 import { isLocale, locales } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
@@ -65,61 +63,35 @@ export default async function ProjectPage({
         next={next}
         prevHref={href(locale, 'work', previous.slug)}
         nextHref={href(locale, 'work', next.slug)}
-        prevLabel={`${t.project.previous}: ${previous.title}`}
-        nextLabel={`${t.project.next}: ${next.title}`}
+        backHref={href(locale, 'work')}
+        backLabel={t.project.back}
+        backTitle={t.project.backLong}
         locale={locale}
         dictionary={t}
       >
-        <article className="page-gutter pt-16 pb-32 md:pt-24 md:pb-(--spacing-section)">
-          <header>
-            <h1 data-t="projectTitle" className="text-display tracking-tight uppercase">
-              {project.title}
-            </h1>
-
-            <div data-t="projectMeta" className="mt-6 text-body md:mt-8">
-              <p>
-                {project.location[locale]}, {project.year}
-              </p>
-              <p>{t.type[project.type]}</p>
-              {project.collaboration && (
-                <p>
-                  {t.project.architects}: {project.collaboration}
-                </p>
-              )}
-              {project.client && (
-                <p>
-                  {t.project.client}: {project.client}
-                </p>
-              )}
-            </div>
-          </header>
-
-          <div className="mt-12 flex justify-end md:mt-16">
-            <GalleryToggle dictionary={t} />
+        <article className="page-gutter pt-16 pb-32 md:pt-6 md:pb-(--spacing-section)">
+          <div className="md:hidden">
+            <ProjectMobile project={project} locale={locale} dictionary={t} />
           </div>
 
-          <div className="mt-6 md:mt-8">
-            <Gallery
-              items={project.images.map((image, index) => ({
-                key: image.id,
-                ratio: ratioOf(image),
-                content: (
-                  <Reveal className="gallery-frame">
-                    <Media
-                      image={image}
-                      alt={index === 0 ? image.alt[locale] || project.title : image.alt[locale]}
-                      priority={index === 0}
-                      sizes="(max-width: 768px) 100vw, 40vw"
-                    />
-                  </Reveal>
-                ),
-              }))}
+          <div className="hidden md:-mx-(--spacing-gutter) md:block">
+            <ProjectViewer
+              project={project}
+              locale={locale}
+              prevLabel={t.home.heroPrev}
+              nextLabel={t.home.heroNext}
             />
           </div>
         </article>
       </ProjectPager>
 
-      <BackToWork href={href(locale, 'work')} label={t.project.back} title={t.project.backLong} />
+      <ProjectBar
+        href={href(locale, 'work')}
+        label={t.project.back}
+        title={t.project.backLong}
+        project={project.title}
+        architects={project.collaboration}
+      />
     </>
   )
 }

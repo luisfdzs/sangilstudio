@@ -8,8 +8,11 @@ export const LIVE_KEY = 'sangil.type-lab.live'
 export type State = Record<string, RoleStyle>
 export type View = 'mobile' | 'desktop'
 
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
+
 let state: State = DEFAULT_STATE
 let live = false
+let saveStatus: SaveStatus = 'idle'
 const listeners = new Set<() => void>()
 
 function emit(): void {
@@ -39,10 +42,42 @@ export function isLiveServer(): boolean {
   return false
 }
 
+export function getSaveStatus(): SaveStatus {
+  return saveStatus
+}
+
+export function getSaveStatusServer(): SaveStatus {
+  return 'idle'
+}
+
+let saveTimer: ReturnType<typeof setTimeout> | undefined
+
+function persistToRepo(): void {
+  clearTimeout(saveTimer)
+  saveStatus = 'saving'
+  emit()
+
+  saveTimer = setTimeout(() => {
+    void fetch('/api/typelab', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ styles: state, changed: changedRoles(state) }),
+    })
+      .then((response) => {
+        saveStatus = response.ok ? 'saved' : 'error'
+      })
+      .catch(() => {
+        saveStatus = 'error'
+      })
+      .finally(emit)
+  }, 400)
+}
+
 function persist(): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
   } catch {}
+  persistToRepo()
 }
 
 export function update(roleId: string, patch: Partial<RoleStyle>): void {
@@ -71,20 +106,36 @@ export function setLive(next: boolean): void {
   emit()
 }
 
+function merge(saved: Partial<State>): State {
+  const merged: State = { ...DEFAULT_STATE }
+  for (const role of ROLES) {
+    const entry = saved[role.id]
+    if (entry) merged[role.id] = { ...role.defaults, ...entry }
+  }
+  return merged
+}
+
+function hydrateFromRepo(): void {
+  void fetch('/api/typelab')
+    .then((response) => (response.ok ? response.json() : null))
+    .then((saved: { styles?: Partial<State> | null } | null) => {
+      if (!saved?.styles) return
+      state = merge(saved.styles)
+      emit()
+    })
+    .catch(() => {})
+}
+
 export function hydrate(): void {
   let changed = false
 
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY)
     if (raw) {
-      const saved = JSON.parse(raw) as Partial<State>
-      const merged: State = { ...DEFAULT_STATE }
-      for (const role of ROLES) {
-        const entry = saved[role.id]
-        if (entry) merged[role.id] = { ...role.defaults, ...entry }
-      }
-      state = merged
+      state = merge(JSON.parse(raw) as Partial<State>)
       changed = true
+    } else {
+      hydrateFromRepo()
     }
   } catch {}
 
@@ -141,24 +192,27 @@ function declarations(style: RoleStyle): string[] {
   ]
 }
 
+function block(roleId: string, style: RoleStyle): string {
+  const body = declarations(style)
+    .map((line) => `  ${line}`)
+    .join('\n')
+  const rule = `[data-t='${roleId}'] {\n${body}\n}`
+
+  if (roleId !== 'search') return rule
+  return `${rule}\n[data-t='search']::placeholder {\n  color: ${style.color};\n  opacity: ${style.opacity};\n}`
+}
+
 /** CSS que se inyecta en la web para verla con los valores elegidos. */
 export function liveCss(current: State): string {
-  return ROLES.map((role) => {
-    const body = declarations(current[role.id]!)
-      .map((line) => `  ${line}`)
-      .join('\n')
-    return `[data-t='${role.id}'] {\n${body}\n}`
-  }).join('\n')
+  return ROLES.map((role) => block(role.id, current[role.id]!)).join('\n')
 }
 
 /** CSS para llevar al sistema de diseño, con su comentario. */
 export function exportCss(current: State): string {
-  return ROLES.map((role) => {
-    const body = declarations(current[role.id]!)
-      .map((line) => `  ${line}`)
-      .join('\n')
-    return `/* ${role.label} — ${role.where}\n   hoy: ${role.today} */\n[data-t='${role.id}'] {\n${body}\n}`
-  }).join('\n\n')
+  return ROLES.map(
+    (role) =>
+      `/* ${role.label} — ${role.where}\n   hoy: ${role.today} */\n${block(role.id, current[role.id]!)}`,
+  ).join('\n\n')
 }
 
 export function isChanged(roleId: string, style: RoleStyle): boolean {

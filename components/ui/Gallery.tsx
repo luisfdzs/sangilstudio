@@ -9,14 +9,14 @@ export type GalleryItem = {
 
 const PER_ROW = 3
 
-export function Gallery({ items }: { items: GalleryItem[] }) {
+export function Gallery({ items, rows: always = false }: { items: GalleryItem[]; rows?: boolean }) {
   const rows: GalleryItem[][] = []
   for (let index = 0; index < items.length; index += PER_ROW) {
     rows.push(items.slice(index, index + PER_ROW))
   }
 
   return (
-    <div className="gallery">
+    <div className={always ? 'gallery gallery-rows' : 'gallery'}>
       {rows.map((row) => {
         const average = row.reduce((sum, item) => sum + item.ratio, 0) / row.length
 
