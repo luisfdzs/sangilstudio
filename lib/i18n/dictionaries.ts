@@ -43,16 +43,15 @@ const es = {
     title: 'Contacto',
   },
   legal: {
-    title: 'Aviso legal y privacidad',
-    draft: 'Texto provisional, pendiente de revisión.',
+    title: 'Aviso legal',
     blocks: [
       {
-        heading: 'Titular del sitio',
-        body: 'Este sitio web es propiedad de SANGIL STUDIO, estudio de arquitectura con domicilio en [dirección] (Pamplona, Navarra, España) y NIF [NIF]. Para cualquier cuestión relacionada con esta web se puede escribir a sangil@sangilstudio.com.',
+        heading: 'Titular',
+        body: 'En cumplimiento con lo dispuesto en la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico (LSSI-CE), se informa que este sitio web es titularidad de:\nResponsable: SANGIL STUDIO S.L.P.\nCIF: B71549737\nTeléfono de contacto: 664197624\nCorreo electrónico: sangil@sangilstudio.com',
       },
       {
-        heading: 'Uso del sitio',
-        body: 'Los contenidos de esta web —textos, fotografías, planos e imágenes de los proyectos— son propiedad de SANGIL STUDIO o de sus autores, y no pueden reproducirse ni utilizarse sin autorización. Los proyectos publicados se muestran a título informativo.',
+        heading: 'Propiedad intelectual',
+        body: 'Todos los contenidos del sitio web, incluyendo textos, imágenes, logotipos, diseños, código fuente, y cualquier otro elemento, son propiedad de SANGIL STUDIO y/o de sus autores, y no pueden reproducirse ni utilizarse sin autorización. Los proyectos publicados se muestran a título informativo.',
       },
       {
         heading: 'Datos personales',
@@ -60,7 +59,11 @@ const es = {
       },
       {
         heading: 'Cookies',
-        body: 'Esta web no instala cookies de analítica, publicidad ni seguimiento. El idioma se decide a partir de la configuración del navegador y de la dirección visitada. Lo único que se guarda en el dispositivo es la vista de imágenes que elija cada visitante —cuadrados o filas—, para respetarla al pasar de una página a otra.',
+        body: 'Esta web no instala cookies de analítica, publicidad ni seguimiento. El idioma se decide a partir de la configuración del navegador y de la dirección visitada.',
+      },
+      {
+        heading: 'Legislación aplicable',
+        body: 'El presente aviso legal se rige por la legislación española. Para cualquier controversia que pudiera derivarse del acceso o uso del sitio web, las partes se someten a los juzgados y tribunales de la ciudad de Pamplona, con renuncia expresa a cualquier otro fuero que pudiera corresponderles.',
       },
     ],
   },
@@ -129,16 +132,15 @@ const en: Dictionary = {
     title: 'Contact',
   },
   legal: {
-    title: 'Legal notice and privacy',
-    draft: 'Provisional text, pending review.',
+    title: 'Legal notice',
     blocks: [
       {
         heading: 'Site owner',
-        body: 'This website belongs to SANGIL STUDIO, an architecture practice based at [address] (Pamplona, Navarre, Spain), tax ID [NIF]. For anything concerning this website, write to sangil@sangilstudio.com.',
+        body: 'In accordance with Spanish Law 34/2002, of 11 July, on Information Society Services and Electronic Commerce (LSSI-CE), this website is owned by:\nOwner: SANGIL STUDIO S.L.P.\nTax ID (CIF): B71549737\nPhone: +34 664 197 624\nEmail: sangil@sangilstudio.com',
       },
       {
-        heading: 'Using this site',
-        body: 'The contents of this website —texts, photographs, drawings and project images— belong to SANGIL STUDIO or to their authors, and may not be reproduced or used without permission. Published projects are shown for information only.',
+        heading: 'Intellectual property',
+        body: 'All contents of this website, including texts, images, logos, designs, source code and any other element, belong to SANGIL STUDIO and/or to their authors, and may not be reproduced or used without permission. Published projects are shown for information only.',
       },
       {
         heading: 'Personal data',
@@ -146,7 +148,11 @@ const en: Dictionary = {
       },
       {
         heading: 'Cookies',
-        body: 'This website sets no analytics, advertising or tracking cookies. The language comes from your browser settings and from the address you visit. The only thing stored on your device is the image layout you choose —squares or rows—, so that it carries over from one page to the next.',
+        body: 'This website sets no analytics, advertising or tracking cookies. The language comes from your browser settings and from the address you visit.',
+      },
+      {
+        heading: 'Applicable law',
+        body: 'This legal notice is governed by Spanish law. For any dispute arising from access to or use of this website, the parties submit to the courts of the city of Pamplona, expressly waiving any other jurisdiction that may correspond to them.',
       },
     ],
   },
