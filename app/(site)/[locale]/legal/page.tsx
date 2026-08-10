@@ -33,7 +33,7 @@ export default async function LegalPage({ params }: { params: Promise<{ locale: 
   const t = getDictionary(locale)
 
   return (
-    <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
+    <div className="page-gutter pt-10 pb-(--spacing-section)">
       <h1 data-t="legalTitle" className="text-display tracking-tight uppercase">
         {t.legal.title}
       </h1>

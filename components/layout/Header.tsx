@@ -117,11 +117,9 @@ export function Header({ locale, dictionary }: Props) {
               data-t="menuLink"
               onClick={close}
               aria-current={isCurrent(pathname, href(locale, key)) ? 'page' : undefined}
-              className="text-title tracking-tight text-ink-soft"
+              className="text-title tracking-tight text-ink-soft transition-colors duration-300 hover:text-ink focus-visible:text-ink"
             >
-              <span className="hover-bold" data-text={dictionary.nav[key]}>
-                {dictionary.nav[key]}
-              </span>
+              {dictionary.nav[key]}
             </Link>
           ))}
 

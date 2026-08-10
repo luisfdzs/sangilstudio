@@ -145,7 +145,7 @@ export function ProjectSearchGrid({ projects, locale, dictionary }: Props) {
               aria-selected={index === active}
               onPointerEnter={() => setActive(index)}
               onClick={() => go(project)}
-              className={`cursor-pointer px-6 py-4 text-center text-body tracking-[0.14em] uppercase transition-colors duration-200 ease-(--ease-out-soft) ${
+              className={`cursor-pointer px-6 py-3 text-center text-small tracking-[0.14em] uppercase transition-colors duration-200 ease-(--ease-out-soft) ${
                 index === active ? 'bg-paper-deep/70 text-ink' : 'text-ink-soft'
               } ${index > 0 ? 'border-t border-line/60' : ''}`}
             >

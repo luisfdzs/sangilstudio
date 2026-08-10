@@ -20,7 +20,20 @@ export const siteSettings = defineType({
       description:
         'Las imágenes que se van fundiendo a pantalla completa al entrar en la web. Se ' +
         'usa la PRIMERA imagen de cada proyecto elegido, en este orden. Si se deja ' +
-        'vacío, la web recurre a los proyectos marcados como destacados.',
+        'vacío, la web recurre a los proyectos marcados como destacados. En el móvil ' +
+        'se ve esta misma selección salvo que se rellene la lista de abajo.',
+    }),
+
+    defineField({
+      name: 'heroProjectsMobile',
+      title: 'Proyectos de la portada en el móvil',
+      type: 'array',
+      group: 'portada',
+      of: [{ type: 'reference', to: [{ type: 'project' }] }],
+      description:
+        'Opcional. Sirve para elegir otras imágenes cuando se entra desde el móvil, ' +
+        'donde la pantalla es vertical y recorta mucho. Si se deja vacío, el móvil ' +
+        'enseña las mismas que el ordenador.',
     }),
 
     defineField({

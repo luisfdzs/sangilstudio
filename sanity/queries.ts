@@ -39,6 +39,7 @@ export const PROJECT_SLUGS_QUERY = defineQuery(`
 export const SITE_SETTINGS_QUERY = defineQuery(`
   *[_type == "siteSettings"][0] {
     "hero": heroProjects[]-> { "image": images[0] ${IMAGE} },
+    "heroMobile": heroProjectsMobile[]-> { "image": images[0] ${IMAGE} },
     statement,
     "team": team[] { name, role, phone },
     collaborators,

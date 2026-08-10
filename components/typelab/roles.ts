@@ -139,8 +139,8 @@ export const ROLES: Role[] = [
     where: 'Proyectos · los títulos del desplegable',
     group: 'proyectos',
     sample: 'Centro de congresos en Pozuelo',
-    today: 'text-body tracking-[0.14em] uppercase',
-    defaults: { ...base, letterSpacing: 0.14, transform: 'uppercase', color: SOFT },
+    today: 'text-small tracking-[0.14em] uppercase',
+    defaults: { ...small, letterSpacing: 0.14, transform: 'uppercase', color: SOFT },
   },
   {
     id: 'searchEmpty',
@@ -181,10 +181,10 @@ export const ROLES: Role[] = [
   },
   {
     id: 'backLink',
-    label: 'Enlace «Volver»',
+    label: 'Enlace de vuelta a proyectos',
     where: 'Ficha · la barra inferior fija',
     group: 'ficha',
-    sample: 'Volver',
+    sample: 'Proyectos',
     today: 'text-micro uppercase',
     defaults: { ...micro },
   },

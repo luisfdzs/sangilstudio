@@ -33,7 +33,7 @@ const es = {
     client: 'Promotor',
     previous: 'Proyecto anterior',
     next: 'Proyecto siguiente',
-    back: 'Volver',
+    back: 'Proyectos',
     backLong: 'Volver a los proyectos',
   },
   studio: {
@@ -122,7 +122,7 @@ const en: Dictionary = {
     client: 'Client',
     previous: 'Previous project',
     next: 'Next project',
-    back: 'Back',
+    back: 'Projects',
     backLong: 'Back to all projects',
   },
   studio: {

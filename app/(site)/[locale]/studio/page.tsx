@@ -36,7 +36,7 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
   const settings = await getSiteSettings()
 
   return (
-    <div className="page-gutter pt-16 pb-(--spacing-section) md:pt-24">
+    <div className="page-gutter pt-10 pb-(--spacing-section)">
       <h1 data-t="studioTitle" className="text-display tracking-tight uppercase">
         {t.studio.title}
       </h1>

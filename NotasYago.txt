@@ -98,3 +98,10 @@ Arquitectos: Yago Fernández Sangil, Juan Luis Irigaray Huarte, Vaillo + Archite
 
 ----------------------------------------------------------------------------------------------------------------------
 
+1. Quiero que la página de "estudio" se vea como la sección de "contacto", sin el margen superior y hueco que hay ahora. La página de aviso legal le pasa lo mismo que a la de estudio y también quiero que se vea como la de contacto.
+2. El buscador de proyectos, que los textos de sus opciones del desplegable sea más pequeño.
+3. En un proyecto concreto las imagenes en miniatura a la derecha ponerlas debajo de la imagen principal, no a la derecha, así pueden ocupar un espacio fijo, discreto minimalista y elegante, a pie de imagen. Es decir, poner precisamente el carrusel de miniaturas a pie de imagen, es decir, debajo centrado. Cambiar la transición entre imágenes para modo ordenador: usar transiciones de difuminados suaves. El carrusel de imagenes en miniatura tiene que incluir la imagen que se está viendo para ser siempre estático. Con la salvedad de marcar más la imagen que se está viendo y la que tenga el hover del ratón, las dos.
+4. En el menú principal en el hover de las opciones el texto se vuelve negrita, quiero color negro normal. 
+5. el icono de volver cambiar texto a proyectos y projects en inglés
+6. quitar el efecto de deslizar en el móvil tanto entre proyectos como en el hero principal.
+7.se puede configurar en sanity que imagenes queremos en la portada diferenciando visión mobile o desktop?

@@ -62,6 +62,7 @@ const CONTACT_FALLBACK = {
 
 const siteSettingsSchema = z.object({
   hero: z.array(z.object({ image: imageSchema.nullish() })).nullish(),
+  heroMobile: z.array(z.object({ image: imageSchema.nullish() })).nullish(),
   statement: localizedParagraphs,
   team: z
     .array(z.object({ name: z.string().min(1), role: localizedString, phone: z.string().min(1) }))
@@ -87,9 +88,10 @@ export type ProjectEntry = z.infer<typeof projectSchema> & {
 
 export type SiteSettings = Omit<
   z.infer<typeof siteSettingsSchema>,
-  'hero' | 'street' | 'postalCode' | 'phone' | 'website'
+  'hero' | 'heroMobile' | 'street' | 'postalCode' | 'phone' | 'website'
 > & {
   heroImages: DescribedImage[]
+  heroImagesMobile: DescribedImage[]
   street: string
   postalCode: string
   phone: string
@@ -161,6 +163,12 @@ export async function getHeroImages(): Promise<DescribedImage[]> {
   return featured.map((project) => project.cover)
 }
 
+/** Selección propia para el móvil. Vacía significa «las mismas que en el ordenador». */
+export async function getMobileHeroImages(): Promise<DescribedImage[]> {
+  const settings = await getSiteSettings()
+  return settings.heroImagesMobile
+}
+
 export async function getSiteSettings(): Promise<SiteSettings> {
   const raw = await fetchContent<unknown>(SITE_SETTINGS_QUERY)
   const result = siteSettingsSchema.safeParse(raw)
@@ -171,14 +179,13 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     )
   }
 
-  const { hero, street, postalCode, phone, website, ...rest } = result.data
+  const { hero, heroMobile, street, postalCode, phone, website, ...rest } = result.data
   const resolvedWebsite = website || CONTACT_FALLBACK.website
 
   return {
     ...rest,
-    heroImages: (hero ?? [])
-      .map((entry) => entry.image)
-      .filter((image): image is DescribedImage => Boolean(image)),
+    heroImages: pickImages(hero),
+    heroImagesMobile: pickImages(heroMobile),
     street: street || CONTACT_FALLBACK.street,
     postalCode: postalCode || CONTACT_FALLBACK.postalCode,
     phone: phone || CONTACT_FALLBACK.phone,
@@ -186,6 +193,12 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     websiteLabel: hostnameOf(resolvedWebsite),
     instagramHandle: rest.instagram ? lastPathSegment(rest.instagram) : null,
   }
+}
+
+function pickImages(entries?: { image?: DescribedImage | null }[] | null): DescribedImage[] {
+  return (entries ?? [])
+    .map((entry) => entry.image)
+    .filter((image): image is DescribedImage => Boolean(image))
 }
 
 function hostnameOf(url: string): string {

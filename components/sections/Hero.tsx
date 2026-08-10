@@ -3,15 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import type { CSSProperties, MouseEvent as ReactMouseEvent } from 'react'
 import { EdgeArrows } from '@/components/ui/EdgeArrows'
-import {
-  enteringStyle,
-  isGesturing,
-  outgoingStyle,
-  transitionStyle,
-} from '@/components/swipe/motion'
-import { useHorizontalSwipe, type SwipeDrag } from '@/components/ui/useHorizontalSwipe'
 import type { DescribedImage } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -22,14 +14,24 @@ type Props = {
   prevLabel: string
   nextLabel: string
   workHref: string
+  sizes?: string
+  className?: string
 }
 
 const HOLD_MS = 5000
 const FADE_MS = 1600
 
-export function Hero({ images, locale, label, prevLabel, nextLabel, workHref }: Props) {
+export function Hero({
+  images,
+  locale,
+  label,
+  prevLabel,
+  nextLabel,
+  workHref,
+  sizes = '(max-width: 768px) 92vw, 84vw',
+  className,
+}: Props) {
   const [{ index, reach }, setFrame] = useState({ index: 0, reach: 2 })
-  const [instant, setInstant] = useState(false)
 
   const step = useCallback(
     (delta: number) => {
@@ -42,52 +44,23 @@ export function Hero({ images, locale, label, prevLabel, nextLabel, workHref }: 
     [images.length],
   )
 
-  /** Tras un gesto la imagen entrante ya está en su sitio: nada debe fundirse. */
-  const swipeStep = useCallback(
-    (delta: number) => {
-      setInstant(true)
-      step(delta)
-    },
-    [step],
-  )
-
-  const { swipedRef, drag, handlers } = useHorizontalSwipe(swipeStep)
-
   useEffect(() => {
-    if (!instant) return
-    const frame = requestAnimationFrame(() => setInstant(false))
-    return () => cancelAnimationFrame(frame)
-  }, [instant])
-
-  useEffect(() => {
-    if (images.length < 2 || drag.active) return
+    if (images.length < 2) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const timer = setTimeout(() => step(1), HOLD_MS)
     return () => clearTimeout(timer)
-  }, [index, images.length, step, drag.active])
+  }, [index, images.length, step])
 
   if (images.length === 0) return null
 
-  const total = images.length
-  const gesturing = isGesturing(drag)
-  const incoming = gesturing ? (index + drag.direction + total) % total : -1
-  const rendered = Math.max(reach, incoming + 1)
-
-  const onLinkClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
-    if (!swipedRef.current) return
-    event.preventDefault()
-    swipedRef.current = false
-  }
-
   return (
-    <div className="page-gutter">
+    <div className={className ? `page-gutter ${className}` : 'page-gutter'}>
       <div
         data-hero
-        {...handlers}
-        className="relative h-[calc(100svh-9rem)] min-h-[20rem] w-full touch-pan-y overflow-hidden select-none md:h-[calc(100svh-11rem)]"
+        className="relative h-[calc(100svh-9rem)] min-h-[20rem] w-full overflow-hidden select-none md:h-[calc(100svh-11rem)]"
       >
-        {images.slice(0, rendered).map((image, position) => (
+        {images.slice(0, reach).map((image, position) => (
           <Image
             key={image.id}
             src={image.src}
@@ -97,22 +70,22 @@ export function Hero({ images, locale, label, prevLabel, nextLabel, workHref }: 
             priority={position === 0}
             fetchPriority={position === 0 ? 'high' : 'auto'}
             loading={position === 0 ? undefined : 'lazy'}
-            sizes="(max-width: 768px) 92vw, 84vw"
+            sizes={sizes}
             quality={82}
             placeholder="blur"
             blurDataURL={image.blur}
             draggable={false}
-            className="object-cover will-change-[opacity,transform]"
-            style={frameStyle({ position, index, incoming, drag, instant })}
+            className="object-cover will-change-[opacity]"
+            style={{
+              opacity: position === index ? 1 : 0,
+              transitionProperty: 'opacity',
+              transitionDuration: `${FADE_MS}ms`,
+              transitionTimingFunction: 'var(--ease-in-out-soft)',
+            }}
           />
         ))}
 
-        <Link
-          href={workHref}
-          aria-label={label}
-          onClick={onLinkClick}
-          className="absolute inset-0 block"
-        />
+        <Link href={workHref} aria-label={label} className="absolute inset-0 block" />
 
         {images.length > 1 && (
           <EdgeArrows
@@ -125,30 +98,4 @@ export function Hero({ images, locale, label, prevLabel, nextLabel, workHref }: 
       </div>
     </div>
   )
-}
-
-type FrameArgs = {
-  position: number
-  index: number
-  incoming: number
-  drag: SwipeDrag
-  instant: boolean
-}
-
-function frameStyle({ position, index, incoming, drag, instant }: FrameArgs): CSSProperties {
-  // En reposo manda el pase automático: el fundido lento de siempre.
-  if (!isGesturing(drag)) {
-    return {
-      opacity: position === index ? 1 : 0,
-      transitionProperty: 'opacity',
-      transitionDuration: instant ? '0ms' : `${FADE_MS}ms`,
-      transitionTimingFunction: 'var(--ease-in-out-soft)',
-    }
-  }
-
-  const base = transitionStyle(drag)
-
-  if (position === index) return { ...base, ...outgoingStyle(drag) }
-  if (position === incoming) return { ...base, ...enteringStyle(drag) }
-  return { ...base, opacity: 0, transitionDuration: '0ms' }
 }
