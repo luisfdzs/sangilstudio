@@ -13,13 +13,12 @@ type Props = {
   nextLabel: string
 }
 
-const FADE_MS = 900
+const FADE_MS = 1600
 
 export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) {
   const images = project.images
   const [index, setIndex] = useState(0)
   const [seen, setSeen] = useState([0])
-  const current = images[index] ?? images[0]!
 
   const show = (position: number) => {
     setIndex(position)
@@ -30,55 +29,35 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
 
   return (
     <div className="flex h-[calc(100svh-13rem)] flex-col">
-      <div className="flex min-h-0 flex-1 items-start justify-center gap-2">
-        <EdgeArrow
-          side="left"
-          anchor="flow"
-          tone="ink"
-          label={prevLabel}
-          onPress={() => step(-1)}
-        />
+      <div className="relative min-h-0 w-full flex-1">
+        {images.map((image, position) =>
+          seen.includes(position) ? (
+            <Image
+              key={image.id}
+              src={image.src}
+              alt={image.alt[locale] || project.title}
+              fill
+              sizes="80vw"
+              quality={82}
+              priority={position === 0}
+              placeholder="blur"
+              blurDataURL={image.blur}
+              draggable={false}
+              aria-hidden={position !== index}
+              style={{
+                objectFit: 'contain',
+                objectPosition: 'top',
+                opacity: position === index ? 1 : 0,
+                transitionProperty: 'opacity',
+                transitionDuration: `${FADE_MS}ms`,
+                transitionTimingFunction: 'var(--ease-in-out-soft)',
+              }}
+            />
+          ) : null,
+        )}
 
-        <div
-          className="relative h-full max-w-full min-w-0"
-          style={{
-            aspectRatio: `${current.width} / ${current.height}`,
-            transitionProperty: 'aspect-ratio',
-            transitionDuration: `${FADE_MS}ms`,
-            transitionTimingFunction: 'var(--ease-in-out-soft)',
-          }}
-        >
-          {images.map((image, position) =>
-            seen.includes(position) ? (
-              <Image
-                key={image.id}
-                src={image.src}
-                alt={image.alt[locale] || project.title}
-                fill
-                sizes="80vw"
-                quality={82}
-                priority={position === 0}
-                placeholder="blur"
-                blurDataURL={image.blur}
-                draggable={false}
-                aria-hidden={position !== index}
-                className="object-contain object-top transition-opacity ease-(--ease-in-out-soft)"
-                style={{
-                  opacity: position === index ? 1 : 0,
-                  transitionDuration: `${FADE_MS}ms`,
-                }}
-              />
-            ) : null,
-          )}
-        </div>
-
-        <EdgeArrow
-          side="right"
-          anchor="flow"
-          tone="ink"
-          label={nextLabel}
-          onPress={() => step(1)}
-        />
+        <EdgeArrow side="left" tone="ink" label={prevLabel} onPress={() => step(-1)} />
+        <EdgeArrow side="right" tone="ink" label={nextLabel} onPress={() => step(1)} />
       </div>
 
       {images.length > 1 && (
