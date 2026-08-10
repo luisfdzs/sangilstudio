@@ -61,8 +61,8 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
 
         {images.length > 1 && (
           <>
-            <StepZone half side="left" label={prevLabel} onPress={() => step(-1)} />
-            <StepZone half side="right" label={nextLabel} onPress={() => step(1)} />
+            <StepZone tone="ink" side="left" label={prevLabel} onPress={() => step(-1)} />
+            <StepZone tone="ink" side="right" label={nextLabel} onPress={() => step(1)} />
           </>
         )}
       </div>
