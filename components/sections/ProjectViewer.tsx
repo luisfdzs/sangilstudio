@@ -2,7 +2,8 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
-import { EdgeArrow } from '@/components/ui/EdgeArrows'
+import { StepZone } from '@/components/ui/StepZone'
+import { useArrowKeys } from '@/components/ui/useArrowKeys'
 import type { ProjectEntry } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -26,6 +27,8 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
   }
 
   const step = (delta: number) => show((index + delta + images.length) % images.length)
+
+  useArrowKeys(step)
 
   return (
     <div className="flex h-[calc(100svh-13rem)] flex-col">
@@ -56,8 +59,12 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
           ) : null,
         )}
 
-        <EdgeArrow side="left" tone="ink" label={prevLabel} onPress={() => step(-1)} />
-        <EdgeArrow side="right" tone="ink" label={nextLabel} onPress={() => step(1)} />
+        {images.length > 1 && (
+          <>
+            <StepZone half side="left" label={prevLabel} onPress={() => step(-1)} />
+            <StepZone half side="right" label={nextLabel} onPress={() => step(1)} />
+          </>
+        )}
       </div>
 
       {images.length > 1 && (

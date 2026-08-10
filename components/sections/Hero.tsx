@@ -3,7 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import { EdgeArrows } from '@/components/ui/EdgeArrows'
+import { StepZone } from '@/components/ui/StepZone'
+import { useArrowKeys } from '@/components/ui/useArrowKeys'
 import type { DescribedImage } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -43,6 +44,8 @@ export function Hero({
     },
     [images.length],
   )
+
+  useArrowKeys(step)
 
   useEffect(() => {
     if (images.length < 2) return
@@ -88,12 +91,10 @@ export function Hero({
         <Link href={workHref} aria-label={label} className="absolute inset-0 block" />
 
         {images.length > 1 && (
-          <EdgeArrows
-            prevLabel={prevLabel}
-            nextLabel={nextLabel}
-            onPrev={() => step(-1)}
-            onNext={() => step(1)}
-          />
+          <>
+            <StepZone side="left" label={prevLabel} onPress={() => step(-1)} />
+            <StepZone side="right" label={nextLabel} onPress={() => step(1)} />
+          </>
         )}
       </div>
     </div>
