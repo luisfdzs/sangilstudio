@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { StepZone } from '@/components/ui/StepZone'
 import { useArrowKeys } from '@/components/ui/useArrowKeys'
 import type { ProjectEntry } from '@/lib/content'
@@ -18,53 +18,60 @@ const FADE_MS = 900
 
 export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) {
   const images = project.images
-  const [index, setIndex] = useState(0)
-  const [seen, setSeen] = useState([0])
+  const [{ index, reach }, setFrame] = useState({ index: 0, reach: 2 })
 
-  const show = (position: number) => {
-    if (position === index) return
+  const show = useCallback((position: number) => {
+    setFrame((current) => {
+      if (position === current.index) return current
+      if (position < current.reach) {
+        return { index: position, reach: Math.max(current.reach, position + 2) }
+      }
 
-    if (seen.includes(position)) {
-      setIndex(position)
-      return
-    }
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() =>
+          setFrame((frame) => ({ index: position, reach: Math.max(frame.reach, position + 2) })),
+        ),
+      )
+      return { ...current, reach: position + 2 }
+    })
+  }, [])
 
-    setSeen((loaded) => [...loaded, position])
-    requestAnimationFrame(() => requestAnimationFrame(() => setIndex(position)))
-  }
-
-  const step = (delta: number) => show((index + delta + images.length) % images.length)
+  const step = useCallback(
+    (delta: number) => show((index + delta + images.length) % images.length),
+    [images.length, index, show],
+  )
 
   useArrowKeys(step)
 
   return (
     <div className="flex h-[calc(100svh-13rem)] flex-col">
       <div className="relative min-h-0 w-full flex-1">
-        {images.map((image, position) =>
-          seen.includes(position) ? (
-            <Image
-              key={image.id}
-              src={image.src}
-              alt={image.alt[locale] || project.title}
-              fill
-              sizes="84vw"
-              quality={82}
-              priority={position === 0}
-              placeholder="blur"
-              blurDataURL={image.blur}
-              draggable={false}
-              aria-hidden={position !== index}
-              style={{
-                objectFit: 'contain',
-                objectPosition: 'top',
-                opacity: position === index ? 1 : 0,
-                transitionProperty: 'opacity',
-                transitionDuration: `${FADE_MS}ms`,
-                transitionTimingFunction: 'var(--ease-in-out-soft)',
-              }}
-            />
-          ) : null,
-        )}
+        {images.slice(0, reach).map((image, position) => (
+          <Image
+            key={image.id}
+            src={image.src}
+            alt={image.alt[locale] || project.title}
+            fill
+            sizes="84vw"
+            quality={82}
+            priority={position === 0}
+            fetchPriority={position === 0 ? 'high' : 'auto'}
+            loading={position === 0 ? undefined : 'lazy'}
+            placeholder="blur"
+            blurDataURL={image.blur}
+            draggable={false}
+            aria-hidden={position !== index}
+            className="will-change-[opacity]"
+            style={{
+              objectFit: 'contain',
+              objectPosition: 'top',
+              opacity: position === index ? 1 : 0,
+              transitionProperty: 'opacity',
+              transitionDuration: `${FADE_MS}ms`,
+              transitionTimingFunction: 'var(--ease-in-out-soft)',
+            }}
+          />
+        ))}
 
         {images.length > 1 && (
           <>
