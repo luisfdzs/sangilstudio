@@ -36,12 +36,12 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
   const settings = await getSiteSettings()
 
   return (
-    <div className="page-gutter pt-10 pb-(--spacing-section)">
+    <div className="page-gutter pt-(--spacing-page-top) pb-(--spacing-section)">
       <h1 data-t="studioTitle" className="text-display tracking-tight uppercase">
         {t.studio.title}
       </h1>
 
-      <div className="mt-10 grid max-w-2xl gap-6 md:mt-14">
+      <div className="mt-(--spacing-page-lead) grid max-w-2xl gap-6">
         {settings.statement[locale].map((paragraph, index) => (
           <Reveal key={paragraph.slice(0, 24)} step={index}>
             <p

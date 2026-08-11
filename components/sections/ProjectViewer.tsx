@@ -14,7 +14,7 @@ type Props = {
   nextLabel: string
 }
 
-const FADE_MS = 1600
+const FADE_MS = 900
 
 export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) {
   const images = project.images
@@ -22,8 +22,15 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
   const [seen, setSeen] = useState([0])
 
   const show = (position: number) => {
-    setIndex(position)
-    setSeen((loaded) => (loaded.includes(position) ? loaded : [...loaded, position]))
+    if (position === index) return
+
+    if (seen.includes(position)) {
+      setIndex(position)
+      return
+    }
+
+    setSeen((loaded) => [...loaded, position])
+    requestAnimationFrame(() => requestAnimationFrame(() => setIndex(position)))
   }
 
   const step = (delta: number) => show((index + delta + images.length) % images.length)
@@ -40,7 +47,7 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
               src={image.src}
               alt={image.alt[locale] || project.title}
               fill
-              sizes="80vw"
+              sizes="84vw"
               quality={82}
               priority={position === 0}
               placeholder="blur"

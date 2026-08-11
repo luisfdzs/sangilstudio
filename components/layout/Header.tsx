@@ -78,7 +78,7 @@ export function Header({ locale, dictionary }: Props) {
           {dictionary.nav.skipToContent}
         </a>
 
-        <div className="page-gutter flex h-20 items-center justify-between gap-6 md:h-24">
+        <div className="page-gutter flex h-(--spacing-header) items-center justify-between gap-6">
           <Link href={home} aria-label={dictionary.nav.home} className="tap" onClick={goHome}>
             <Wordmark className="h-5 w-auto md:h-7" />
           </Link>
@@ -100,7 +100,7 @@ export function Header({ locale, dictionary }: Props) {
         id={MENU_ID}
         inert={!open}
         className={cn(
-          'page-gutter fixed inset-0 z-40 overflow-y-auto bg-paper pt-20 pb-16 md:pt-24',
+          'page-gutter fixed inset-0 z-40 overflow-y-auto bg-paper pt-(--spacing-header) pb-16',
           'transition-[opacity,visibility] duration-500 ease-(--ease-out-soft)',
           '[transition-behavior:allow-discrete]',
           open ? 'visible opacity-100' : 'invisible opacity-0',

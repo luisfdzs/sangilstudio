@@ -61,8 +61,10 @@ const CONTACT_FALLBACK = {
 } as const
 
 const siteSettingsSchema = z.object({
-  hero: z.array(z.object({ image: imageSchema.nullish() })).nullish(),
-  heroMobile: z.array(z.object({ image: imageSchema.nullish() })).nullish(),
+  hero: z.array(z.unknown()).nullish(),
+  heroMobile: z.array(z.unknown()).nullish(),
+  heroLegacy: z.array(z.object({ image: imageSchema.nullish() })).nullish(),
+  heroLegacyMobile: z.array(z.object({ image: imageSchema.nullish() })).nullish(),
   statement: localizedParagraphs,
   team: z
     .array(z.object({ name: z.string().min(1), role: localizedString, phone: z.string().min(1) }))
@@ -88,7 +90,14 @@ export type ProjectEntry = z.infer<typeof projectSchema> & {
 
 export type SiteSettings = Omit<
   z.infer<typeof siteSettingsSchema>,
-  'hero' | 'heroMobile' | 'street' | 'postalCode' | 'phone' | 'website'
+  | 'hero'
+  | 'heroMobile'
+  | 'heroLegacy'
+  | 'heroLegacyMobile'
+  | 'street'
+  | 'postalCode'
+  | 'phone'
+  | 'website'
 > & {
   heroImages: DescribedImage[]
   heroImagesMobile: DescribedImage[]
@@ -179,13 +188,25 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     )
   }
 
-  const { hero, heroMobile, street, postalCode, phone, website, ...rest } = result.data
+  const {
+    hero,
+    heroMobile,
+    heroLegacy,
+    heroLegacyMobile,
+    street,
+    postalCode,
+    phone,
+    website,
+    ...rest
+  } = result.data
   const resolvedWebsite = website || CONTACT_FALLBACK.website
+  const chosen = validImages(hero)
+  const chosenMobile = validImages(heroMobile)
 
   return {
     ...rest,
-    heroImages: pickImages(hero),
-    heroImagesMobile: pickImages(heroMobile),
+    heroImages: chosen.length > 0 ? chosen : pickImages(heroLegacy),
+    heroImagesMobile: chosenMobile.length > 0 ? chosenMobile : pickImages(heroLegacyMobile),
     street: street || CONTACT_FALLBACK.street,
     postalCode: postalCode || CONTACT_FALLBACK.postalCode,
     phone: phone || CONTACT_FALLBACK.phone,
@@ -193,6 +214,13 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     websiteLabel: hostnameOf(resolvedWebsite),
     instagramHandle: rest.instagram ? lastPathSegment(rest.instagram) : null,
   }
+}
+
+function validImages(entries?: unknown[] | null): DescribedImage[] {
+  return (entries ?? []).flatMap((entry) => {
+    const parsed = imageSchema.safeParse(entry)
+    return parsed.success ? [parsed.data] : []
+  })
 }
 
 function pickImages(entries?: { image?: DescribedImage | null }[] | null): DescribedImage[] {

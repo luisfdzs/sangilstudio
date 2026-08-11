@@ -33,11 +33,11 @@ export default async function LegalPage({ params }: { params: Promise<{ locale: 
   const t = getDictionary(locale)
 
   return (
-    <div className="page-gutter pt-10 pb-(--spacing-section)">
+    <div className="page-gutter pt-(--spacing-page-top) pb-(--spacing-section)">
       <h1 data-t="legalTitle" className="text-display tracking-tight uppercase">
         {t.legal.title}
       </h1>
-      <div className="mt-10 grid max-w-2xl gap-10 md:mt-14">
+      <div className="mt-(--spacing-page-lead) grid max-w-2xl gap-10">
         {t.legal.blocks.map((block) => (
           <section key={block.heading}>
             <h2 data-t="legalHeading" className="text-prose">

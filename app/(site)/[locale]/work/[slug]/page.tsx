@@ -57,7 +57,7 @@ export default async function ProjectPage({
           <ProjectMobile project={project} locale={locale} dictionary={t} />
         </div>
 
-        <div className="hidden md:-mx-(--spacing-gutter) md:block">
+        <div className="hidden md:block">
           <ProjectViewer
             project={project}
             locale={locale}

@@ -29,6 +29,9 @@
 
   --spacing-gutter: clamp(1.25rem, 8vw, 12rem);
   --spacing-section: clamp(4rem, 9vw, 9rem);
+  --spacing-header: 5rem;
+  --spacing-page-top: 2rem;
+  --spacing-page-lead: 1.7rem;
 
   --media-cap: 76svh;
 
@@ -54,10 +57,16 @@
     color: var(--color-paper);
   }
 
+  @media (width >= 48rem) {
+    :root {
+      --spacing-header: 6rem;
+    }
+  }
+
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
-    scroll-padding-top: 6rem;
+    scroll-padding-top: var(--spacing-header);
     scrollbar-gutter: stable;
   }
 

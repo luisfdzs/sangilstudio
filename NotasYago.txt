@@ -105,3 +105,9 @@ Arquitectos: Yago Fernández Sangil, Juan Luis Irigaray Huarte, Vaillo + Archite
 5. el icono de volver cambiar texto a proyectos y projects en inglés
 6. quitar el efecto de deslizar en el móvil tanto entre proyectos como en el hero principal.
 7.se puede configurar en sanity que imagenes queremos en la portada diferenciando visión mobile o desktop?
+
+----------------------------------------------------------------------------------------------------------------------
+
+1. La página de estudio, contacto y legal las quiero alineadas en cuanto a textos y espacios, de forma que los títulos "estudio" "contacto" y "aviso legal" estén a la misma altura y tengan el mismo tamaño separación entre letras, tipografía etc. De la misma forma que los títulos, alinear también el texto de debajo, donde empieza, es decir, misma separación titulo-texto en las tres pantallas.
+2. Para las imágenes de un proyecto, el efecto de transición con opacidad no ocurre cuando cambias la imagen por primera vez, luego ya sí. Arreglarlo para que pase desde el principio bien. Quiero modificar también la flecha para pasar de una imagen a otra, que esté dentro de los márgenes del layout principal, más cerca de la imagen, ahora queda raro que no respete el margen derecho e izquierdo general de la web. Además quiero que el efecto difuminado sea un poco más rápido tanto aquí para pasar imágenes dentro de un proyecto como para el hero principal.
+3. En sanity, en donde podemos poner las imagenes del hero tanto para vision movil como ordenador, solo deja poner la primera imagen de cada proyecto, quiero poder poner cualquier imagen en cualquiera de ambos.

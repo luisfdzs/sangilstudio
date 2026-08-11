@@ -20,7 +20,7 @@ type Props = {
 }
 
 const HOLD_MS = 5000
-const FADE_MS = 1600
+const FADE_MS = 900
 
 export function Hero({
   images,

@@ -43,16 +43,16 @@ export function ContactSection({ locale, settings }: { locale: Locale; settings:
   }
 
   return (
-    <div className="min-h-[100svh] pt-(--spacing-section)">
+    <div className="pt-(--spacing-section)">
       <section
         id={sections.contact}
-        className="page-gutter scroll-mt-8 pb-(--spacing-section) text-left"
+        className="page-gutter min-h-[100svh] scroll-mt-(--spacing-page-top) pb-(--spacing-section) text-left"
       >
         <h2 data-t="contactHeading" className="text-display tracking-tight uppercase">
           {t.contact.title}
         </h2>
 
-        <address data-t="contactBody" className="mt-[1.7em] text-body not-italic">
+        <address data-t="contactBody" className="mt-(--spacing-page-lead) text-body not-italic">
           <span className="block">{settings.street}</span>
           <span className="block">
             {settings.postalCode} {settings.city}, {settings.country[locale]}
