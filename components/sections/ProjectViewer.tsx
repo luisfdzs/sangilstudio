@@ -14,7 +14,7 @@ type Props = {
   nextLabel: string
 }
 
-const FADE_MS = 900
+const FADE_MS = 700
 
 export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) {
   const images = project.images
