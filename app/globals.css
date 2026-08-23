@@ -42,6 +42,13 @@
 
 @custom-variant lying (@media (height < 33rem) and (pointer: coarse));
 
+@custom-variant desk (@media (width >= 48rem) and (height >= 33rem));
+@custom-variant squat (@media (height < 33rem));
+
+body:has([data-visor]) [data-rotate] {
+  display: none;
+}
+
 @keyframes reveal {
   from {
     opacity: 0;

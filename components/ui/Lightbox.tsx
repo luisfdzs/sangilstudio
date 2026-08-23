@@ -96,8 +96,9 @@ export function Lightbox({ images, locale, title, start, dictionary, onClose }: 
     box.style.transform = 'none'
     box.style.opacity = '1'
 
-    const from = pageImage(start)?.getBoundingClientRect()
-    const to = slideImage(start)?.getBoundingClientRect()
+    const ratio = images[start]!.width / images[start]!.height
+    const from = fitted(pageImage(start)?.getBoundingClientRect(), ratio)
+    const to = fitted(slideImage(start)?.getBoundingClientRect(), ratio)
 
     if (from && to && to.width > 0) {
       box.style.opacity = String(OPEN_FROM)
@@ -181,9 +182,20 @@ export function Lightbox({ images, locale, title, start, dictionary, onClose }: 
     return () => window.removeEventListener('keydown', onKey)
   }, [close])
 
-  /** Un toque limpio en el margen de al lado de la foto vuelve al proyecto. */
-  function onSlideClick(event: ReactMouseEvent<HTMLDivElement>) {
-    if (event.target === event.currentTarget) close()
+  function onStageClick(event: ReactMouseEvent<HTMLDivElement>) {
+    if ((event.target as HTMLElement).closest('button')) return
+
+    const image = images[index]!
+    const photo = fitted(slideImage(index)?.getBoundingClientRect(), image.width / image.height)
+    if (!photo) return
+
+    const inside =
+      event.clientX >= photo.left &&
+      event.clientX <= photo.left + photo.width &&
+      event.clientY >= photo.top &&
+      event.clientY <= photo.top + photo.height
+
+    if (!inside) close()
   }
 
   const fade = cn('transition-opacity', shown ? 'opacity-100' : 'opacity-0')
@@ -194,23 +206,27 @@ export function Lightbox({ images, locale, title, start, dictionary, onClose }: 
       role="dialog"
       aria-modal="false"
       aria-label={title}
+      data-visor
       className={cn(
-        'fixed inset-0 z-30 transition-opacity md:hidden',
+        'fixed inset-0 z-30 transition-opacity desk:hidden squat:z-60',
         going ? 'opacity-0' : 'opacity-100',
       )}
       style={{ transitionDuration: `${CLOSE_MS}ms`, transitionTimingFunction: CLOSE_EASE }}
     >
       <div aria-hidden="true" className={cn('absolute inset-0 bg-paper', fade)} style={fadeMs} />
 
-      <div className="relative flex h-full flex-col pt-(--spacing-header)">
-        <div ref={stage} className="relative min-h-0 flex-1 overflow-hidden py-2 select-none">
+      <div className="relative flex h-full flex-col pt-(--spacing-header) squat:pt-0">
+        <div
+          ref={stage}
+          onClick={onStageClick}
+          className="relative min-h-0 flex-1 overflow-hidden py-2 select-none"
+        >
           {images.map((image, position) => (
             <div
               key={image.id}
               data-slide={position}
-              onClick={onSlideClick}
               aria-hidden={position === index ? undefined : 'true'}
-              className="page-gutter absolute inset-x-0 inset-y-2 flex items-center justify-center will-change-[opacity]"
+              className="page-gutter absolute inset-x-0 inset-y-2 will-change-[opacity]"
               style={{
                 opacity: position === index ? 1 : 0,
                 transition: `opacity ${FADE_MS}ms ${FADE_EASE}`,
@@ -227,7 +243,7 @@ export function Lightbox({ images, locale, title, start, dictionary, onClose }: 
                 placeholder="blur"
                 blurDataURL={image.blur}
                 draggable={false}
-                className="h-auto max-h-full w-full max-w-full object-contain"
+                className="h-full w-full object-contain"
               />
             </div>
           ))}
@@ -252,12 +268,23 @@ export function Lightbox({ images, locale, title, start, dictionary, onClose }: 
           )}
         </div>
 
-        <div className={cn('page-gutter flex min-h-16 shrink-0 items-center', fade)} style={fadeMs}>
+        <div
+          className={cn(
+            'page-gutter flex min-h-16 shrink-0 items-center',
+            /** Tumbado flota en la esquina, para no quitarle alto a la foto. */
+            'squat:absolute squat:inset-x-0 squat:bottom-0 squat:min-h-12',
+            fade,
+          )}
+          style={fadeMs}
+        >
           <button
             type="button"
             onClick={close}
             title={dictionary.project.backOneLong}
-            className="tap group flex shrink-0 items-center gap-2 text-ink transition-colors duration-300 hover:text-ink-soft"
+            className={cn(
+              'tap group flex shrink-0 items-center gap-2 text-ink transition-colors duration-300 hover:text-ink-soft',
+              'squat:rounded-full squat:bg-paper/85 squat:px-3 squat:py-2 squat:backdrop-blur-sm',
+            )}
           >
             <Chevron
               direction="left"
@@ -272,8 +299,29 @@ export function Lightbox({ images, locale, title, start, dictionary, onClose }: 
   )
 }
 
+/**
+ * La foto que se ve dentro de su hueco. La imagen llena el hueco y se contiene
+ * dentro (`object-fit: contain`), así que su caja no es la foto: hay que
+ * deducirla de la proporción del fichero para que el zoom cuadre.
+ */
+function fitted(box: DOMRect | undefined, ratio: number) {
+  if (!box || box.width === 0 || box.height === 0) return null
+
+  const width = Math.min(box.width, box.height * ratio)
+  const height = width / ratio
+
+  return {
+    width,
+    height,
+    left: box.left + (box.width - width) / 2,
+    top: box.top + (box.height - height) / 2,
+  }
+}
+
+type Rect = { left: number; top: number; width: number; height: number }
+
 /** Deja el escenario del tamaño y en el sitio de la foto de la página. */
-function place(box: HTMLElement, from: DOMRect, to: DOMRect): void {
+function place(box: HTMLElement, from: Rect, to: Rect): void {
   const stage = box.getBoundingClientRect()
   const centre = { x: to.left + to.width / 2, y: to.top + to.height / 2 }
 

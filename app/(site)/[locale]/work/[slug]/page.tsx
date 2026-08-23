@@ -53,11 +53,11 @@ export default async function ProjectPage({
   return (
     <>
       <article className="page-gutter pt-16 pb-32 md:pt-6 md:pb-(--spacing-section)">
-        <div className="md:hidden">
+        <div className="desk:hidden">
           <ProjectMobile project={project} locale={locale} dictionary={t} />
         </div>
 
-        <div className="hidden md:block">
+        <div className="hidden desk:block">
           <ProjectViewer
             project={project}
             locale={locale}
