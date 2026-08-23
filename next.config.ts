@@ -2,6 +2,7 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  allowedDevOrigins: ['192.168.1.*', '192.168.0.*', '10.0.0.*', '172.20.10.*'],
   cacheComponents: true,
   poweredByHeader: false,
   images: {

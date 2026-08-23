@@ -6,6 +6,7 @@ type Props = {
   label: string
   onPress: () => void
   tone?: 'paper' | 'ink'
+  always?: boolean
 }
 
 const TONE = {
@@ -14,8 +15,7 @@ const TONE = {
   ink: 'text-ink focus-visible:outline-ink',
 }
 
-/** Borde de la sección que pasa a la imagen anterior o la siguiente. Sólo con ratón. */
-export function StepZone({ side, label, onPress, tone = 'paper' }: Props) {
+export function StepZone({ side, label, onPress, tone = 'paper', always = false }: Props) {
   const left = side === 'left'
 
   return (
@@ -24,8 +24,9 @@ export function StepZone({ side, label, onPress, tone = 'paper' }: Props) {
       aria-label={label}
       onClick={onPress}
       className={cn(
-        'group absolute inset-y-0 hidden w-[14%] max-w-32 min-w-16 items-center',
-        'outline-offset-[-0.5rem] pointer-fine:flex focus-visible:outline',
+        'group absolute inset-y-0 w-[14%] max-w-32 min-w-16 items-center',
+        'outline-offset-[-0.5rem] focus-visible:outline',
+        always ? 'flex' : 'hidden pointer-fine:flex',
         left ? 'left-0 justify-start pl-4 md:pl-6' : 'right-0 justify-end pr-4 md:pr-6',
         TONE[tone],
       )}

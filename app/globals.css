@@ -40,6 +40,8 @@
   --animate-reveal: reveal 0.9s var(--ease-out-soft) both;
 }
 
+@custom-variant lying (@media (height < 33rem) and (pointer: coarse));
+
 @keyframes reveal {
   from {
     opacity: 0;
@@ -136,7 +138,7 @@
 
   .gallery-frame img {
     margin-inline: auto;
-    width: auto;
+    width: 100%;
     height: auto;
     max-width: 100%;
     max-height: var(--media-cap);

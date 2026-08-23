@@ -26,6 +26,17 @@ export function MinusIcon({ className }: IconProps) {
   )
 }
 
+export function RotateIcon({ className }: IconProps) {
+  return (
+    <svg {...common} aria-hidden className={className}>
+      <rect width="10" height="16" x="7" y="4" rx="2" />
+      <path d="M10.5 6.5h3" />
+      <path d="M3 12a9 9 0 0 1 2.2-5.9" />
+      <path d="M2 9.4 3 12l2.6-1" />
+    </svg>
+  )
+}
+
 export function GlobeIcon({ className }: IconProps) {
   return (
     <svg {...common} aria-hidden className={className}>

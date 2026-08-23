@@ -11,6 +11,7 @@ const es = {
     close: 'Cerrar menú',
     language: 'Idioma',
     skipToContent: 'Saltar al contenido',
+    rotate: 'Gira el móvil para ver la web',
   },
   home: {
     heroLink: 'Ver todos los proyectos',
@@ -35,6 +36,9 @@ const es = {
     next: 'Proyecto siguiente',
     back: 'Proyectos',
     backLong: 'Volver a los proyectos',
+    zoom: 'Ampliar la imagen',
+    backOne: 'Proyecto',
+    backOneLong: 'Volver al proyecto',
   },
   studio: {
     title: 'Estudio',
@@ -100,6 +104,7 @@ const en: Dictionary = {
     close: 'Close menu',
     language: 'Language',
     skipToContent: 'Skip to content',
+    rotate: 'Rotate your phone to browse',
   },
   home: {
     heroLink: 'View all projects',
@@ -124,6 +129,9 @@ const en: Dictionary = {
     next: 'Next project',
     back: 'Projects',
     backLong: 'Back to all projects',
+    zoom: 'Enlarge image',
+    backOne: 'Project',
+    backOneLong: 'Back to the project',
   },
   studio: {
     title: 'Studio',
