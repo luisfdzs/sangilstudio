@@ -61,7 +61,36 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 .DS_Store
+
+# --- Assets maestros de imagen (NUNCA al repo) ---
+# El ZIP (~1,7 GB) y su contenido descomprimido son el ARCHIVO MAESTRO: se guardan
+# en Drive + disco externo, jamás en git. La web sólo versiona los derivados
+# optimizados que genera `npm run images` en public/media/.
 IMAGENES PROYECTOS.zip
 IMAGENES PROYECTOS/
-.vercel/
+LOGO REDES/
+
+# --- Next.js / Vercel ---
+.vercel
+next-env.d.ts
+*.tsbuildinfo
+
+# --- Worktrees de trabajo (locales) ---
+# Cada worktree es una copia de trabajo del propio repo (con su .next y demás):
+# vive en la máquina de cada uno y nunca se versiona.
+.claude/worktrees/
+
+# --- Panel de tipografía (local) ---
+# Lo escribe /api/typelab cada vez que se mueve un control del panel. Es un
+# borrador de trabajo de la máquina de cada uno; lo que se decide acaba en
+# app/globals.css y en los componentes, no aquí.
+typelab.local.json
+
+# --- Migración a Sanity ---
+# Generado por npm run migrate:build a partir de content-snapshot.json.
+scripts/migration/import.ndjson
+# Generado por npm run images. Dejó de versionarse cuando el contenido pasó al panel:
+# las dimensiones y el LQIP los sirve ahora Sanity, no este fichero.
+content/media-manifest.json
+
 .claude/

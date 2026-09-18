@@ -1,0 +1,16 @@
+# Finales de línea normalizados a LF en el repositorio y en la copia de trabajo.
+#
+# Sin esto, en Windows (`core.autocrlf=true`) cada `checkout` convierte los ficheros
+# a CRLF y `npm run check` falla en decenas de ficheros por formato, aunque nadie
+# haya tocado nada. Con `eol=lf` la copia de trabajo también usa LF y Prettier,
+# ESLint y los diffs se comportan igual en Windows, macOS y Linux.
+* text=auto eol=lf
+
+# Binarios: nunca tocar.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.zip binary

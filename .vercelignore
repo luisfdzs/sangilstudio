@@ -1,0 +1,15 @@
+# Qué NO se sube a Vercel al desplegar con el CLI
+# (los despliegues normales vienen de GitHub, pero `vercel deploy` sube desde disco)
+
+# Secretos: las variables se configuran en el panel de Vercel, nunca se suben.
+.env
+.env.*
+
+# Archivo maestro de imágenes: 1,7 GB que no tienen nada que hacer en un build.
+IMAGENES PROYECTOS/
+IMAGENES PROYECTOS.zip
+LOGO REDES/
+
+# Documentación y herramientas que no participan en el build.
+docs/
+.claude/

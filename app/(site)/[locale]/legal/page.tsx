@@ -1,0 +1,54 @@
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { isLocale, locales } from '@/lib/i18n/config'
+import { getDictionary } from '@/lib/i18n/dictionaries'
+import { href } from '@/lib/i18n/routes'
+
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  if (!isLocale(locale)) return {}
+
+  const t = getDictionary(locale)
+  return {
+    title: t.legal.title,
+    alternates: {
+      canonical: href(locale, 'legal'),
+      languages: Object.fromEntries(locales.map((l) => [l, href(l, 'legal')])),
+    },
+  }
+}
+
+export default async function LegalPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  if (!isLocale(locale)) notFound()
+
+  const t = getDictionary(locale)
+
+  return (
+    <div className="page-gutter pt-(--spacing-page-top) pb-(--spacing-section)">
+      <h1 data-t="legalTitle" className="text-display tracking-tight uppercase">
+        {t.legal.title}
+      </h1>
+      <div className="mt-(--spacing-page-lead) grid max-w-2xl gap-10">
+        {t.legal.blocks.map((block) => (
+          <section key={block.heading}>
+            <h2 data-t="legalHeading" className="text-prose">
+              {block.heading}
+            </h2>
+            <p data-t="legalBody" className="mt-3 text-prose whitespace-pre-line text-ink-soft">
+              {block.body}
+            </p>
+          </section>
+        ))}
+      </div>
+    </div>
+  )
+}
