@@ -6,6 +6,7 @@ import { RotateNotice } from '@/components/layout/RotateNotice'
 import { TypeLabOverlay } from '@/components/typelab/TypeLabOverlay'
 import { GALLERY_BOOT_SCRIPT, GALLERY_DEFAULT } from '@/components/ui/GalleryToggle'
 import { site } from '@/content/site'
+import { getSiteSettings } from '@/lib/content'
 import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isIndexable } from '@/lib/site-env'
@@ -74,6 +75,27 @@ export default async function LocaleLayout({
 
   const typedLocale: Locale = locale
   const dictionary = getDictionary(typedLocale)
+  const settings = await getSiteSettings()
+
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfessionalService',
+    '@id': `${site.url}/#organization`,
+    name: site.name,
+    url: settings.website,
+    telephone: settings.phone,
+    email: settings.email,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: settings.street,
+      postalCode: settings.postalCode,
+      addressLocality: settings.city,
+      addressRegion: settings.region[typedLocale],
+      addressCountry: settings.country[typedLocale],
+    },
+    areaServed: [settings.city, settings.region[typedLocale]],
+    sameAs: [settings.instagram, settings.linkedin].filter(Boolean),
+  }
 
   return (
     <html
@@ -84,6 +106,10 @@ export default async function LocaleLayout({
       className={montserrat.variable}
     >
       <body className="flex min-h-svh flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <script dangerouslySetInnerHTML={{ __html: GALLERY_BOOT_SCRIPT }} />
         <Header locale={typedLocale} dictionary={dictionary} />
         <main id="main" className="flex-1">
