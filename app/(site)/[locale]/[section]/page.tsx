@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { ScrollToSection } from '@/components/ui/ScrollToSection'
 import { isLocale, locales } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { sectionFromSegment, sectionKeys, sections } from '@/lib/i18n/routes'
+import { localizedAlternates, sectionFromSegment, sectionKeys, sections } from '@/lib/i18n/routes'
 import { HomeContent } from '../HomeContent'
 
 export function generateStaticParams() {
@@ -21,7 +21,10 @@ export async function generateMetadata({
   const key = sectionFromSegment(section)
   if (!key) return {}
 
-  return { title: getDictionary(locale).nav[key] }
+  return {
+    title: getDictionary(locale).nav[key],
+    alternates: localizedAlternates(locale, key),
+  }
 }
 
 export default async function SectionPage({

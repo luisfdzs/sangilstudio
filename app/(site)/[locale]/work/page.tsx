@@ -4,6 +4,7 @@ import { ProjectSearchGrid } from '@/components/sections/ProjectSearchGrid'
 import { getProjects } from '@/lib/content'
 import { isLocale, locales } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
+import { localizedAlternates } from '@/lib/i18n/routes'
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
@@ -16,7 +17,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params
   if (!isLocale(locale)) return {}
-  return { title: getDictionary(locale).work.title }
+  return {
+    title: getDictionary(locale).work.title,
+    alternates: localizedAlternates(locale, 'work'),
+  }
 }
 
 export default async function WorkPage({ params }: { params: Promise<{ locale: string }> }) {

@@ -6,7 +6,7 @@ import { ProjectViewer } from '@/components/sections/ProjectViewer'
 import { getProject, getProjectSlugs } from '@/lib/content'
 import { isLocale, locales } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { href } from '@/lib/i18n/routes'
+import { href, localizedAlternates } from '@/lib/i18n/routes'
 
 export async function generateStaticParams() {
   const slugs = await getProjectSlugs()
@@ -25,10 +25,7 @@ export async function generateMetadata({
   return {
     title: project.title,
     description: project.summary[locale],
-    alternates: {
-      canonical: href(locale, 'work', slug),
-      languages: Object.fromEntries(locales.map((l) => [l, href(l, 'work', slug)])),
-    },
+    alternates: localizedAlternates(locale, 'work', slug),
     openGraph: {
       title: project.title,
       description: project.summary[locale],

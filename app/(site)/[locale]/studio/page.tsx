@@ -4,7 +4,7 @@ import { Reveal } from '@/components/ui/Reveal'
 import { getSiteSettings } from '@/lib/content'
 import { isLocale, locales } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { href } from '@/lib/i18n/routes'
+import { localizedAlternates } from '@/lib/i18n/routes'
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
@@ -21,10 +21,7 @@ export async function generateMetadata({
   const t = getDictionary(locale)
   return {
     title: t.studio.title,
-    alternates: {
-      canonical: href(locale, 'studio'),
-      languages: Object.fromEntries(locales.map((l) => [l, href(l, 'studio')])),
-    },
+    alternates: localizedAlternates(locale, 'studio'),
   }
 }
 

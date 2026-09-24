@@ -9,6 +9,7 @@ import { site } from '@/content/site'
 import { getSiteSettings } from '@/lib/content'
 import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
+import { localizedAlternates } from '@/lib/i18n/routes'
 import { isIndexable } from '@/lib/site-env'
 import '../../globals.css'
 
@@ -45,10 +46,7 @@ export async function generateMetadata({
     metadataBase: new URL(site.url),
     title: { default: title, template: `%s · ${site.name}` },
     description,
-    alternates: {
-      canonical: `/${locale}`,
-      languages: Object.fromEntries(locales.map((l) => [localeHtmlLang[l], `/${l}`])),
-    },
+    alternates: localizedAlternates(locale, 'home'),
     openGraph: {
       type: 'website',
       siteName: site.name,
@@ -82,6 +80,7 @@ export default async function LocaleLayout({
     '@type': 'ProfessionalService',
     '@id': `${site.url}/#organization`,
     name: site.name,
+    alternateName: 'sangilstudio',
     url: settings.website,
     telephone: settings.phone,
     email: settings.email,

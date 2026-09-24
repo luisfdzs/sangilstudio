@@ -1,4 +1,4 @@
-import type { Locale } from './config'
+import { defaultLocale, locales, localeHtmlLang, type Locale } from './config'
 
 export const routes = {
   home: '',
@@ -29,6 +29,16 @@ export function href(locale: Locale, key: LinkKey, ...segments: string[]): strin
   const base = isSection(key) ? sections[key] : routes[key]
   const parts = [locale, base, ...segments].filter(Boolean)
   return `/${parts.join('/')}`
+}
+
+export function localizedAlternates(locale: Locale, key: LinkKey, ...segments: string[]) {
+  return {
+    canonical: href(locale, key, ...segments),
+    languages: {
+      ...Object.fromEntries(locales.map((l) => [localeHtmlLang[l], href(l, key, ...segments)])),
+      'x-default': href(defaultLocale, key, ...segments),
+    },
+  }
 }
 
 export const navigation = ['work', 'studio', 'contact'] as const satisfies readonly LinkKey[]
