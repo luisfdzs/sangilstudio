@@ -25,7 +25,6 @@ export function ProjectCard({ project, locale, priority = false }: Props) {
             alt={cover.alt[locale]}
             sizes="(max-width: 768px) 100vw, 40vw"
             priority={priority}
-            entrance="settle"
           />
         </div>
 

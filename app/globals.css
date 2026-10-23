@@ -138,18 +138,6 @@ body:has([data-visor]) [data-rotate] {
     filter: opacity(0);
   }
 
-  /* En la cuadrícula de proyectos, además, la foto se asienta: llega un poco grande y se recoge. */
-  .media-settle {
-    transition:
-      filter var(--media-in),
-      scale 1100ms var(--ease-out-soft);
-  }
-
-  .media-settle:not([data-loaded]) {
-    filter: opacity(0);
-    scale: 1.02;
-  }
-
   .gallery {
     display: flex;
     flex-direction: column;

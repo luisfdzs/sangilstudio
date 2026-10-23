@@ -10,19 +10,10 @@ type Props = {
   alt: string
   sizes: string
   priority?: boolean
-  /** Cómo aparece al cargar: un fundido, o un fundido que además se asienta. */
-  entrance?: 'fade' | 'settle'
   className?: string
 }
 
-export function Media({
-  image,
-  alt,
-  sizes,
-  priority = false,
-  entrance = 'fade',
-  className,
-}: Props) {
+export function Media({ image, alt, sizes, priority = false, className }: Props) {
   return (
     <Image
       ref={markIfLoaded}
@@ -35,7 +26,7 @@ export function Media({
       priority={priority}
       loading={priority ? undefined : 'lazy'}
       quality={75}
-      className={cn(entrance === 'settle' ? 'media-settle' : 'media-fade', className)}
+      className={cn('media-fade', className)}
     />
   )
 }
