@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useCallback, useState } from 'react'
 import { StepZone } from '@/components/ui/StepZone'
 import { useArrowKeys } from '@/components/ui/useArrowKeys'
+import { useLoaded } from '@/components/ui/useLoaded'
 import type { ProjectEntry } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -19,6 +20,7 @@ const FADE_MS = 700
 export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) {
   const images = project.images
   const [{ index, reach }, setFrame] = useState({ index: 0, reach: 2 })
+  const { loaded, track } = useLoaded()
 
   const show = useCallback((position: number) => {
     setFrame((current) => {
@@ -49,6 +51,7 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
         {images.slice(0, reach).map((image, position) => (
           <Image
             key={image.id}
+            {...track(image.id)}
             src={image.src}
             alt={image.alt[locale] || project.title}
             fill
@@ -57,15 +60,13 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
             priority={position === 0}
             fetchPriority={position === 0 ? 'high' : 'auto'}
             loading={position === 0 ? undefined : 'lazy'}
-            placeholder="blur"
-            blurDataURL={image.blur}
             draggable={false}
             aria-hidden={position !== index}
             className="will-change-[opacity]"
             style={{
               objectFit: 'contain',
               objectPosition: 'top',
-              opacity: position === index ? 1 : 0,
+              opacity: position === index && loaded.has(image.id) ? 1 : 0,
               transitionProperty: 'opacity',
               transitionDuration: `${FADE_MS}ms`,
               transitionTimingFunction: 'var(--ease-in-out-soft)',
@@ -95,16 +96,16 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
                 }`}
               >
                 <Image
+                  {...track(`thumb-${image.id}`)}
                   src={image.src}
                   alt={image.alt[locale] || project.title}
                   width={image.width}
                   height={image.height}
                   sizes="8rem"
                   quality={70}
-                  placeholder="blur"
-                  blurDataURL={image.blur}
                   draggable={false}
-                  className="h-full w-auto"
+                  data-loaded={loaded.has(`thumb-${image.id}`) || undefined}
+                  className="media-fade h-full w-auto"
                 />
               </button>
             </li>

@@ -123,6 +123,30 @@ body:has([data-visor]) [data-rotate] {
 }
 
 @layer components {
+  /* Las fotos aparecen con un fundido al cargar, el mismo que hay entre fotos. */
+  .media-fade {
+    opacity: 0;
+    transition: opacity 700ms var(--ease-in-out-soft);
+  }
+
+  .media-fade[data-loaded] {
+    opacity: 1;
+  }
+
+  /* En la cuadrícula de proyectos, además, la foto se asienta: llega un poco grande y se recoge. */
+  .media-settle {
+    opacity: 0;
+    scale: 1.02;
+    transition:
+      opacity 700ms var(--ease-in-out-soft),
+      scale 1100ms var(--ease-out-soft);
+  }
+
+  .media-settle[data-loaded] {
+    opacity: 1;
+    scale: 1;
+  }
+
   .gallery {
     display: flex;
     flex-direction: column;

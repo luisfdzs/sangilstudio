@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { StepZone } from '@/components/ui/StepZone'
 import { useArrowKeys } from '@/components/ui/useArrowKeys'
+import { useLoaded } from '@/components/ui/useLoaded'
 import type { DescribedImage } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -33,6 +34,7 @@ export function Hero({
   className,
 }: Props) {
   const [{ index, reach }, setFrame] = useState({ index: 0, reach: 2 })
+  const { loaded, track } = useLoaded()
 
   const step = useCallback(
     (delta: number) => {
@@ -66,6 +68,7 @@ export function Hero({
         {images.slice(0, reach).map((image, position) => (
           <Image
             key={image.id}
+            {...track(image.id)}
             src={image.src}
             alt={position === 0 ? image.alt[locale] : ''}
             aria-hidden={position !== 0}
@@ -75,12 +78,10 @@ export function Hero({
             loading={position === 0 ? undefined : 'lazy'}
             sizes={sizes}
             quality={82}
-            placeholder="blur"
-            blurDataURL={image.blur}
             draggable={false}
             className="object-cover will-change-[opacity]"
             style={{
-              opacity: position === index ? 1 : 0,
+              opacity: position === index && loaded.has(image.id) ? 1 : 0,
               transitionProperty: 'opacity',
               transitionDuration: `${FADE_MS}ms`,
               transitionTimingFunction: 'var(--ease-in-out-soft)',

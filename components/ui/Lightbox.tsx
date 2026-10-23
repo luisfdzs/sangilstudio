@@ -13,6 +13,7 @@ import { createPortal } from 'react-dom'
 import { Chevron } from '@/components/ui/Chevron'
 import { StepZone } from '@/components/ui/StepZone'
 import { useArrowKeys } from '@/components/ui/useArrowKeys'
+import { useLoaded } from '@/components/ui/useLoaded'
 import { cn } from '@/lib/cn'
 import type { DescribedImage } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
@@ -80,6 +81,14 @@ export function Lightbox({ images, locale, title, start, dictionary, onClose }: 
     if (!image) return null
     return document.querySelector<HTMLImageElement>(`[${ZOOM_ATTR}="${image.id}"] img`)
   }
+
+  /**
+   * Las fotos que ya se ven en la página son las mismas que pide el visor, así
+   * que vienen de la caché: no se funden otra vez, sólo hacen el viaje de entrada.
+   */
+  const { loaded, track } = useLoaded(() =>
+    images.filter((_, position) => pageImage(position)?.complete).map((image) => image.id),
+  )
 
   /** Entrada: la foto arranca en su sitio de la página y medio fundida. */
   useLayoutEffect(() => {
@@ -233,6 +242,7 @@ export function Lightbox({ images, locale, title, start, dictionary, onClose }: 
               }}
             >
               <Image
+                {...track(image.id)}
                 src={image.src}
                 alt={labelOf(image)}
                 width={image.width}
@@ -240,10 +250,9 @@ export function Lightbox({ images, locale, title, start, dictionary, onClose }: 
                 sizes="100vw"
                 quality={75}
                 loading={Math.abs(position - start) <= 1 ? 'eager' : 'lazy'}
-                placeholder="blur"
-                blurDataURL={image.blur}
                 draggable={false}
-                className="h-full w-full object-contain"
+                data-loaded={loaded.has(image.id) || undefined}
+                className="media-fade h-full w-full object-contain"
               />
             </div>
           ))}
