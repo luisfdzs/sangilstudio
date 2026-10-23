@@ -17,9 +17,9 @@ export function ProjectCard({ project, locale, priority = false }: Props) {
     <article className="group">
       <Link
         href={href(locale, 'work', project.slug)}
-        className="block"
+        className="block [&_img]:transition-[opacity,filter] [&_img]:duration-500 [&_img]:ease-(--ease-out-soft) group-hover:[&_img]:opacity-80"
       >
-        <div className="gallery-frame transition-opacity duration-500 ease-(--ease-out-soft) group-hover:opacity-80">
+        <div className="gallery-frame">
           <Media
             image={cover}
             alt={cover.alt[locale]}
