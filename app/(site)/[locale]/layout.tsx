@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header'
 import { RotateNotice } from '@/components/layout/RotateNotice'
 import { TypeLabOverlay } from '@/components/typelab/TypeLabOverlay'
 import { GALLERY_BOOT_SCRIPT, GALLERY_DEFAULT } from '@/components/ui/GalleryToggle'
+import { MEDIA_BOOT_SCRIPT } from '@/components/ui/mediaLoad'
 import { site } from '@/content/site'
 import { getSiteSettings } from '@/lib/content'
 import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
@@ -110,6 +111,7 @@ export default async function LocaleLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
         <script dangerouslySetInnerHTML={{ __html: GALLERY_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: MEDIA_BOOT_SCRIPT }} />
         <Header locale={typedLocale} dictionary={dictionary} />
         <main id="main" className="flex-1">
           {children}

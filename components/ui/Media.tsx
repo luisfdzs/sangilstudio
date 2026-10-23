@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useLoaded } from '@/components/ui/useLoaded'
+import { markIfLoaded } from '@/components/ui/mediaLoad'
 import type { DescribedImage } from '@/lib/content'
 import { cn } from '@/lib/cn'
 
@@ -23,11 +23,10 @@ export function Media({
   entrance = 'fade',
   className,
 }: Props) {
-  const { loaded, track } = useLoaded()
-
   return (
     <Image
-      {...track(image.id)}
+      ref={markIfLoaded}
+      suppressHydrationWarning
       src={image.src}
       alt={alt}
       width={image.width}
@@ -36,7 +35,6 @@ export function Media({
       priority={priority}
       loading={priority ? undefined : 'lazy'}
       quality={75}
-      data-loaded={loaded.has(image.id) || undefined}
       className={cn(entrance === 'settle' ? 'media-settle' : 'media-fade', className)}
     />
   )

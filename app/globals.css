@@ -37,6 +37,7 @@
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --media-in: 500ms var(--ease-out-soft);
   --animate-reveal: reveal 0.9s var(--ease-out-soft) both;
 }
 
@@ -123,28 +124,30 @@ body:has([data-visor]) [data-rotate] {
 }
 
 @layer components {
-  /* Las fotos aparecen con un fundido al cargar, el mismo que hay entre fotos. */
+  /*
+   * Las fotos aparecen con un fundido en cuanto terminan de cargar (el atributo
+   * lo pone `MEDIA_BOOT_SCRIPT`). Va por `filter` y no por `opacity` para no
+   * pisar el fundido entre fotos del hero y de los visores, que usa `opacity`.
+   * La curva arranca rápido: la foto se ve enseguida y sólo el final es suave.
+   */
   .media-fade {
-    opacity: 0;
-    transition: opacity 700ms var(--ease-in-out-soft);
+    transition: filter var(--media-in);
   }
 
-  .media-fade[data-loaded] {
-    opacity: 1;
+  .media-fade:not([data-loaded]) {
+    filter: opacity(0);
   }
 
   /* En la cuadrícula de proyectos, además, la foto se asienta: llega un poco grande y se recoge. */
   .media-settle {
-    opacity: 0;
-    scale: 1.02;
     transition:
-      opacity 700ms var(--ease-in-out-soft),
+      filter var(--media-in),
       scale 1100ms var(--ease-out-soft);
   }
 
-  .media-settle[data-loaded] {
-    opacity: 1;
-    scale: 1;
+  .media-settle:not([data-loaded]) {
+    filter: opacity(0);
+    scale: 1.02;
   }
 
   .gallery {

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useCallback, useState } from 'react'
 import { StepZone } from '@/components/ui/StepZone'
 import { useArrowKeys } from '@/components/ui/useArrowKeys'
-import { useLoaded } from '@/components/ui/useLoaded'
+import { markIfLoaded } from '@/components/ui/mediaLoad'
 import type { ProjectEntry } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -20,7 +20,6 @@ const FADE_MS = 700
 export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) {
   const images = project.images
   const [{ index, reach }, setFrame] = useState({ index: 0, reach: 2 })
-  const { loaded, track } = useLoaded()
 
   const show = useCallback((position: number) => {
     setFrame((current) => {
@@ -51,7 +50,8 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
         {images.slice(0, reach).map((image, position) => (
           <Image
             key={image.id}
-            {...track(image.id)}
+            ref={markIfLoaded}
+            suppressHydrationWarning
             src={image.src}
             alt={image.alt[locale] || project.title}
             fill
@@ -62,14 +62,12 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
             loading={position === 0 ? undefined : 'lazy'}
             draggable={false}
             aria-hidden={position !== index}
-            className="will-change-[opacity]"
+            className="media-fade will-change-[opacity]"
             style={{
               objectFit: 'contain',
               objectPosition: 'top',
-              opacity: position === index && loaded.has(image.id) ? 1 : 0,
-              transitionProperty: 'opacity',
-              transitionDuration: `${FADE_MS}ms`,
-              transitionTimingFunction: 'var(--ease-in-out-soft)',
+              opacity: position === index ? 1 : 0,
+              transition: `opacity ${FADE_MS}ms var(--ease-in-out-soft), filter var(--media-in)`,
             }}
           />
         ))}
@@ -96,7 +94,8 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
                 }`}
               >
                 <Image
-                  {...track(`thumb-${image.id}`)}
+                  ref={markIfLoaded}
+                  suppressHydrationWarning
                   src={image.src}
                   alt={image.alt[locale] || project.title}
                   width={image.width}
@@ -104,7 +103,6 @@ export function ProjectViewer({ project, locale, prevLabel, nextLabel }: Props) 
                   sizes="8rem"
                   quality={70}
                   draggable={false}
-                  data-loaded={loaded.has(`thumb-${image.id}`) || undefined}
                   className="media-fade h-full w-auto"
                 />
               </button>
